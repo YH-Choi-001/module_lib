@@ -24,24 +24,9 @@ namespace yh {
                 uint16_t dist_read_mm;
                 // ask the ultrasound to pulse a sound wave
                 void trig_wave ();
-                // ask the ultrasound to pulse a sound wave and wait for echo pin to rise
-                // suitable for using interrupt to collect data
-                // void trig_wave_and_wait ();
                 // functions that load raw data for other functions to further process
                 // !! call trig_wave() method before calling me !!
                 uint16_t raw_uts_by_pulseIn (const unsigned long limiting_time_in_us = 13000U);
-                // interrupt to record and process the time
-                // !! read-only !!
-                // do not use this function directly as it is completely wrong from the beginning
-                // void int_2_coll_echo_data_template ();
-                // functions that load raw data for other functions to further process
-                // attaches an interrupt to the echo pin, to allow processing other data
-                // while waiting for the returning sound wave to come back
-                // !! only available for pins that are declared able to run hardware interrupts !!
-                // inline void attach_data_collecting_method_to_interrupt ();
-                // detaches the ISR that has been attached in attach_data_collecting_method_to_interrupt()
-                // !! only available for pins that are declared able to run hardware interrupts !!
-                // inline void detach_data_collecting_method_to_interrupt ();
             public:
                 Hc_sr04 (const Hc_sr04 &init_obj);
                 // inits both trigger pin and echo pin with one argument only
