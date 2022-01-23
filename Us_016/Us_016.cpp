@@ -37,8 +37,10 @@ uint16_t yh::rec::Us_016::raw_uts () {
 }
 
 inline void yh::rec::Us_016::refresh_range_pin () {
-    if (is_resolution_3m) (*range_pin_output_port) |= range_pin_mask; // digitalWrite(range_pin, HIGH);
-    else (*range_pin_output_port) &= ~range_pin_mask; // digitalWrite(range_pin, LOW);
+    if (is_resolution_3m)
+        (*range_pin_output_port) |= range_pin_mask; // this line replaces digitalWrite(range_pin, HIGH);
+    else
+        (*range_pin_output_port) &= ~range_pin_mask; // this line replaces digitalWrite(range_pin, LOW);
 }
 
 inline void yh::rec::Us_016::begin () {
