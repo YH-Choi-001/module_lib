@@ -50,7 +50,9 @@ uint16_t yh::rec::Hc_sr04::raw_uts_by_pulseIn (const unsigned long limiting_time
     // set trig_pin high for 10 ms
     // set trig_pin low
     // read the length of high pulse on echo pin with arduino built-in function pulseIn()
-    const unsigned long duration_in_us = pulseIn(echo_pin, HIGH, limiting_time_in_us);
+    // duration_in_us * 0.17 < 3036 mm
+    // duration_in_us < 17858.823
+    const unsigned long duration_in_us = pulseIn(echo_pin, HIGH, limiting_time_in_us > 17858 ? 17858 : limiting_time_in_us);
     dist_read_mm = (duration_in_us ? duration_in_us * 0.17 : 8888); // duration_in_us* 0.17 is from duration_in_us * 0.034 / 2, then because using mm, * 10
     if (dist_read_mm > 4000) dist_read_mm = 8888;
     return dist_read_mm;
