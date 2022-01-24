@@ -268,14 +268,16 @@ double yh::rec::Gy_521::cal_gyro_y () {
 
 double yh::rec::Gy_521::cal_gyro_z () {
     unsigned long time_spent = 0;
-    unsigned long prev_log_time = millis();
     double cal_val = 0;
+    unsigned long prev_log_time = millis();
     for (uint16_t i = 0; i < 2048; i++) {
         unsigned long time_diff = millis() - prev_log_time;
         // cal_val += get_gyro_z() * time_diff;
         // time_spent += time_diff;
         // cal_val += get_gyro_z();
-        cal_val = (cal_val * i + get_gyro_z() / time_diff);
+
+        // cal_val = (cal_val * i + get_gyro_z() / time_diff);
+        cal_val += get_gyro_z() * time_diff / 1000.0;
         prev_log_time += time_diff;
     }
     // return gyro_z_corr = cal_val / time_spent;
