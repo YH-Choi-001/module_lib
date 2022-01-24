@@ -54,7 +54,7 @@ uint16_t yh::rec::Hc_sr04::raw_uts_by_pulseIn (const unsigned long limiting_time
     // duration_in_us < 17858.823
     const unsigned long duration_in_us = pulseIn(echo_pin, HIGH, limiting_time_in_us > 17858 ? 17858 : limiting_time_in_us);
     dist_read_mm = (duration_in_us ? duration_in_us * 0.17 : 8888); // duration_in_us* 0.17 is from duration_in_us * 0.034 / 2, then because using mm, * 10
-    if (dist_read_mm > 4000) dist_read_mm = 8888;
+    // if (dist_read_mm > 4000) dist_read_mm = 8888;
     return dist_read_mm;
 }
 
