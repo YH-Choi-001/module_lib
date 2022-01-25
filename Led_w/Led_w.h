@@ -27,12 +27,16 @@ namespace yh {
                 virtual void led_off ();
                 // set the led on or off
                 virtual void set_led (const bool assign_led_state);
+                // toggle the led to the inverse state
+                void toggle_led ();
+                // returns the state of the led
+                bool led_state ();
         };
         class Led_w : public Led_w_fast {
             private:
                 //
             protected:
-                bool led_state;
+                //
             public:
                 // inits the white led pin to the argument
                 Led_w (const uint8_t init_led_w_pin);
@@ -42,8 +46,6 @@ namespace yh {
                 void led_off ();
                 // set the led on or off
                 void set_led (const bool assign_led_state);
-                // toggle the led to the inverse state
-                void toggle_led ();
         };
     }
 }

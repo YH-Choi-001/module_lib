@@ -27,6 +27,14 @@ void yh::rec::Led_w_fast::set_led (const bool assign_led_state) {
     assign_led_state ? ((*led_w_pin_output_port) |= led_w_pin_mask) : ((*led_w_pin_output_port) &= ~led_w_pin_mask);
 }
 
+void yh::rec::Led_w_fast::toggle_led () {
+    ((*led_w_pin_output_port) & led_w_pin_mask) ? ((*led_w_pin_output_port) &= ~led_w_pin_mask) : ((*led_w_pin_output_port) |= led_w_pin_mask);
+}
+
+bool yh::rec::Led_w_fast::led_state () {
+    return ((*led_w_pin_output_port) & led_w_pin_mask) ? 1 : 0;
+}
+
 yh::rec::Led_w::Led_w (const uint8_t init_led_w_pin) :
 Led_w_fast(init_led_w_pin)
 {
@@ -50,13 +58,9 @@ void yh::rec::Led_w::set_led (const bool assign_led_state) {
     //    0    1 => turn_on
     //    1    0 => turn_off
     //    1    1 => nothing
-    const bool curr_state = ((*led_w_pin_output_port) & led_w_pin_mask)?1:0;
+    const bool curr_state = led_state();
     if ((assign_led_state?1:0) ^ curr_state)
         curr_state ? ((*led_w_pin_output_port) &= ~led_w_pin_mask) : ((*led_w_pin_output_port) |= led_w_pin_mask);
-}
-
-void yh::rec::Led_w::toggle_led () {
-    ((*led_w_pin_output_port) & led_w_pin_mask) ? ((*led_w_pin_output_port) &= ~led_w_pin_mask) : ((*led_w_pin_output_port) |= led_w_pin_mask);
 }
 
 #endif // #ifndef LED_W_CPP
