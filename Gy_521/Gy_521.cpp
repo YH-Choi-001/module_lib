@@ -295,7 +295,7 @@ void yh::rec::Gy_521::get_raw_accel_temp_gyro () {
         raw_accel_x = (static_cast<uint16_t>(temp_buf[0]) << 8)  | temp_buf[1];
         raw_accel_y = (static_cast<uint16_t>(temp_buf[2]) << 8)  | temp_buf[3];
         raw_accel_z = (static_cast<uint16_t>(temp_buf[4]) << 8)  | temp_buf[5];
-        temp    = (static_cast<uint16_t>(temp_buf[6]) << 8)  | temp_buf[7];
+        temp        = (static_cast<uint16_t>(temp_buf[6]) << 8)  | temp_buf[7];
         raw_gyro_x  = (static_cast<uint16_t>(temp_buf[8]) << 8)  | temp_buf[9];
         raw_gyro_y  = (static_cast<uint16_t>(temp_buf[10]) << 8) | temp_buf[11];
         raw_gyro_z  = (static_cast<uint16_t>(temp_buf[12]) << 8) | temp_buf[13];
