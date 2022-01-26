@@ -12,11 +12,12 @@ namespace yh {
                 //
             protected:
                 // pins that cannot be changed:
+                // the pin connected to the led
                 const uint8_t led_w_pin;
                 uint8_t led_w_pin_mask;
                 volatile uint8_t *led_w_pin_output_port;
             public:
-                // inits the white led pin to the argument
+                // inits the white led pin to the object
                 Led_w_fast (const uint8_t init_led_w_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
@@ -38,7 +39,7 @@ namespace yh {
             protected:
                 //
             public:
-                // inits the white led pin to the argument
+                // inits the white led pin to the object
                 Led_w (const uint8_t init_led_w_pin);
                 // turn on the led
                 void led_on ();
@@ -46,6 +47,30 @@ namespace yh {
                 void led_off ();
                 // set the led on or off
                 void set_led (const bool assign_led_state);
+        };
+        // This class uses analogWrite(pin, val) function,
+        // which allows varying brightness of the led.
+        // note 1: only analog pins and pwm pins are able to use this class
+        // note 2: analogWrite(...) is very slow
+        class Led_w_analog {
+            private:
+                //
+            protected:
+                // pins that cannot be changed:
+                // the pin connected to the led
+                const uint8_t led_w_pin;
+                // the brightness of the led
+                uint8_t led_brightness;
+            public:
+                // inits the white led pin to the object
+                Led_w_analog (const uint8_t init_led_w_pin);
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // calls pinMode function and config the pin modes
+                inline void begin ();
+                // set the brightness of the led
+                void set_led (const uint8_t assign_led_brightness);
+                // returns the brightness of the led
+                uint8_t get_led_brightness ();
         };
     }
 }

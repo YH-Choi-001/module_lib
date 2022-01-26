@@ -63,4 +63,22 @@ void yh::rec::Led_w::set_led (const bool assign_led_state) {
         curr_state ? ((*led_w_pin_output_port) &= ~led_w_pin_mask) : ((*led_w_pin_output_port) |= led_w_pin_mask);
 }
 
+yh::rec::Led_w_analog::Led_w_analog (const uint8_t init_led_w_pin) :
+    led_w_pin(init_led_w_pin), led_brightness(0)
+{
+    //
+}
+
+inline void yh::rec::Led_w_analog::begin () {
+    pinMode(led_w_pin, OUTPUT);
+}
+
+void yh::rec::Led_w_analog::set_led (const uint8_t assign_led_brightness) {
+    analogWrite(led_w_pin, led_brightness = assign_led_brightness);
+}
+
+uint8_t yh::rec::Led_w_analog::get_led_brightness () {
+    return led_brightness;
+}
+
 #endif // #ifndef LED_W_CPP
