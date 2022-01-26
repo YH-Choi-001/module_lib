@@ -42,10 +42,13 @@ namespace yh {
                 // inits the white led pin to the object
                 Led_w (const uint8_t init_led_w_pin);
                 // turn on the led
+                // to override Led_w_fast::led_on()
                 void led_on ();
                 // turn off the led
+                // to override Led_w_fast::led_off()
                 void led_off ();
                 // set the led on or off
+                // to override Led_w_fast::set_led()
                 void set_led (const bool assign_led_state);
         };
         // This class uses analogWrite(pin, val) function,

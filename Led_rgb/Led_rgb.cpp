@@ -5,6 +5,7 @@
 
 #define LED_ON(x) ((*led_##x##_pin_output_port)|=led_##x##_pin_mask)
 #define LED_OFF(x) ((*led_##x##_pin_output_port)&=(~led_##x##_pin_mask))
+#define LED_TOGGLE(x) ((*led_##x##_pin_output_port)^=led_##x##_pin_mask)
 #define LED_STATE(x) ((*led_##x##_pin_output_port)&led_##x##_pin_mask)
 
 yh::rec::Led_rgb_fast::Led_rgb_fast (const Led_rgb_fast &init_obj) :
@@ -45,7 +46,7 @@ ON_OFF(r) ON_OFF(g) ON_OFF(b)
 SET(r) SET(g) SET(b)
 #undef SET
 
-#define TOGGLE(x) void yh::rec::Led_rgb_fast::toggle_##x##() {LED_STATE(x)?LED_OFF(x):LED_ON(x);}
+#define TOGGLE(x) void yh::rec::Led_rgb_fast::toggle_##x##() {LED_TOGGLE(x);}
 TOGGLE(r) TOGGLE(g) TOGGLE(b)
 #undef TOGGLE
 
