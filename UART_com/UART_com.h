@@ -96,7 +96,7 @@ namespace yh {
                 UART_com (Serial_ &init_serial_obj);
                 // calls uart_serial.begin(baud) and sets the baud rate
                 inline void begin (const uint32_t baud);
-                // returns the who_am_i value of the board
+                // returns the who_am_i value of the replying arduino
                 uint8_t get_who_am_i ();
 
                 // motors:
