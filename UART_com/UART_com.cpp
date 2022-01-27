@@ -11,6 +11,12 @@ yh::rec::UART_com::UART_com (Serial_ &init_serial_obj) :
 
 inline void yh::rec::UART_com::begin (const uint32_t baud) {
     uart_serial.begin(baud);
+    const uint8_t who_am_i = get_who_am_i();
+    who_am_i_error = ((who_am_i < 030) || (who_am_i > 037)); // checks if the who_am_i value is 03X
+}
+
+uint8_t yh::rec::UART_com::get_who_am_i () {
+    return request_data(WHO_AM_I);
 }
 
 // ===================================================================================
@@ -73,6 +79,30 @@ uint16_t yh::rec::UART_com::request_2_data (const uint8_t key, const unsigned lo
         }
     }
     return (uart_serial.read() << 8) | uart_serial.read();
+}
+
+// ===================================================================================
+// ====================================== motor ======================================
+// ===================================================================================
+
+void yh::rec::UART_com::set_motor_direction (const uint8_t direction) {
+    write_data(SET_MOTOR_DIR, direction);
+}
+
+void yh::rec::UART_com::set_motor_0_spd (const uint8_t direction) {
+    write_data(MOTOR_0_SPD, direction);
+}
+
+void yh::rec::UART_com::set_motor_1_spd (const uint8_t direction) {
+    write_data(MOTOR_1_SPD, direction);
+}
+
+void yh::rec::UART_com::set_motor_2_spd (const uint8_t direction) {
+    write_data(MOTOR_2_SPD, direction);
+}
+
+void yh::rec::UART_com::set_motor_3_spd (const uint8_t direction) {
+    write_data(MOTOR_3_SPD, direction);
 }
 
 // ===================================================================================
@@ -196,7 +226,7 @@ uint16_t yh::rec::UART_com::compass_9bit () {
 }
 
 void yh::rec::UART_com::reset_compass () {
-    write_data(RST_CMPAS_0);
+    write_key(RST_CMPAS_0);
 }
 
 void yh::rec::UART_com::set_compass_direction (const uint16_t direction) {

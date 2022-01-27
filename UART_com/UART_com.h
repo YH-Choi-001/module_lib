@@ -43,6 +43,12 @@ namespace yh {
             SUN_DIR_L      = 'e', // the direction of the strongest ball (Sun) LOW byte
             SUN_VAL_L      = 'f', // the intensity of the strongest ball (Sun) LOW byte
             CAL_GRYSCL     = 'g', // request calibrate grayscales
+            SET_MOTOR_DIR  = 'o', // set the direction of the motor
+            MOTOR_0_SPD    = 'p', // set the speed of motor 0
+            MOTOR_1_SPD    = 'q', // set the speed of motor 1
+            MOTOR_2_SPD    = 'r', // set the speed of motor 2
+            MOTOR_3_SPD    = 's', // set the speed of motor 3
+            WHO_AM_I       = 0x75,// get the identity of the replying arduino
             UTS0_L         = 'w', // ultrasound 0 LOW byte
             UTS1_L         = 'x', // ultrasound 1 LOW byte
             UTS2_L         = 'y', // ultrasound 2 LOW byte
@@ -81,6 +87,8 @@ namespace yh {
                 uint16_t request_2_data (const uint8_t key, const unsigned long timeout);
                 // flag to indicate if request_data(..., timeout) or request_2_data(..., timeout) has occured a time-out
                 unsigned int request_timeout : 1;
+                // flag to indicate if the replying arduino's who_am_i value is accepted
+                unsigned int who_am_i_error : 1;
             public:
                 // inits the object of UART serial communication to this object
                 // can be Serial, Serial1, Serial2, Serial3 for arduino mega boards
@@ -88,14 +96,31 @@ namespace yh {
                 UART_com (Serial_ &init_serial_obj);
                 // calls uart_serial.begin(baud) and sets the baud rate
                 inline void begin (const uint32_t baud);
+                // returns the who_am_i value of the board
+                uint8_t get_who_am_i ();
+
+                // motors:
+
+                // (c0 d0 c1 d1 c2 d2 c3 d3)
+                // cN flag indicates if the direction needs to be updated
+                // dN flag indicates +ive or -ive direction of motor
+                void set_motor_direction (const uint8_t direction);
+                // set the speed of motor 0
+                void set_motor_0_spd (const uint8_t absolute_spd);
+                // set the speed of motor 1
+                void set_motor_1_spd (const uint8_t absolute_spd);
+                // set the speed of motor 2
+                void set_motor_2_spd (const uint8_t absolute_spd);
+                // set the speed of motor 3
+                void set_motor_3_spd (const uint8_t absolute_spd);
 
                 // grayscales:
 
                 // returns if grayscales of (F, LF, L, LB, RF, R, RB, B) direction are touching the white line
                 uint8_t grayscales_8_sides_touch_white ();
-                // returns if grayscales of L0, L1, L2, L3, R0, R1, R2, R3 are touching the white line
+                // returns if grayscales of (L0, L1, L2, L3, R0, R1, R2, R3) are touching the white line
                 uint8_t hori_grayscales_touch_white ();
-                // returns if grayscales of F0, F1, F2, F3, B0, B1, B2, B3 are touching the white line
+                // returns if grayscales of (F0, F1, F2, F3, B0, B1, B2, B3) are touching the white line
                 uint8_t vert_grayscales_touch_white ();
                 // holds the thread and waits for the calibration of grayscales to be completed
                 void request_calibrate_grayscales ();
