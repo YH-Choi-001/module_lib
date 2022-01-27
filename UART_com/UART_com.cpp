@@ -92,7 +92,7 @@ uint8_t yh::rec::UART_com::vert_grayscales_touch_white () {
 }
 
 void yh::rec::UART_com::request_calibrate_grayscales () {
-    write_key(CAL_GRYSCL);
+    request_data(CAL_GRYSCL, 30000000U);
 }
 
 // ===================================================================================
