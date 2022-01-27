@@ -241,4 +241,119 @@ void yh::rec::UART_com::set_dribbler_spd (const int8_t spd) {
     write_data(DRBLR_SPD, spd);
 }
 
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+// -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
+
+yh::rec::UART_com_slave::UART_com_slave (Serial_ &init_serial_obj) :
+    uart_serial(init_serial_obj), who_am_i('3')
+{
+    //
+}
+
+inline void yh::rec::UART_com_slave::begin (const uint32_t baud) {
+    uart_serial.begin(baud);
+}
+
+void yh::rec::UART_com_slave::write_data (const uint8_t data) {
+    uart_serial.write(data);
+}
+
+void yh::rec::UART_com_slave::write_2_data (const uint16_t data) {
+    uart_serial.write(data >> 8);
+    uart_serial.write(data & 0xff);
+}
+
+void yh::rec::UART_com_slave::serial_received_key () {
+    switch (uart_serial.read()) {
+        // grayscales
+        case GRYSCL_8_DIR:
+            break;
+        case HORI_GRYSCL:
+            break;
+        case VERT_GRYSCL:
+            break;
+        // compass
+        case CMPAS_H:
+            break;
+        case CMPAS_9:
+            break;
+        case CMPAS_L:
+            break;
+        // compoundeyes
+        case SUN_DIR_H:
+            break;
+        case SUN_VAL_H:
+            break;
+        case SUN_DIR_L:
+            break;
+        case SUN_VAL_L:
+            break;
+        // ultrasounds
+        case FB_UTS_H:
+            break;
+        case UTS0_H:
+            break;
+        case UTS1_H:
+            break;
+        case UTS2_H:
+            break;
+        case UTS3_H:
+            break;
+        case FB_UTS_9:
+            break;
+        case UTS0_9:
+            break;
+        case UTS1_9:
+            break;
+        case UTS2_9:
+            break;
+        case UTS3_9:
+            break;
+        case FB_UTS_L:
+            break;
+        case UTS0_L:
+            break;
+        case UTS1_L:
+            break;
+        case UTS2_L:
+            break;
+        case UTS3_L:
+            break;
+        // motors
+        case SET_MOTOR_DIR:
+            break;
+        case MOTOR_0_SPD:
+            break;
+        case MOTOR_1_SPD:
+            break;
+        case MOTOR_2_SPD:
+            break;
+        case MOTOR_3_SPD:
+            break;
+        // dribbler
+        case DRBLR_SPD:
+            break;
+        // calibrate grayscale
+        case CAL_GRYSCL:
+            break;
+        // reset compass to 0
+        case RST_CMPAS_0:
+            break;
+        // set compass
+        case SET_CMPAS:
+            break;
+        // who am I
+        case WHO_AM_I:
+            break;
+    }
+}
+
 #endif // #ifndef UART_COM_CPP

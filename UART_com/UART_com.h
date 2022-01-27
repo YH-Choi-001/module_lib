@@ -54,16 +54,17 @@ namespace yh {
             UTS2_L         = 'y', // ultrasound 2 LOW byte
             UTS3_L         = 'z'  // ultrasound 3 LOW byte
             // the priority of returning data from replying arduino:
-                // 0. grayscale // should not access grayscale through UART, but digital pins
+                // 0. grayscale   (8-DIR > HORI > VERT) // should not access grayscale through UART, but digital pins
                 // 1. compass     (HIGH > 9-bit > LOW)
                 // 2. compoundeye (HIGH > LOW)
                 // 3. ultrasound  (HIGH > 9-bit > LOW)
             // then the priority of configuring data in replying aruino:
-                // 4. set motor speed
+                // 4. set motor dir and speed
                 // 5. set dribbler speed
                 // 6. calibrate grayscale
                 // 7. software reset compass
                 // 8. software set compass direction
+                // 9. return WHO_AM_I
         };
         class UART_com {
             private:
@@ -187,6 +188,28 @@ namespace yh {
 
                 // sets the speed of the dribbler to (clockwise or anti-clockwise with full-power) or (0)
                 void set_dribbler_spd (const int8_t spd);
+        };
+        class UART_com_slave {
+            private:
+                //
+            protected:
+                // the selected UART serial object
+                Serial_ &uart_serial;
+                // who am I ? (as a slave)
+                const uint8_t who_am_i;
+            public:
+                // inits the object of UART serial communication to this object
+                // can be Serial, Serial1, Serial2, Serial3 for arduino mega boards
+                // depends on which UART you have connected to
+                UART_com_slave (Serial_ &init_serial_obj);
+                // calls uart_serial.begin(baud) and sets the baud rate
+                inline void begin (const uint32_t baud);
+                // writes a byte to main arduino
+                void write_data (const uint8_t data);
+                // writes 2 bytes to main arduino
+                void write_2_data (const uint16_t data);
+                // this method is just here to let you know how should you write your SerialNEvent()
+                void serial_received_key ();
         };
     }
 }
