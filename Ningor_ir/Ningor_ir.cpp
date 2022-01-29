@@ -60,14 +60,22 @@ uint16_t yh::rec::Ningor_ir_fast::get_ball_direction () {
     LOGIC_CHECK(4)LOGIC_CHECK(5)LOGIC_CHECK(6)LOGIC_CHECK(7)
     LOGIC_CHECK(8)LOGIC_CHECK(9)LOGIC_CHECK(10)LOGIC_CHECK(11)
     #undef LOGIC_CHECK
-    const uint16_t
+    // const uint16_t
+    //     &right = eyes_val[(max_idx != 11) * (max_idx + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
+    //     &left = eyes_val[max_idx ? (max_idx - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
+    // const uint16_t dir_of_ball = 30 * max_idx +
+    //     15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
+    //     * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
+    //     / ( max_val - ((left < right) ? left : right) ); // the difference of max and (lower one between left and right)
+    // return (dir_of_ball < 0) ? (dir_of_ball + 360) : dir_of_ball;
+    const int16_t
         &right = eyes_val[(max_idx != 11) * (max_idx + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
         &left = eyes_val[max_idx ? (max_idx - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
-    const uint16_t dir_of_ball = 30 * max_idx +
+    const int16_t fake_dir_of_ball = 30 * max_idx +
         15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
         * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
         / ( max_val - ((left < right) ? left : right) ); // the difference of max and (lower one between left and right)
-    return (dir_of_ball < 0) ? (dir_of_ball + 360) : dir_of_ball;
+        return (fake_dir_of_ball < 0) ? (fake_dir_of_ball + 360) : fake_dir_of_ball;
 }
 
 yh::rec::Ningor_ir::Ningor_ir (const uint8_t *arr) :
@@ -120,14 +128,14 @@ uint16_t yh::rec::Ningor_ir::get_ball_direction () {
     // which is very mature,
     // is presented below.
     refresh_eyes();
-    const uint16_t
+    const int16_t
         &right = eyes_reading[(eye_no_of_max_eye != 11) * (eye_no_of_max_eye + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
         &left = eyes_reading[eye_no_of_max_eye ? (eye_no_of_max_eye - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
-    dir_of_ball = 30 * eye_no_of_max_eye +
+    const int16_t fake_dir_of_ball = 30 * eye_no_of_max_eye +
         15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
         * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
         / ( eyes_reading[eye_no_of_max_eye] - ((left < right) ? left : right) ); // the difference of max and (lower one between left and right)
-    if (dir_of_ball < 0) dir_of_ball += 360;
+        dir_of_ball = (fake_dir_of_ball < 0) ? (fake_dir_of_ball + 360) : fake_dir_of_ball;
     return dir_of_ball;
 }
 
@@ -137,14 +145,14 @@ uint16_t yh::rec::Ningor_ir::get_ball_direction (const bool refresh) {
     // is presented below.
     if (refresh) {
         refresh_eyes();
-        const uint16_t
+        const int16_t
             &right = eyes_reading[(eye_no_of_max_eye != 11) * (eye_no_of_max_eye + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
             &left = eyes_reading[eye_no_of_max_eye ? (eye_no_of_max_eye - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
-        dir_of_ball = 30 * eye_no_of_max_eye +
+        const int16_t fake_dir_of_ball = 30 * eye_no_of_max_eye +
             15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
             * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
             / ( eyes_reading[eye_no_of_max_eye] - ((left < right) ? left : right) ); // the difference of max and (lower one between left and right)
-        if (dir_of_ball < 0) dir_of_ball += 360;
+            dir_of_ball = (fake_dir_of_ball < 0) ? (fake_dir_of_ball + 360) : fake_dir_of_ball;
     }
     return dir_of_ball;
 }
