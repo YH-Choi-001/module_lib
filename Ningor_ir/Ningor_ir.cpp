@@ -231,11 +231,11 @@ uint16_t yh::rec::Ningor_ir_filtered::get_ball_direction_filtered () {
     const uint16_t
         &right = eyes_reading_filtered[(eye_no_of_max_eye_filtered != 11) * (eye_no_of_max_eye_filtered + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
         &left = eyes_reading_filtered[eye_no_of_max_eye_filtered ? (eye_no_of_max_eye_filtered - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
-    dir_of_ball_filtered = 30 * eye_no_of_max_eye_filtered +
+    const int16_t fake_dir_of_ball_filtered = 30 * eye_no_of_max_eye_filtered +
         15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
         * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
         / ( eyes_reading_filtered[eye_no_of_max_eye_filtered] - ((left < right) ? left : right) ); // the difference of max and (lower one between left and right)
-    if (dir_of_ball_filtered < 0) dir_of_ball_filtered += 360;
+        dir_of_ball_filtered = (fake_dir_of_ball_filtered < 0) ? (fake_dir_of_ball_filtered + 360) : fake_dir_of_ball_filtered;
     return dir_of_ball_filtered;
 }
 
@@ -248,11 +248,11 @@ uint16_t yh::rec::Ningor_ir_filtered::get_ball_direction_filtered (const bool re
         const uint16_t
             &right = eyes_reading_filtered[(eye_no_of_max_eye_filtered != 11) * (eye_no_of_max_eye_filtered + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
             &left = eyes_reading_filtered[eye_no_of_max_eye_filtered ? (eye_no_of_max_eye_filtered - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
-        dir_of_ball_filtered = 30 * eye_no_of_max_eye_filtered +
+        const int16_t fake_dir_of_ball_filtered = 30 * eye_no_of_max_eye_filtered +
             15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
             * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
             / ( eyes_reading_filtered[eye_no_of_max_eye_filtered] - ((left < right) ? left : right) ); // the difference of max and (lower one between left and right)
-        if (dir_of_ball_filtered < 0) dir_of_ball_filtered += 360;
+            dir_of_ball_filtered = (fake_dir_of_ball_filtered < 0) ? (fake_dir_of_ball_filtered + 360) : fake_dir_of_ball_filtered;
     }
     return dir_of_ball_filtered;
 }
