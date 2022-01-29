@@ -69,8 +69,8 @@ uint16_t yh::rec::Ningor_ir_fast::get_ball_direction () {
     //     / ( max_val - ((left < right) ? left : right) ); // the difference of max and (lower one between left and right)
     // return (dir_of_ball < 0) ? (dir_of_ball + 360) : dir_of_ball;
     const int16_t
-        &right = eyes_val[(max_idx != 11) * (max_idx + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
-        &left = eyes_val[max_idx ? (max_idx - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
+        right = eyes_val[(max_idx != 11) * (max_idx + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
+        left = eyes_val[max_idx ? (max_idx - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
     const int16_t fake_dir_of_ball = 30 * max_idx +
         15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
         * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
@@ -129,8 +129,8 @@ uint16_t yh::rec::Ningor_ir::get_ball_direction () {
     // is presented below.
     refresh_eyes();
     const int16_t
-        &right = eyes_reading[(eye_no_of_max_eye != 11) * (eye_no_of_max_eye + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
-        &left = eyes_reading[eye_no_of_max_eye ? (eye_no_of_max_eye - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
+        right = eyes_reading[(eye_no_of_max_eye != 11) * (eye_no_of_max_eye + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
+        left = eyes_reading[eye_no_of_max_eye ? (eye_no_of_max_eye - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
     const int16_t fake_dir_of_ball = 30 * eye_no_of_max_eye +
         15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
         * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
@@ -146,8 +146,8 @@ uint16_t yh::rec::Ningor_ir::get_ball_direction (const bool refresh) {
     if (refresh) {
         refresh_eyes();
         const int16_t
-            &right = eyes_reading[(eye_no_of_max_eye != 11) * (eye_no_of_max_eye + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
-            &left = eyes_reading[eye_no_of_max_eye ? (eye_no_of_max_eye - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
+            right = eyes_reading[(eye_no_of_max_eye != 11) * (eye_no_of_max_eye + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
+            left = eyes_reading[eye_no_of_max_eye ? (eye_no_of_max_eye - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
         const int16_t fake_dir_of_ball = 30 * eye_no_of_max_eye +
             15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
             * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
@@ -228,9 +228,9 @@ uint16_t yh::rec::Ningor_ir_filtered::get_ball_direction_filtered () {
     // which is very mature,
     // is presented below.
     refresh_eyes_filtered();
-    const uint16_t
-        &right = eyes_reading_filtered[(eye_no_of_max_eye_filtered != 11) * (eye_no_of_max_eye_filtered + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
-        &left = eyes_reading_filtered[eye_no_of_max_eye_filtered ? (eye_no_of_max_eye_filtered - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
+    const int16_t
+        right = eyes_reading_filtered[(eye_no_of_max_eye_filtered != 11) * (eye_no_of_max_eye_filtered + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
+        left = eyes_reading_filtered[eye_no_of_max_eye_filtered ? (eye_no_of_max_eye_filtered - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
     const int16_t fake_dir_of_ball_filtered = 30 * eye_no_of_max_eye_filtered +
         15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
         * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
@@ -245,9 +245,9 @@ uint16_t yh::rec::Ningor_ir_filtered::get_ball_direction_filtered (const bool re
     // is presented below.
     if (refresh) {
         refresh_eyes_filtered();
-        const uint16_t
-            &right = eyes_reading_filtered[(eye_no_of_max_eye_filtered != 11) * (eye_no_of_max_eye_filtered + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
-            &left = eyes_reading_filtered[eye_no_of_max_eye_filtered ? (eye_no_of_max_eye_filtered - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
+        const int16_t
+            right = eyes_reading_filtered[(eye_no_of_max_eye_filtered != 11) * (eye_no_of_max_eye_filtered + 1)], // (eye_no_of_max_eye == 11) ? 0 : (eye_no_of_max_eye + 1)
+            left = eyes_reading_filtered[eye_no_of_max_eye_filtered ? (eye_no_of_max_eye_filtered - 1) : 11];     // (eye_no_of_max_eye == 0) ? 11 : (eye_no_of_max_eye - 1)
         const int16_t fake_dir_of_ball_filtered = 30 * eye_no_of_max_eye_filtered +
             15 // magnifies the difference of 2 eyes in fraction to +/- 15 degrees
             * (right - left) // this difference automatically turns the offset to -ive when the ball bears left, but +ive when the ball bears right of max_eye
