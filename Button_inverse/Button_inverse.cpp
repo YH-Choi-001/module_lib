@@ -7,7 +7,7 @@ yh::rec::Button_inverse_fast::Button_inverse_fast (const uint8_t init_read_butto
     read_button_pin(init_read_button_pin)
 {
     read_button_pin_mask = digitalPinToBitMask(read_button_pin);
-    read_button_pin_input_port = (portOutputRegister(digitalPinToPort(read_button_pin)));
+    read_button_pin_input_port = (portInputRegister(digitalPinToPort(read_button_pin)));
 }
 
 inline void yh::rec::Button_inverse_fast::begin () {
