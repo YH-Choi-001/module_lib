@@ -1,0 +1,24 @@
+yh		KEYWORD1
+rec		KEYWORD1
+Led_rgb_fast	KEYWORD1
+Led_rgb_analog	KEYWORD1
+
+begin		KEYWORD2
+r_on		KEYWORD2
+r_off		KEYWORD2
+g_on		KEYWORD2
+b_on		KEYWORD2
+b_off		KEYWORD2
+set_r		KEYWORD2
+set_g		KEYWORD2
+set_b		KEYWORD2
+toggle_r	KEYWORD2
+toggle_g	KEYWORD2
+toggle_b	KEYWORD2
+r_state		KEYWORD2
+g_state		KEYWORD2
+b_state		KEYWORD2
+set_rgb		KEYWORD2
+get_r_brightness	KEYWORD2
+get_g_brightness	KEYWORD2
+get_b_brightness	KEYWORD2

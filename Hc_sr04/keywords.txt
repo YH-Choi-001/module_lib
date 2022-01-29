@@ -1,0 +1,7 @@
+yh		KEYWORD1
+rec		KEYWORD1
+Hc_sr04		KEYWORD1
+
+begin		KEYWORD2
+read_dist_mm	KEYWORD2
+read_dist_cm	KEYWORD2

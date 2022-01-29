@@ -1,0 +1,15 @@
+yh		KEYWORD1
+rec		KEYWORD1
+Ningor_ir_fast	KEYWORD1
+Ningor_ir	KEYWORD1
+NIngor_ir_filtered	KEYWORD1
+
+begin		KEYWORD2
+read_one_eye	KEYWORD2
+idx_of_max_eye	KEYWORD2
+val_of_max_eye	KEYWORD2
+get_ball_direction	KEYWORD2
+read_one_eye_filtered	KEYWORD2
+idx_of_max_eye_filtered	KEYWORD2
+val_of_max_eye_filtered	KEYWORD2
+get_ball_direction_filtered	KEYWORD2

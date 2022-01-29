@@ -1,0 +1,9 @@
+yh		KEYWORD1
+rec		KEYWORD1
+Sen_1930_fast	KEYWORD1
+Sen_1930	KEYWORD1
+
+begin		KEYWORD2
+set_lower_limit_of_white	KEYWORD2
+raw_read_gry_value	KEYWORD2
+touch_white	KEYWORD2

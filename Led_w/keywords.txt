@@ -1,0 +1,13 @@
+yh		KEYWORD1
+rec		KEYWORD1
+Led_w_fast	KEYWORD1
+Led_w		KEYWORD1
+Led_w_analog	KEYWORD1
+
+begin		KEYWORD2
+led_on		KEYWORD2
+led_off		KEYWORD2
+set_led		KEYWORD2
+toggle_led	KEYWORD2
+led_state	KEYWORD2
+get_led_brightness	KEYWORD2
