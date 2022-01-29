@@ -139,7 +139,7 @@ namespace yh {
 
                 // returns the direction of the Sun with a resolution of 2degrees ( << 1 )
                 uint16_t sun_direction_HIGH ();
-                // returns the intensity of the Sun with a resolution of 4units_of_brightness ( << 2 )
+                // returns the intensity of the Sun with a resolution of 2units_of_brightness ( << 1 )
                 uint16_t sun_intensity_HIGH ();
                 // returns the direction of the Sun % 256
                 uint8_t sun_direction_LOW ();
@@ -148,7 +148,7 @@ namespace yh {
 
                 // returns the direction of the filter_ball with a resolution of 2degrees ( << 1 )
                 uint16_t filter_ball_direction_HIGH ();
-                // returns the intensity of the filter_ball with a resolution of 4units_of_brightness ( << 2 )
+                // returns the intensity of the filter_ball with a resolution of 2units_of_brightness ( << 1 )
                 uint16_t filter_ball_intensity_HIGH ();
                 // returns the direction of the filter_ball % 256
                 uint8_t filter_ball_direction_LOW ();
