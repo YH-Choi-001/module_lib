@@ -16,7 +16,7 @@ inline void yh::rec::UART_com::begin (const uint32_t baud) {
 }
 
 uint8_t yh::rec::UART_com::get_who_am_i () {
-    return request_data(WHO_AM_I);
+    return request_data(WHO_AM_I, 10000);
 }
 
 // ===================================================================================
@@ -130,11 +130,11 @@ void yh::rec::UART_com::request_calibrate_grayscales () {
 // ===================================================================================
 
 uint16_t yh::rec::UART_com::sun_direction_HIGH () {
-    return request_data(SUN_DIR_H) << 2;
+    return request_data(SUN_DIR_H) << 1;
 }
 
 uint16_t yh::rec::UART_com::sun_intensity_HIGH () {
-    return request_data(SUN_VAL_H) << 2;
+    return request_data(SUN_VAL_H) << 1;
 }
 
 uint8_t yh::rec::UART_com::sun_direction_LOW () {
@@ -145,12 +145,28 @@ uint8_t yh::rec::UART_com::sun_intensity_LOW () {
     return request_data(SUN_VAL_L);
 }
 
+uint16_t yh::rec::UART_com::filter_ball_direction_HIGH () {
+    return request_data(FILT_DIR_H) << 1;
+}
+
+uint16_t yh::rec::UART_com::filter_ball_intensity_HIGH () {
+    return request_data(FILT_VAL_H) << 1;
+}
+
+uint8_t yh::rec::UART_com::filter_ball_direction_LOW () {
+    return request_data(FILT_DIR_L);
+}
+
+uint8_t yh::rec::UART_com::filter_ball_intensity_LOW () {
+    return request_data(FILT_VAL_L);
+}
+
 // ===================================================================================
 // =================================== ultrasounds ===================================
 // ===================================================================================
 
 uint16_t yh::rec::UART_com::find_ball_ultrasound_HIGH () {
-    return request_data(FB_UTS_H, 688) << 2;
+    return request_data(FB_UTS_H, 688) << 1;
 }
 
 uint8_t yh::rec::UART_com::find_ball_ultrasound_LOW () {
@@ -158,7 +174,7 @@ uint8_t yh::rec::UART_com::find_ball_ultrasound_LOW () {
 }
 
 uint16_t yh::rec::UART_com::ultrasound_0_HIGH () {
-    return request_data(UTS0_H) << 2;
+    return request_data(UTS0_H) << 1;
 }
 
 uint8_t yh::rec::UART_com::ultrasound_0_LOW () {
@@ -166,7 +182,7 @@ uint8_t yh::rec::UART_com::ultrasound_0_LOW () {
 }
 
 uint16_t yh::rec::UART_com::ultrasound_1_HIGH () {
-    return request_data(UTS1_H) << 2;
+    return request_data(UTS1_H) << 1;
 }
 
 uint8_t yh::rec::UART_com::ultrasound_1_LOW () {
@@ -174,7 +190,7 @@ uint8_t yh::rec::UART_com::ultrasound_1_LOW () {
 }
 
 uint16_t yh::rec::UART_com::ultrasound_2_HIGH () {
-    return request_data(UTS2_H) << 2;
+    return request_data(UTS2_H) << 1;
 }
 
 uint8_t yh::rec::UART_com::ultrasound_2_LOW () {
@@ -182,7 +198,7 @@ uint8_t yh::rec::UART_com::ultrasound_2_LOW () {
 }
 
 uint16_t yh::rec::UART_com::ultrasound_3_HIGH () {
-    return request_data(UTS3_H) << 2;
+    return request_data(UTS3_H) << 1;
 }
 
 uint8_t yh::rec::UART_com::ultrasound_3_LOW () {
@@ -209,12 +225,28 @@ uint16_t yh::rec::UART_com::ultrasound_3_9bit () {
     return request_2_data(UTS3_9);
 }
 
+void yh::rec::UART_com::set_ultrasound_0_range (const uint16_t dist_in_cm) {
+    write_data(SET_UTS0_RNG, (dist_in_cm >> 8), (dist_in_cm & 0xff));
+}
+
+void yh::rec::UART_com::set_ultrasound_1_range (const uint16_t dist_in_cm) {
+    write_data(SET_UTS1_RNG, (dist_in_cm >> 8), (dist_in_cm & 0xff));
+}
+
+void yh::rec::UART_com::set_ultrasound_2_range (const uint16_t dist_in_cm) {
+    write_data(SET_UTS2_RNG, (dist_in_cm >> 8), (dist_in_cm & 0xff));
+}
+
+void yh::rec::UART_com::set_ultrasound_3_range (const uint16_t dist_in_cm) {
+    write_data(SET_UTS3_RNG, (dist_in_cm >> 8), (dist_in_cm & 0xff));
+}
+
 // ===================================================================================
 // ===================================== compass =====================================
 // ===================================================================================
 
 uint16_t yh::rec::UART_com::compass_HIGH () {
-    return request_data(CMPAS_H) << 2;
+    return request_data(CMPAS_H) << 1;
 }
 
 uint8_t yh::rec::UART_com::compass_LOW () {
@@ -230,7 +262,7 @@ void yh::rec::UART_com::reset_compass () {
 }
 
 void yh::rec::UART_com::set_compass_direction (const uint16_t direction) {
-    write_data(SET_CMPAS, (direction >> 2) & 0xff, (direction & 0xff));
+    write_data(SET_CMPAS, (direction >> 1) & 0xff, (direction & 0xff));
 }
 
 // ===================================================================================
@@ -239,6 +271,23 @@ void yh::rec::UART_com::set_compass_direction (const uint16_t direction) {
 
 void yh::rec::UART_com::set_dribbler_spd (const int8_t spd) {
     write_data(DRBLR_SPD, spd);
+}
+
+// ===================================================================================
+// ===================================== testcom =====================================
+// ===================================================================================
+
+uint8_t yh::rec::UART_com::test_com_stable () {
+    uint8_t error_count = 0;
+    write_key(MIRROR_TEST);
+    for (uint8_t i = 0; i < QUIT_MIRROR; i++) {
+        if (request_data(i) != i) error_count++;
+    }
+    for (uint8_t i = QUIT_MIRROR + 1; i < 255; i++) {
+        if (request_data(i) != i) error_count++;
+    }
+    write_key(QUIT_MIRROR);
+    return error_count;
 }
 
 // -_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-_-
@@ -271,6 +320,7 @@ void yh::rec::UART_com_slave::write_2_data (const uint16_t data) {
     uart_serial.write(data & 0xff);
 }
 
+// not updated
 void yh::rec::UART_com_slave::serial_received_key () {
     switch (uart_serial.read()) {
         // grayscales
