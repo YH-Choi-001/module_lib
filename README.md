@@ -18,8 +18,8 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 
 If you find any problems with my code (or face any difficulties), please contact me at yhei.choi@gmail.com.
 
-**This repository is written by YH Choi,
+**This repository is written by YH Choi,**
 
-tested with hardware modules provided by CSWCSS REC
+**tested with hardware modules provided by CSWCSS REC**
 
-and technical and physical support from CSWCSS REC hardware team.**
+**and technical and physical support from CSWCSS REC hardware team.**
