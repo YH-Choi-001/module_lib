@@ -14,8 +14,12 @@ You may like to see the examples of the modules to get a better understanding on
 
 To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bottom) and select the library name of the module you have added to Arduino IDE just now.
 
-## This repository is written by YH Choi,
+
+
+If you find any problems with my code (or face any difficulties), please contact me at yhei.choi@gmail.com.
+
+**This repository is written by YH Choi,
 
 tested with hardware modules provided by CSWCSS REC
 
-and technical and physical support from CSWCSS REC hardware team.
+and technical and physical support from CSWCSS REC hardware team.**
