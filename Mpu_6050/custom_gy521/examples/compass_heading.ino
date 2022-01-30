@@ -3,7 +3,7 @@
 // connect Gnd on GY-521 to GND on arduino
 // connect SDA on GY-521 to SDA on arduino
 // connect SCL on GY-521 to SCL on arduino
-// connect signal of button to pin 3 on arduino
+// connect signal pin of button to pin 3 on arduino
 
 #include <custom_gy521.h>
 
