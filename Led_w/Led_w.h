@@ -70,7 +70,7 @@ namespace yh {
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 inline void begin ();
-                // set the brightness of the led
+                // set the brightness of the led [0:255]
                 void set_led (const uint8_t assign_led_brightness);
                 // returns the brightness of the led
                 uint8_t get_led_brightness ();
