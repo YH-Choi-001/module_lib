@@ -12,7 +12,7 @@ Then you can use the library of the desired module.
 
 You may like to see the examples of the modules to get a better understanding on how to use them.
 
-To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bottom) and select the library name of the module you have added to Arduino IDE just now.
+To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bottom) and hover the library name of the module you have added to Arduino IDE just now, then you can take a look or even try uploading the examples to your arduino board.
 
 
 
