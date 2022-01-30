@@ -45,12 +45,12 @@ namespace yh {
                 void write_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t data);
                 void read_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t len, uint8_t *byte_array);
             public:
-                // measures the correction added per millisecond
+                // measures the correction added per reading
                 double
                     accel_x_corr,
                     accel_y_corr,
                     accel_z_corr;
-                // measures the correction added per millisecond
+                // measures the correction added per reading
                 double
                     gyro_x_corr,
                     gyro_y_corr,
@@ -58,31 +58,48 @@ namespace yh {
                 Mpu_6050 (const uint8_t init_i2c_address);
                 inline void begin ();
                 // accel
-                void set_accel_range (const uint8_t set_gyro_range); // sensitivity
-                uint16_t get_raw_accel_x ();
-                uint16_t get_raw_accel_y ();
-                uint16_t get_raw_accel_z ();
-                uint64_t get_all_raw_accel ();
-                double get_accel_x ();
-                double get_accel_y ();
-                double get_accel_z ();
-                double cal_accel_x ();
-                double cal_accel_y ();
-                double cal_accel_z ();
+                // sets the sensitivity of accelerometer [0:3]
+                void set_accel_range (const uint8_t set_accel_range); // sensitivity
+                // get the unprocessed accelerometer values by reading the registers in the chip
+                uint16_t
+                    get_raw_accel_x (),
+                    get_raw_accel_y (),
+                    get_raw_accel_z ();
+                // get the unprocessed accelerometer values by reading the registers in the chip
+                uint64_t
+                    get_all_raw_accel ();
+                // get the processed accelerometer values by dividing the raw values with the LSB_sensitivity
+                double
+                    get_accel_x (),
+                    get_accel_y (),
+                    get_accel_z ();
+                // // calibrate the accelerometers x, y, z
+                // double
+                //     cal_accel_x (),
+                //     cal_accel_y (),
+                //     cal_accel_z ();
                 // temp
                 uint16_t get_temp ();
                 // gyro
+                // sets the sensitivity of gyroscope [0:3]
                 void set_gyro_range (const uint8_t set_gyro_range); // sensitivity
-                uint16_t get_raw_gyro_x ();
-                uint16_t get_raw_gyro_y ();
-                uint16_t get_raw_gyro_z ();
+                // get the unprocessed gyroscope values by reading the registers in the chip
+                uint16_t
+                    get_raw_gyro_x (),
+                    get_raw_gyro_y (),
+                    get_raw_gyro_z ();
+                // get the unprocessed gyroscope values by reading the registers in the chip
                 uint64_t get_all_raw_gyro ();
-                double get_gyro_x ();
-                double get_gyro_y ();
-                double get_gyro_z ();
-                double cal_gyro_x ();
-                double cal_gyro_y ();
-                double cal_gyro_z ();
+                // get the processed gyroscope values by dividing the raw values with the LSB_sensitivity
+                double
+                    get_gyro_x (),
+                    get_gyro_y (),
+                    get_gyro_z ();
+                // // calibrate the gyroscopes x, y, z
+                // double
+                //     cal_gyro_x (),
+                //     cal_gyro_y (),
+                //     cal_gyro_z ();
                 // all
                 void get_raw_accel_temp_gyro ();
         };

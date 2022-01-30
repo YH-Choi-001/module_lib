@@ -105,44 +105,44 @@ double yh::rec::Mpu_6050::get_accel_z () {
     return accel_z;
 }
 
-double yh::rec::Mpu_6050::cal_accel_x () {
-    unsigned long time_spent = 0;
-    unsigned long prev_log_time = millis();
-    double cal_val = 0;
-    for (uint16_t i = 0; i < 2048; i++) {
-        unsigned long time_diff = millis() - prev_log_time;
-        cal_val += get_accel_x() * time_diff / 1000.0;
-        time_spent += time_diff;
-        prev_log_time += time_diff;
-    }
-    return accel_x_corr = cal_val / time_spent;
-}
+// double yh::rec::Mpu_6050::cal_accel_x () {
+//     unsigned long time_spent = 0;
+//     unsigned long prev_log_time = millis();
+//     double cal_val = 0;
+//     for (uint16_t i = 0; i < 2048; i++) {
+//         unsigned long time_diff = millis() - prev_log_time;
+//         cal_val += get_accel_x() * time_diff / 1000.0;
+//         time_spent += time_diff;
+//         prev_log_time += time_diff;
+//     }
+//     return accel_x_corr = cal_val / time_spent;
+// }
 
-double yh::rec::Mpu_6050::cal_accel_y () {
-    unsigned long time_spent = 0;
-    unsigned long prev_log_time = millis();
-    double cal_val = 0;
-    for (uint16_t i = 0; i < 2048; i++) {
-        unsigned long time_diff = millis() - prev_log_time;
-        cal_val += get_accel_y() * time_diff / 1000.0;
-        time_spent += time_diff;
-        prev_log_time += time_diff;
-    }
-    return accel_y_corr = cal_val / time_spent;
-}
+// double yh::rec::Mpu_6050::cal_accel_y () {
+//     unsigned long time_spent = 0;
+//     unsigned long prev_log_time = millis();
+//     double cal_val = 0;
+//     for (uint16_t i = 0; i < 2048; i++) {
+//         unsigned long time_diff = millis() - prev_log_time;
+//         cal_val += get_accel_y() * time_diff / 1000.0;
+//         time_spent += time_diff;
+//         prev_log_time += time_diff;
+//     }
+//     return accel_y_corr = cal_val / time_spent;
+// }
 
-double yh::rec::Mpu_6050::cal_accel_z () {
-    unsigned long time_spent = 0;
-    unsigned long prev_log_time = millis();
-    double cal_val = 0;
-    for (uint16_t i = 0; i < 2048; i++) {
-        unsigned long time_diff = millis() - prev_log_time;
-        cal_val += get_accel_z() * time_diff / 1000.0;
-        time_spent += time_diff;
-        prev_log_time += time_diff;
-    }
-    return accel_z_corr = cal_val / time_spent;
-}
+// double yh::rec::Mpu_6050::cal_accel_z () {
+//     unsigned long time_spent = 0;
+//     unsigned long prev_log_time = millis();
+//     double cal_val = 0;
+//     for (uint16_t i = 0; i < 2048; i++) {
+//         unsigned long time_diff = millis() - prev_log_time;
+//         cal_val += get_accel_z() * time_diff / 1000.0;
+//         time_spent += time_diff;
+//         prev_log_time += time_diff;
+//     }
+//     return accel_z_corr = cal_val / time_spent;
+// }
 
 // ====================================================================================================
 // =========================================== thermometer ============================================
@@ -240,49 +240,49 @@ double yh::rec::Mpu_6050::get_gyro_z () {
     return gyro_z;
 }
 
-double yh::rec::Mpu_6050::cal_gyro_x () {
-    unsigned long time_spent = 0;
-    unsigned long prev_log_time = millis();
-    double cal_val = 0;
-    for (uint16_t i = 0; i < 2048; i++) {
-        unsigned long time_diff = millis() - prev_log_time;
-        cal_val += get_gyro_x() * time_diff / 1000.0;
-        time_spent += time_diff;
-        prev_log_time += time_diff;
-    }
-    return gyro_x_corr = cal_val / time_spent;
-}
+// double yh::rec::Mpu_6050::cal_gyro_x () {
+//     unsigned long time_spent = 0;
+//     unsigned long prev_log_time = millis();
+//     double cal_val = 0;
+//     for (uint16_t i = 0; i < 2048; i++) {
+//         unsigned long time_diff = millis() - prev_log_time;
+//         cal_val += get_gyro_x() * time_diff / 1000.0;
+//         time_spent += time_diff;
+//         prev_log_time += time_diff;
+//     }
+//     return gyro_x_corr = cal_val / time_spent;
+// }
 
-double yh::rec::Mpu_6050::cal_gyro_y () {
-    unsigned long time_spent = 0;
-    unsigned long prev_log_time = millis();
-    double cal_val = 0;
-    for (uint16_t i = 0; i < 2048; i++) {
-        unsigned long time_diff = millis() - prev_log_time;
-        cal_val += get_gyro_y() * time_diff / 1000.0;
-        time_spent += time_diff;
-        prev_log_time += time_diff;
-    }
-    return gyro_y_corr = cal_val / time_spent;
-}
+// double yh::rec::Mpu_6050::cal_gyro_y () {
+//     unsigned long time_spent = 0;
+//     unsigned long prev_log_time = millis();
+//     double cal_val = 0;
+//     for (uint16_t i = 0; i < 2048; i++) {
+//         unsigned long time_diff = millis() - prev_log_time;
+//         cal_val += get_gyro_y() * time_diff / 1000.0;
+//         time_spent += time_diff;
+//         prev_log_time += time_diff;
+//     }
+//     return gyro_y_corr = cal_val / time_spent;
+// }
 
-double yh::rec::Mpu_6050::cal_gyro_z () {
-    unsigned long time_spent = 0;
-    double cal_val = 0;
-    unsigned long prev_log_time = millis();
-    for (uint16_t i = 0; i < 2048; i++) {
-        unsigned long time_diff = millis() - prev_log_time;
-        // cal_val += get_gyro_z() * time_diff;
-        // time_spent += time_diff;
-        // cal_val += get_gyro_z();
+// double yh::rec::Mpu_6050::cal_gyro_z () {
+//     unsigned long time_spent = 0;
+//     double cal_val = 0;
+//     unsigned long prev_log_time = millis();
+//     for (uint16_t i = 0; i < 2048; i++) {
+//         unsigned long time_diff = millis() - prev_log_time;
+//         // cal_val += get_gyro_z() * time_diff;
+//         // time_spent += time_diff;
+//         // cal_val += get_gyro_z();
 
-        // cal_val = (cal_val * i + get_gyro_z() / time_diff);
-        cal_val += get_gyro_z() * time_diff / 1000.0;
-        prev_log_time += time_diff;
-    }
-    // return gyro_z_corr = cal_val / time_spent;
-    return gyro_z_corr = cal_val / 2048.0;
-}
+//         // cal_val = (cal_val * i + get_gyro_z() / time_diff);
+//         cal_val += get_gyro_z() * time_diff / 1000.0;
+//         prev_log_time += time_diff;
+//     }
+//     // return gyro_z_corr = cal_val / time_spent;
+//     return gyro_z_corr = cal_val / 2048.0;
+// }
 
 // ====================================================================================================
 // =============================================== all ================================================
