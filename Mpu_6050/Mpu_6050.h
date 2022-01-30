@@ -14,9 +14,17 @@ namespace yh {
                 //
             protected:
                 const uint8_t i2c_address; // either 0x68 when AD0 is low, or 0x69 when AD0 is high
+                void write_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t data);
+                void read_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t len, uint8_t *byte_array);
                 // accelerometers
                 uint8_t accel_range; // sensitivity, available from 0 to 3
                 double accel_LSB_sensitivity; // stores the denominator after getting accel raw value
+                // gyroscopes
+                uint8_t gyro_range; // sensitivity, available from 0 to 3
+                double gyro_LSB_sensitivity; // stores the denominator after getting gyro raw value
+            // protected:
+            public:
+                // accelerometers
                 // measures linear acceleration without dividing the denominator
                 uint16_t
                     raw_accel_x,
@@ -30,8 +38,6 @@ namespace yh {
                 // thermometers
                 uint16_t temp;   // measures temperature of the surrounding, unit is degree Celsius
                 // gyroscopes
-                uint8_t gyro_range; // sensitivity, available from 0 to 3
-                double gyro_LSB_sensitivity; // stores the denominator after getting gyro raw value
                 // measures rotational acceleration without dividing the denominator
                 uint16_t
                     raw_gyro_x,
@@ -42,8 +48,6 @@ namespace yh {
                     gyro_x,
                     gyro_y,
                     gyro_z;
-                void write_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t data);
-                void read_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t len, uint8_t *byte_array);
             public:
                 // measures the correction added per reading
                 double
@@ -55,7 +59,10 @@ namespace yh {
                     gyro_x_corr,
                     gyro_y_corr,
                     gyro_z_corr;
+                // inits the argument to the i2c address of this object
                 Mpu_6050 (const uint8_t init_i2c_address);
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // calls pinMode function and config the pin modes
                 inline void begin ();
                 // accel
                 // sets the sensitivity of accelerometer [0:3]
