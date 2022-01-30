@@ -1,5 +1,5 @@
-#ifndef GY_521_H
-#define GY_521_H __DATE__ ", " __TIME__
+#ifndef MPU_6050_H
+#define MPU_6050_H __DATE__ ", " __TIME__
 
 #if defined(ARDUINO) && !defined(Arduino_h)
 #include <Arduino.h>
@@ -9,7 +9,7 @@
 
 namespace yh {
     namespace rec {
-        class Gy_521 {
+        class Mpu_6050 {
             private:
                 //
             protected:
@@ -55,7 +55,7 @@ namespace yh {
                     gyro_x_corr,
                     gyro_y_corr,
                     gyro_z_corr;
-                Gy_521 (const uint8_t init_i2c_address);
+                Mpu_6050 (const uint8_t init_i2c_address);
                 inline void begin ();
                 // accel
                 void set_accel_range (const uint8_t set_gyro_range); // sensitivity
@@ -89,4 +89,4 @@ namespace yh {
     }
 }
 
-#endif //#ifndef GY_521_H
+#endif //#ifndef MPU_6050_H

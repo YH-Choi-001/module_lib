@@ -1,16 +1,16 @@
-#ifndef GY_521_CPP
-#define GY_521_CPP __DATE__ ", " __TIME__
+#ifndef MPU_6050_CPP
+#define MPU_6050_CPP __DATE__ ", " __TIME__
 
-#include "Gy_521.h"
+#include "Mpu_6050.h"
 
-void yh::rec::Gy_521::write_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t data) {
+void yh::rec::Mpu_6050::write_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t data) {
     Wire.beginTransmission(target_i2c_addr);
     Wire.write(register_no);
     Wire.write(data);
     Wire.endTransmission();
 }
 
-void yh::rec::Gy_521::read_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t len, uint8_t *byte_array) {
+void yh::rec::Mpu_6050::read_i2c (const uint8_t target_i2c_addr, const uint8_t register_no, const uint8_t len, uint8_t *byte_array) {
     Wire.beginTransmission(target_i2c_addr);
     Wire.write(register_no);
     Wire.endTransmission();
@@ -21,7 +21,7 @@ void yh::rec::Gy_521::read_i2c (const uint8_t target_i2c_addr, const uint8_t reg
     }
 }
 
-yh::rec::Gy_521::Gy_521 (const uint8_t init_i2c_address) :
+yh::rec::Mpu_6050::Mpu_6050 (const uint8_t init_i2c_address) :
     i2c_address(init_i2c_address),
     accel_LSB_sensitivity(16384.0),
     gyro_LSB_sensitivity(131.0)
@@ -29,7 +29,7 @@ yh::rec::Gy_521::Gy_521 (const uint8_t init_i2c_address) :
     //
 }
 
-inline void yh::rec::Gy_521::begin () {
+inline void yh::rec::Mpu_6050::begin () {
     Wire.begin();
     // accessing the register 6B - Power Management (Sec. 4.28)
     // setting SLEEP register to 0. (Required; see Note on p. 9)
@@ -40,13 +40,13 @@ inline void yh::rec::Gy_521::begin () {
 // ========================================== accelerometer ===========================================
 // ====================================================================================================
 
-void yh::rec::Gy_521::set_accel_range (const uint8_t set_accel_range) {
+void yh::rec::Mpu_6050::set_accel_range (const uint8_t set_accel_range) {
     accel_range = set_accel_range > 3 ? 3 : set_accel_range;
     write_i2c(i2c_address, 0x1C, (accel_range << 3) & 0b00011000); // register 0x1C - gyroscope config
     accel_LSB_sensitivity = 16384.0 / static_cast<double>(1U << accel_range);
 }
 
-uint16_t yh::rec::Gy_521::get_raw_accel_x () {
+uint16_t yh::rec::Mpu_6050::get_raw_accel_x () {
     {
         uint8_t temp_buf [2];
         read_i2c(i2c_address, 0x3B, 2, temp_buf); // register 0x3B to 0x3C - accelerometer x
@@ -55,7 +55,7 @@ uint16_t yh::rec::Gy_521::get_raw_accel_x () {
     return raw_accel_x;
 }
 
-uint16_t yh::rec::Gy_521::get_raw_accel_y () {
+uint16_t yh::rec::Mpu_6050::get_raw_accel_y () {
     {
         uint8_t temp_buf [2];
         read_i2c(i2c_address, 0x3D, 2, temp_buf); // register 0x3D to 0x3E - accelerometer y
@@ -64,7 +64,7 @@ uint16_t yh::rec::Gy_521::get_raw_accel_y () {
     return raw_accel_y;
 }
 
-uint16_t yh::rec::Gy_521::get_raw_accel_z () {
+uint16_t yh::rec::Mpu_6050::get_raw_accel_z () {
     {
         uint8_t temp_buf [2];
         read_i2c(i2c_address, 0x3F, 2, temp_buf); // register 0x3F to 0x40 - accelerometer x
@@ -73,7 +73,7 @@ uint16_t yh::rec::Gy_521::get_raw_accel_z () {
     return raw_accel_z;
 }
 
-uint64_t yh::rec::Gy_521::get_all_raw_accel () {
+uint64_t yh::rec::Mpu_6050::get_all_raw_accel () {
     {
         uint8_t temp_buf [6];
         read_i2c(i2c_address, 0x3B, 6, temp_buf); // register 0x3B to 0x40 - accelerometer x y z
@@ -84,28 +84,28 @@ uint64_t yh::rec::Gy_521::get_all_raw_accel () {
     return (static_cast<uint64_t>(raw_accel_x) << 32) | (static_cast<uint64_t>(raw_accel_y) << 16) | raw_accel_z;
 }
 
-double yh::rec::Gy_521::get_accel_x () {
+double yh::rec::Mpu_6050::get_accel_x () {
     {
         accel_x = static_cast<double>(get_raw_accel_x()) / accel_LSB_sensitivity;
     }
     return accel_x;
 }
 
-double yh::rec::Gy_521::get_accel_y () {
+double yh::rec::Mpu_6050::get_accel_y () {
     {
         accel_y = static_cast<double>(get_raw_accel_y())/ accel_LSB_sensitivity;
     }
     return accel_y;
 }
 
-double yh::rec::Gy_521::get_accel_z () {
+double yh::rec::Mpu_6050::get_accel_z () {
     {
         accel_z = static_cast<double>(get_raw_accel_z()) / accel_LSB_sensitivity;
     }
     return accel_z;
 }
 
-double yh::rec::Gy_521::cal_accel_x () {
+double yh::rec::Mpu_6050::cal_accel_x () {
     unsigned long time_spent = 0;
     unsigned long prev_log_time = millis();
     double cal_val = 0;
@@ -118,7 +118,7 @@ double yh::rec::Gy_521::cal_accel_x () {
     return accel_x_corr = cal_val / time_spent;
 }
 
-double yh::rec::Gy_521::cal_accel_y () {
+double yh::rec::Mpu_6050::cal_accel_y () {
     unsigned long time_spent = 0;
     unsigned long prev_log_time = millis();
     double cal_val = 0;
@@ -131,7 +131,7 @@ double yh::rec::Gy_521::cal_accel_y () {
     return accel_y_corr = cal_val / time_spent;
 }
 
-double yh::rec::Gy_521::cal_accel_z () {
+double yh::rec::Mpu_6050::cal_accel_z () {
     unsigned long time_spent = 0;
     unsigned long prev_log_time = millis();
     double cal_val = 0;
@@ -148,7 +148,7 @@ double yh::rec::Gy_521::cal_accel_z () {
 // =========================================== thermometer ============================================
 // ====================================================================================================
 
-uint16_t yh::rec::Gy_521::get_temp () {
+uint16_t yh::rec::Mpu_6050::get_temp () {
     {
         uint8_t temp_buf [2];
         read_i2c(i2c_address, 0x41, 2, temp_buf); // register 0x41 to 0x42 - thermometer
@@ -161,7 +161,7 @@ uint16_t yh::rec::Gy_521::get_temp () {
 // ============================================ gyroscopes ============================================
 // ====================================================================================================
 
-void yh::rec::Gy_521::set_gyro_range (const uint8_t set_gyro_range) {
+void yh::rec::Mpu_6050::set_gyro_range (const uint8_t set_gyro_range) {
     gyro_range = set_gyro_range > 3 ? 3 : set_gyro_range;
     write_i2c(i2c_address, 0x1B, (gyro_range << 3) & 0b00011000); // register 0x1B - gyroscope config
     // gyro_LSB_sensitivity = 131.0 / static_cast<double>(1U << gyro_range);
@@ -181,7 +181,7 @@ void yh::rec::Gy_521::set_gyro_range (const uint8_t set_gyro_range) {
     }
 }
 
-uint16_t yh::rec::Gy_521::get_raw_gyro_x () {
+uint16_t yh::rec::Mpu_6050::get_raw_gyro_x () {
     {
         uint8_t temp_buf [2];
         read_i2c(i2c_address, 0x43, 2, temp_buf); // register 0x43 to 0x44 - gyroscope x
@@ -190,7 +190,7 @@ uint16_t yh::rec::Gy_521::get_raw_gyro_x () {
     return raw_gyro_x;
 }
 
-uint16_t yh::rec::Gy_521::get_raw_gyro_y () {
+uint16_t yh::rec::Mpu_6050::get_raw_gyro_y () {
     {
         uint8_t temp_buf [2];
         read_i2c(i2c_address, 0x45, 2, temp_buf); // register 0x45 to 0x46 - gyroscope y
@@ -199,7 +199,7 @@ uint16_t yh::rec::Gy_521::get_raw_gyro_y () {
     return raw_gyro_y;
 }
 
-uint16_t yh::rec::Gy_521::get_raw_gyro_z () {
+uint16_t yh::rec::Mpu_6050::get_raw_gyro_z () {
     {
         uint8_t temp_buf [2];
         read_i2c(i2c_address, 0x47, 2, temp_buf); // register 0x47 to 0x48 - gyroscope z
@@ -208,7 +208,7 @@ uint16_t yh::rec::Gy_521::get_raw_gyro_z () {
     return raw_gyro_z;
 }
 
-uint64_t yh::rec::Gy_521::get_all_raw_gyro () {
+uint64_t yh::rec::Mpu_6050::get_all_raw_gyro () {
     {
         uint8_t temp_buf [6];
         read_i2c(i2c_address, 0x43, 6, temp_buf); // register 0x43 to 0x48 - gyroscope x y z
@@ -219,28 +219,28 @@ uint64_t yh::rec::Gy_521::get_all_raw_gyro () {
     return (static_cast<uint64_t>(raw_gyro_x) << 32) | (static_cast<uint64_t>(raw_gyro_y) << 16) | raw_gyro_z;
 }
 
-double yh::rec::Gy_521::get_gyro_x () {
+double yh::rec::Mpu_6050::get_gyro_x () {
     {
         gyro_x = static_cast<double>(get_raw_gyro_x()) / gyro_LSB_sensitivity;
     }
     return gyro_x;
 }
 
-double yh::rec::Gy_521::get_gyro_y () {
+double yh::rec::Mpu_6050::get_gyro_y () {
     {
         gyro_y = static_cast<double>(get_raw_gyro_y()) / gyro_LSB_sensitivity;
     }
     return gyro_y;
 }
 
-double yh::rec::Gy_521::get_gyro_z () {
+double yh::rec::Mpu_6050::get_gyro_z () {
     {
         gyro_z = static_cast<double>(get_raw_gyro_z()) / gyro_LSB_sensitivity;
     }
     return gyro_z;
 }
 
-double yh::rec::Gy_521::cal_gyro_x () {
+double yh::rec::Mpu_6050::cal_gyro_x () {
     unsigned long time_spent = 0;
     unsigned long prev_log_time = millis();
     double cal_val = 0;
@@ -253,7 +253,7 @@ double yh::rec::Gy_521::cal_gyro_x () {
     return gyro_x_corr = cal_val / time_spent;
 }
 
-double yh::rec::Gy_521::cal_gyro_y () {
+double yh::rec::Mpu_6050::cal_gyro_y () {
     unsigned long time_spent = 0;
     unsigned long prev_log_time = millis();
     double cal_val = 0;
@@ -266,7 +266,7 @@ double yh::rec::Gy_521::cal_gyro_y () {
     return gyro_y_corr = cal_val / time_spent;
 }
 
-double yh::rec::Gy_521::cal_gyro_z () {
+double yh::rec::Mpu_6050::cal_gyro_z () {
     unsigned long time_spent = 0;
     double cal_val = 0;
     unsigned long prev_log_time = millis();
@@ -288,7 +288,7 @@ double yh::rec::Gy_521::cal_gyro_z () {
 // =============================================== all ================================================
 // ====================================================================================================
 
-void yh::rec::Gy_521::get_raw_accel_temp_gyro () {
+void yh::rec::Mpu_6050::get_raw_accel_temp_gyro () {
     {
         uint8_t temp_buf [14];
         read_i2c(i2c_address, 0x3B, 14, temp_buf); // register 0x3B to 0x48 - accel x y z temp gyro x y z
@@ -302,4 +302,4 @@ void yh::rec::Gy_521::get_raw_accel_temp_gyro () {
     }
 }
 
-#endif //#ifndef GY_521_CPP
+#endif //#ifndef MPU_6050_CPP
