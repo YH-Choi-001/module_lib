@@ -58,7 +58,7 @@ uint16_t yh::rec::Hc_sr04_fast::read_dist_cm (const unsigned long limiting_time_
     unsigned long width =
         countPulseASM(echo_pin_input_port, echo_pin_mask, echo_pin_mask,
             microsecondsToClockCycles( (limiting_time_in_us > 17858 ? 17858 : limiting_time_in_us) ) / 16);
-    return width ? (clockCyclesToMicroseconds(width * 16 + 16) * 0.017) : 8888;
+    return width ? (clockCyclesToMicroseconds(width * 16 + 16) * 0.017) : 888;
 }
 
 #define CONFIG_MASK_N_PORTS() \
