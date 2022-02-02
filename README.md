@@ -25,3 +25,5 @@ If you find any problems with my code (or face any difficulties), please raise a
 **tested with hardware modules provided by CSWCSS REC**
 
 **and technically supported by CSWCSS REC hardware team.**
+
+![](Ningor_ir/ball_pulse_graph.png)
