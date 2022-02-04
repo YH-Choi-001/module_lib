@@ -26,4 +26,5 @@ If you find any problems with my code (or face any difficulties), please raise a
 
 **and technically supported by CSWCSS REC hardware team.**
 
-![](Ningor_ir/ball_pulse_graph.png)
+![](./Ningor_ir/ball_pulse_graph.png)
+![](./ATmega2560_pinout.jpeg)
