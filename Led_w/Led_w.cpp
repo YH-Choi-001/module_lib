@@ -10,7 +10,7 @@ led_w_pin(init_led_w_pin)
     led_w_pin_output_port = portOutputRegister(digitalPinToPort(led_w_pin));
 }
 
-void yh::rec::Led_w_fast::begin () {
+inline void yh::rec::Led_w_fast::begin () {
     pinMode(led_w_pin, OUTPUT);
 }
 
