@@ -29,7 +29,7 @@ yh::rec::Mpu_6050::Mpu_6050 (const uint8_t init_i2c_address) :
     //
 }
 
-inline void yh::rec::Mpu_6050::begin () {
+void yh::rec::Mpu_6050::begin () {
     Wire.begin();
     // accessing the register 6B - Power Management (Sec. 4.28)
     // setting SLEEP register to 0. (Required; see Note on p. 9)

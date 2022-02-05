@@ -21,7 +21,7 @@ namespace yh {
                 Sen_1930_fast (const uint8_t init_read_gryscl_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // sets the value to decide whether the sensor is touching white
                 void set_lower_limit_of_white (const uint16_t input_lower_limit_of_white);
                 // functions that load raw data for other functions to further process

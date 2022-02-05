@@ -21,7 +21,7 @@ namespace yh {
                 Led_w_fast (const uint8_t init_led_w_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // turn on the led
                 virtual void led_on ();
                 // turn off the led
@@ -69,7 +69,7 @@ namespace yh {
                 Led_w_analog (const uint8_t init_led_w_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // set the brightness of the led [0:255]
                 void set_led (const uint8_t assign_led_brightness);
                 // returns the brightness of the led

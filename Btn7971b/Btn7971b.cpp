@@ -21,7 +21,7 @@ yh::rec::Btn7971b::Btn7971b (const uint16_t init_pwm_1_and_2_pin) :
     pwm_2_pin_output_port = portOutputRegister(digitalPinToPort(pwm_2_pin));
 }
 
-inline void yh::rec::Btn7971b::begin () {
+void yh::rec::Btn7971b::begin () {
     pinMode(pwm_1_pin, OUTPUT);
     pinMode(pwm_2_pin, OUTPUT);
     (*pwm_1_pin_output_port) &= ~pwm_1_pin_mask; // this line replaces digitalWrite(pwm_1_pin, LOW);
@@ -35,7 +35,7 @@ inline void yh::rec::Btn7971b::begin () {
 // set the motor to negative speed with the magnitude of the speed
 #define SET_NEG_SPD(spd) SET_SPD(2,1,spd)
 
-inline void yh::rec::Btn7971b::set_spd (const int16_t input_spd) {
+void yh::rec::Btn7971b::set_spd (const int16_t input_spd) {
     speed = constrain(input_spd, slowest_spd, fastest_spd);
     if (speed > 0) {
         SET_POS_SPD(speed);
@@ -46,15 +46,15 @@ inline void yh::rec::Btn7971b::set_spd (const int16_t input_spd) {
     }
 }
 
-inline void yh::rec::Btn7971b::stop_motor () {
+void yh::rec::Btn7971b::stop_motor () {
     (*pwm_2_pin_output_port) &= ~pwm_2_pin_mask; // this line replaces digitalWrite(pwm_2_pin, LOW);
 }
 
-inline int16_t yh::rec::Btn7971b::get_spd () {
+int16_t yh::rec::Btn7971b::get_spd () {
     return speed;
 }
 
-inline int16_t yh::rec::Btn7971b::operator += (const int16_t increase) {
+int16_t yh::rec::Btn7971b::operator += (const int16_t increase) {
     speed += increase;
     speed = constrain(speed, slowest_spd, fastest_spd);
     if (speed > 0) {
@@ -67,7 +67,7 @@ inline int16_t yh::rec::Btn7971b::operator += (const int16_t increase) {
     return speed;
 }
 
-inline int16_t yh::rec::Btn7971b::operator -= (const int16_t decrease) {
+int16_t yh::rec::Btn7971b::operator -= (const int16_t decrease) {
     speed -= decrease;
     speed = constrain(speed, slowest_spd, fastest_spd);
     if (speed > 0) {
@@ -80,7 +80,7 @@ inline int16_t yh::rec::Btn7971b::operator -= (const int16_t decrease) {
     return speed;
 }
 
-inline int16_t yh::rec::Btn7971b::operator ++ () {
+int16_t yh::rec::Btn7971b::operator ++ () {
     if (speed < fastest_spd) {
         speed++;
         if (speed > 0) {
@@ -94,7 +94,7 @@ inline int16_t yh::rec::Btn7971b::operator ++ () {
     return speed;
 }
 
-inline int16_t yh::rec::Btn7971b::operator -- () {
+int16_t yh::rec::Btn7971b::operator -- () {
     if (speed > slowest_spd) {
         speed--;
         if (speed > 0) {

@@ -32,7 +32,7 @@ yh::rec::Led_rgb_fast::Led_rgb_fast (const uint8_t init_led_r_pin, const uint8_t
     #undef CONFIG_MASK_N_PORT
 }
 
-inline void yh::rec::Led_rgb_fast::begin () {
+void yh::rec::Led_rgb_fast::begin () {
     #define CONFIG_PINMODE(x) pinMode(led_##x##_pin,OUTPUT);
     CONFIG_PINMODE(r) CONFIG_PINMODE(g) CONFIG_PINMODE(b)
     #undef CONFIG_PINMODE
@@ -88,7 +88,7 @@ yh::rec::Led_rgb_analog::Led_rgb_analog (const uint8_t init_led_r_pin, const uin
     //
 }
 
-inline void yh::rec::Led_rgb_analog::begin () {
+void yh::rec::Led_rgb_analog::begin () {
     #define CONFIG_PINMODE(x) pinMode(led_##x##_pin,OUTPUT);
     CONFIG_PINMODE(r) CONFIG_PINMODE(g) CONFIG_PINMODE(b)
     #undef CONFIG_PINMODE

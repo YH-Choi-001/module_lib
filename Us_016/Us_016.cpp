@@ -28,7 +28,7 @@ yh::rec::Us_016_fast::Us_016_fast (const uint8_t init_range_pin, const uint8_t i
     range_pin_output_port = (portOutputRegister(digitalPinToPort(range_pin)));
 }
 
-inline void yh::rec::Us_016_fast::begin () {
+void yh::rec::Us_016_fast::begin () {
     pinMode(range_pin, OUTPUT);
     pinMode(out_pin, INPUT);
     if (is_resolution_3m)

@@ -9,7 +9,7 @@ yh::rec::UART_com::UART_com (Serial_ &init_serial_obj) :
     //
 }
 
-inline void yh::rec::UART_com::begin (const uint32_t baud) {
+void yh::rec::UART_com::begin (const uint32_t baud) {
     uart_serial.begin(baud);
     const uint8_t who_am_i = get_who_am_i();
     who_am_i_error = ((who_am_i < '0') || (who_am_i > '9')); // checks if the who_am_i ranges from 0x30 to 0x39
@@ -307,7 +307,7 @@ yh::rec::UART_com_slave::UART_com_slave (Serial_ &init_serial_obj) :
     //
 }
 
-inline void yh::rec::UART_com_slave::begin (const uint32_t baud) {
+void yh::rec::UART_com_slave::begin (const uint32_t baud) {
     uart_serial.begin(baud);
 }
 

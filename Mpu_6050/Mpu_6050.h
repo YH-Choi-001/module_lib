@@ -63,7 +63,7 @@ namespace yh {
                 Mpu_6050 (const uint8_t init_i2c_address);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // accel
                 // sets the sensitivity of accelerometer [0:3]
                 void set_accel_range (const uint8_t set_accel_range); // sensitivity

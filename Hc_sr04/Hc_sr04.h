@@ -35,7 +35,7 @@ namespace yh {
                 Hc_sr04_fast (const uint8_t init_trig_pin, const uint8_t init_echo_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is mm)
                 // returns 888 when the returning sound wave is undetectable
                 // has better performance under noInterrupts() environment

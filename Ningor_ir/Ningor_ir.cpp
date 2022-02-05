@@ -13,7 +13,7 @@ yh::rec::Ningor_ir_fast::Ningor_ir_fast (const uint8_t *arr) :
     //
 }
 
-inline void yh::rec::Ningor_ir_fast::begin () {
+void yh::rec::Ningor_ir_fast::begin () {
     #define SETPINMODE(x) pinMode(eyes_pins[x], INPUT);
     SETPINMODE(0)SETPINMODE(1)SETPINMODE(2)SETPINMODE(3)
     SETPINMODE(4)SETPINMODE(5)SETPINMODE(6)SETPINMODE(7)
@@ -21,7 +21,7 @@ inline void yh::rec::Ningor_ir_fast::begin () {
     #undef SETPINMODE
 }
 
-inline uint16_t yh::rec::Ningor_ir_fast::raw_read_one_eye (const uint8_t eye_idx) {
+uint16_t yh::rec::Ningor_ir_fast::raw_read_one_eye (const uint8_t eye_idx) {
     return analogRead(eyes_pins[eye_idx]);
     // return 1023 - analogRead(eyes_pins[eye_idx]);
 }

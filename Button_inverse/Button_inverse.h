@@ -21,7 +21,7 @@ namespace yh {
                 Button_inverse_fast (const uint8_t init_read_button_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // checks if the button is pressed
                 virtual bool pressed_down ();
         };

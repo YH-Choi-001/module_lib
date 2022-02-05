@@ -27,7 +27,7 @@ yh::rec::Hc_sr04_fast::Hc_sr04_fast (const uint8_t init_trig_pin, const uint8_t 
 
 #undef CONFIG_MASK_N_PORTS
 
-inline void yh::rec::Hc_sr04_fast::begin () {
+void yh::rec::Hc_sr04_fast::begin () {
     pinMode(trig_pin, OUTPUT);
     pinMode(echo_pin, INPUT);
 }

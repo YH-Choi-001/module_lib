@@ -32,7 +32,7 @@ namespace yh {
                 Led_rgb_fast (const uint8_t init_led_r_pin, const uint8_t init_led_g_pin, const uint8_t init_led_b_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // turn on red led
                 virtual void r_on ();
                 // turn off red led
@@ -97,7 +97,7 @@ namespace yh {
                 Led_rgb_analog (const uint8_t init_led_r_pin, const uint8_t init_led_g_pin, const uint8_t init_led_b_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // set the brightness of the red led [0:255]
                 void set_r (const uint8_t assign_r_brightness);
                 // set the brightness of the green led [0:255]

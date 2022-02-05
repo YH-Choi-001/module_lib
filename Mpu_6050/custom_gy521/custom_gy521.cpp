@@ -8,7 +8,7 @@ Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
     yaw = 0;
 }
 
-inline void Custom_gy521::begin () {
+void Custom_gy521::begin () {
     // init settings to the GY-521 module through I2C
     Wire.begin();
     Wire.beginTransmission(i2c_address); // talk to GY-521
@@ -21,7 +21,7 @@ inline void Custom_gy521::begin () {
     Wire.endTransmission();
 }
 
-inline void Custom_gy521::reset_yaw () {
+void Custom_gy521::reset_yaw () {
     yaw = 0;
 }
 
@@ -41,6 +41,6 @@ double Custom_gy521::update_yaw (const double correction) {
     return yaw;
 }
 
-inline double Custom_gy521::get_yaw () {
+double Custom_gy521::get_yaw () {
     return yaw;
 }

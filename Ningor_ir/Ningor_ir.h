@@ -15,13 +15,13 @@ namespace yh {
                 // the pins connected to the corresponding eyes
                 const uint8_t eyes_pins [12];
                 // this function decides how to read an eye
-                inline uint16_t raw_read_one_eye (const uint8_t eye_idx);
+                uint16_t raw_read_one_eye (const uint8_t eye_idx);
             public:
                 // inits the pins of 12 eyes into the object using an array argument
                 Ningor_ir_fast (const uint8_t *init_eyes_pin_array);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // returns the reading of the eye requested
                 virtual uint16_t read_one_eye (const uint8_t eye_idx);
                 // returns the index of the max eye

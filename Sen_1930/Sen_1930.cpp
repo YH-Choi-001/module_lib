@@ -9,7 +9,7 @@ read_gryscl_pin(init_read_gryscl_pin)
     //
 }
 
-inline void yh::rec::Sen_1930_fast::begin () {
+void yh::rec::Sen_1930_fast::begin () {
     pinMode(read_gryscl_pin, INPUT);
 }
 

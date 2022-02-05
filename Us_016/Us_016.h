@@ -29,13 +29,13 @@ namespace yh {
                 Us_016_fast (const uint8_t init_range_pin, const uint8_t init_out_pin, const uint8_t init_resolution = 3);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is mm)
                 virtual uint16_t read_dist_mm ();
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is cm)
                 virtual uint16_t read_dist_cm ();
                 // set the resolution to either 1 or 3 meters
-                inline void set_resolution (const uint8_t resolution);
+                void set_resolution (const uint8_t resolution);
         };
         class Us_016 : public Us_016_fast {
             private:

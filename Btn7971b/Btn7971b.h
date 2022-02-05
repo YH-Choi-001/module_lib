@@ -35,23 +35,23 @@ namespace yh {
                 Btn7971b (const uint16_t init_pwm_1_and_2_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin ();
+                void begin ();
                 // set the speed of the motor [-slowest_spd:fastest_spd]
-                inline void set_spd (const int16_t input_spd);
+                void set_spd (const int16_t input_spd);
                 // stops the motor
-                inline void stop_motor ();
+                void stop_motor ();
                 // returns the speed inputed for the motor
-                inline int16_t get_spd ();
+                int16_t get_spd ();
                 // adds the increase to the current speed of the motor
                 // and returns the newest speed
-                inline int16_t operator += (const int16_t increase);
+                int16_t operator += (const int16_t increase);
                 // subtracts the decrease from the current speed of the motor
                 // and returns the newest speed
-                inline int16_t operator -= (const int16_t decrease);
+                int16_t operator -= (const int16_t decrease);
                 // increases the motor speed by 1
-                inline int16_t operator ++ ();
+                int16_t operator ++ ();
                 // decreases the motor speed by 1
-                inline int16_t operator -- ();
+                int16_t operator -- ();
         };
     }
 }

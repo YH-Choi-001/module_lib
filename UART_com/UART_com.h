@@ -105,7 +105,7 @@ namespace yh {
                 // depends on which UART you have connected to
                 UART_com (Serial_ &init_serial_obj);
                 // calls uart_serial.begin(baud) and sets the baud rate
-                inline void begin (const uint32_t baud);
+                void begin (const uint32_t baud);
                 // returns the who_am_i value of the replying arduino
                 uint8_t get_who_am_i ();
 
@@ -235,7 +235,7 @@ namespace yh {
                 // depends on which UART you have connected to
                 UART_com_slave (Serial_ &init_serial_obj);
                 // calls uart_serial.begin(baud) and sets the baud rate
-                inline void begin (const uint32_t baud);
+                void begin (const uint32_t baud);
                 // writes a byte to main arduino
                 void write_data (const uint8_t data);
                 // writes 2 bytes to main arduino
