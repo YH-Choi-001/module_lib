@@ -5,12 +5,12 @@
 
 #include "Led_rgb.h"
 
-#define LED_ON(x) ((*led_##x##_pin_output_port)|=led_##x##_pin_mask)
-#define LED_OFF(x) ((*led_##x##_pin_output_port)&=(~led_##x##_pin_mask))
-#define LED_TOGGLE(x) ((*led_##x##_pin_output_port)^=led_##x##_pin_mask)
-#define LED_STATE(x) ((*led_##x##_pin_output_port)&led_##x##_pin_mask)
+#define LED_ON(x) ((*led_##x##_pin_output_register)|=led_##x##_pin_mask)
+#define LED_OFF(x) ((*led_##x##_pin_output_register)&=(~led_##x##_pin_mask))
+#define LED_TOGGLE(x) ((*led_##x##_pin_output_register)^=led_##x##_pin_mask)
+#define LED_STATE(x) ((*led_##x##_pin_output_register)&led_##x##_pin_mask)
 
-#define CONFIG_MASK_N_PORT(x) led_##x##_pin_mask=digitalPinToBitMask(led_##x##_pin);led_##x##_pin_output_port=portOutputRegister(digitalPinToPort(led_##x##_pin));
+#define CONFIG_MASK_N_PORT(x) led_##x##_pin_mask=digitalPinToBitMask(led_##x##_pin);led_##x##_pin_output_register=portOutputRegister(digitalPinToPort(led_##x##_pin));
 
 yh::rec::Led_rgb_fast::Led_rgb_fast (const Led_rgb_fast &init_obj) :
     led_r_pin(init_obj.led_r_pin), led_g_pin(init_obj.led_g_pin), led_b_pin(init_obj.led_b_pin)

@@ -17,15 +17,15 @@ namespace yh {
                 // the pin connected to the red led
                 const uint8_t led_r_pin;
                 uint8_t led_r_pin_mask;
-                volatile uint8_t *led_r_pin_output_port;
+                volatile uint8_t *led_r_pin_output_register;
                 // the pin connected to the green led
                 const uint8_t led_g_pin;
                 uint8_t led_g_pin_mask;
-                volatile uint8_t *led_g_pin_output_port;
+                volatile uint8_t *led_g_pin_output_register;
                 // the pin connected to the blue led
                 const uint8_t led_b_pin;
                 uint8_t led_b_pin_mask;
-                volatile uint8_t *led_b_pin_output_port;
+                volatile uint8_t *led_b_pin_output_register;
             public:
                 Led_rgb_fast (const Led_rgb_fast &init_obj);
                 // inits the red, green, blue led pins to the object with single argument

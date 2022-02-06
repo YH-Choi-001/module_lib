@@ -23,11 +23,11 @@ namespace yh {
                 // the pin to trigger a sound wave
                 const uint8_t trig_pin;
                 uint8_t trig_pin_mask;
-                volatile uint8_t *trig_pin_output_port;
+                volatile uint8_t *trig_pin_output_register;
                 // the pin to read the soundwave sensor
                 const uint8_t echo_pin;
                 uint8_t echo_pin_mask;
-                volatile uint8_t *echo_pin_input_port;
+                volatile uint8_t *echo_pin_input_register;
                 // ask the ultrasound to pulse a sound wave
                 void trig_wave ();
             public:

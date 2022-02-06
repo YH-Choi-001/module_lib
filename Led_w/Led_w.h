@@ -17,7 +17,7 @@ namespace yh {
                 // the pin connected to the led
                 const uint8_t led_w_pin;
                 uint8_t led_w_pin_mask;
-                volatile uint8_t *led_w_pin_output_port;
+                volatile uint8_t *led_w_pin_output_register;
             public:
                 // inits the white led pin to the object
                 Led_w_fast (const uint8_t init_led_w_pin);

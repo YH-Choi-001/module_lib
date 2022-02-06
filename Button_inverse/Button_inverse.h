@@ -17,7 +17,7 @@ namespace yh {
                 // the pin to read the state of inverse button
                 const uint8_t read_button_pin;
                 uint8_t read_button_pin_mask;
-                volatile uint8_t *read_button_pin_input_port;
+                volatile uint8_t *read_button_pin_input_register;
             public:
                 // inits the button pin to this object
                 Button_inverse_fast (const uint8_t init_read_button_pin);

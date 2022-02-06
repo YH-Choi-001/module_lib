@@ -5,6 +5,8 @@
 #include <Arduino.h>
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
+#include "wiring_digital.c"
+
 namespace yh {
     namespace rec {
         class Btn7971b {
@@ -53,6 +55,57 @@ namespace yh {
                 // decreases the motor speed by 1
                 int16_t operator -- ();
         };
+        //*
+        #define Btn7971b Btn7971b_alpha
+        class Btn7971b {
+            private:
+                //
+            protected:
+                // pins that cannot be changed:
+                // pwm pin
+                const uint8_t pwm_pin;
+                uint8_t pwm_pin_timer;
+                uint8_t pwm_pin_mask;
+                volatile uint8_t *pwm_pin_output_register;
+                // dir pin
+                const uint8_t dir_pin;
+                uint8_t dir_pin_mask;
+                volatile uint8_t *dir_pin_output_register;
+                // the current speed of the motor
+                // (actually is the voltage supplied to the motor)
+                int16_t speed;
+                // the limits on the spd of the motor
+                const int16_t
+                    slowest_spd,
+                    fastest_spd;
+            public:
+                // inits the arguments into pwm pin and dir pin
+                Btn7971b (const uint8_t init_pwm_pin, const uint8_t init_dir_pin);
+                // inits the arguments into pwm pin and dir pin
+                // syntax should be Btn7971b(pwm_pin << 8 | dir_pin)
+                Btn7971b (const uint16_t init_pwm_and_dir_pin);
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // calls pinMode function and config the pin modes
+                void begin ();
+                // set the speed of the motor [-slowest_spd:fastest_spd]
+                void set_spd (const int16_t input_spd);
+                // stops the motor
+                void stop_motor ();
+                // returns the speed inputed for the motor
+                int16_t get_spd ();
+                // adds the increase to the current speed of the motor
+                // and returns the newest speed
+                int16_t operator += (const int16_t increase);
+                // subtracts the decrease from the current speed of the motor
+                // and returns the newest speed
+                int16_t operator -= (const int16_t decrease);
+                // increases the motor speed by 1
+                int16_t operator ++ ();
+                // decreases the motor speed by 1
+                int16_t operator -- ();
+        };
+        #undef Btn7971b
+        //*/
     }
 }
 
