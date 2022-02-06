@@ -1,3 +1,5 @@
+// This library is proved to be working on 6 Feb 2022 at 18:36
+
 #ifndef HC_SR04_H
 #define HC_SR04_H __DATE__ ", " __TIME__
 
@@ -5,7 +7,9 @@
 #include <Arduino.h>
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
-
+// pulseIn is simplified to countPulseASM, so the following libraries are included
+#include "wiring_private.h"
+#include "pins_arduino.h"
 
 namespace yh {
     namespace rec {
