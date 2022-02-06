@@ -1,6 +1,7 @@
 yh		KEYWORD1
 rec		KEYWORD1
 Hc_sr04		KEYWORD1
+Hc_sr04_fast	KEYWORD1
 
 begin		KEYWORD2
 read_dist_mm	KEYWORD2
