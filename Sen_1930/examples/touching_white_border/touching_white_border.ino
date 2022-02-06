@@ -1,6 +1,6 @@
 // Please do the following:
-// connect the Vcc of nin gor's ir to 5V on arduino
-// connect the Gnd of nin gor's ir to GND on arduino
+// connect the Vcc of SEN1930 to 5V on arduino
+// connect the Gnd of SEN1930 to GND on arduino
 // connect the analog signal to A0 on arduino
 
 #include <Sen_1930.h>
@@ -20,6 +20,6 @@ void loop () {
     Serial.print(grayscale.raw_read_gry_value());
 
     // check if touching the white line using touch_white() method
-    Serial.print(", max eye: ");
-    Serial.print(grayscale.touch_white());
+    Serial.print(", touching white: ");
+    Serial.println(grayscale.touch_white() ? "yes" : "no");
 }
