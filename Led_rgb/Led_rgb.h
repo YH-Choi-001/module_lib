@@ -1,3 +1,5 @@
+// This library is proved to be working on 6 Feb 2022 at 19:19
+
 #ifndef LED_RGB_H
 #define LED_RGB_H __DATE__ ", " __TIME__
 

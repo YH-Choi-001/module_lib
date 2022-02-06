@@ -1,3 +1,5 @@
+// This library is proved to be working on 6 Feb 2022 at 19:19
+
 #ifndef LED_RGB_CPP
 #define LED_RGB_CPP __DATE__ ", " __TIME__
 
@@ -8,29 +10,27 @@
 #define LED_TOGGLE(x) ((*led_##x##_pin_output_port)^=led_##x##_pin_mask)
 #define LED_STATE(x) ((*led_##x##_pin_output_port)&led_##x##_pin_mask)
 
+#define CONFIG_MASK_N_PORT(x) led_##x##_pin_mask=digitalPinToBitMask(led_##x##_pin);led_##x##_pin_output_port=portOutputRegister(digitalPinToPort(led_##x##_pin));
+
 yh::rec::Led_rgb_fast::Led_rgb_fast (const Led_rgb_fast &init_obj) :
     led_r_pin(init_obj.led_r_pin), led_g_pin(init_obj.led_g_pin), led_b_pin(init_obj.led_b_pin)
 {
-    #define CONFIG_MASK_N_PORT(x) led_##x##_pin_mask=digitalPinToBitMask(led_##x##_pin);led_##x##_pin_output_port=portOutputRegister(digitalPinToPort(led_##x##_pin));
     CONFIG_MASK_N_PORT(r)CONFIG_MASK_N_PORT(g)CONFIG_MASK_N_PORT(b)
-    #undef CONFIG_MASK_N_PORT
 }
 
 yh::rec::Led_rgb_fast::Led_rgb_fast (const uint32_t init_led_r_g_b_pin) :
     led_r_pin((init_led_r_g_b_pin >> 16) & 0xff), led_g_pin((init_led_r_g_b_pin >> 8) & 0xff), led_b_pin(init_led_r_g_b_pin & 0xff)
 {
-    #define CONFIG_MASK_N_PORT(x) led_##x##_pin_mask=digitalPinToBitMask(led_##x##_pin);led_##x##_pin_output_port=portOutputRegister(digitalPinToPort(led_##x##_pin));
     CONFIG_MASK_N_PORT(r)CONFIG_MASK_N_PORT(g)CONFIG_MASK_N_PORT(b)
-    #undef CONFIG_MASK_N_PORT
 }
 
 yh::rec::Led_rgb_fast::Led_rgb_fast (const uint8_t init_led_r_pin, const uint8_t init_led_g_pin, const uint8_t init_led_b_pin) :
     led_r_pin(init_led_r_pin), led_g_pin(init_led_g_pin), led_b_pin(init_led_b_pin)
 {
-    #define CONFIG_MASK_N_PORT(x) led_##x##_pin_mask=digitalPinToBitMask(led_##x##_pin);led_##x##_pin_output_port=portOutputRegister(digitalPinToPort(led_##x##_pin));
     CONFIG_MASK_N_PORT(r)CONFIG_MASK_N_PORT(g)CONFIG_MASK_N_PORT(b)
-    #undef CONFIG_MASK_N_PORT
 }
+
+#undef CONFIG_MASK_N_PORT
 
 void yh::rec::Led_rgb_fast::begin () {
     #define CONFIG_PINMODE(x) pinMode(led_##x##_pin,OUTPUT);
@@ -38,7 +38,7 @@ void yh::rec::Led_rgb_fast::begin () {
     #undef CONFIG_PINMODE
 }
 
-#define ON_OFF(x) void yh::rec::Led_rgb_fast::##x##_on() {LED_ON(x);} void yh::rec::Led_rgb_fast::##x##_off() {LED_OFF(x);}
+#define ON_OFF(x) void yh::rec::Led_rgb_fast::x##_on() {LED_ON(x);} void yh::rec::Led_rgb_fast::x##_off() {LED_OFF(x);}
 ON_OFF(r) ON_OFF(g) ON_OFF(b)
 #undef ON_OFF
 
@@ -46,11 +46,11 @@ ON_OFF(r) ON_OFF(g) ON_OFF(b)
 SET(r) SET(g) SET(b)
 #undef SET
 
-#define TOGGLE(x) void yh::rec::Led_rgb_fast::toggle_##x##() {LED_TOGGLE(x);}
+#define TOGGLE(x) void yh::rec::Led_rgb_fast::toggle_##x() {LED_TOGGLE(x);}
 TOGGLE(r) TOGGLE(g) TOGGLE(b)
 #undef TOGGLE
 
-#define STATE(x) bool yh::rec::Led_rgb_fast::##x##_state() {return LED_STATE(x)?1:0;}
+#define STATE(x) bool yh::rec::Led_rgb_fast::x##_state() {return LED_STATE(x)?1:0;}
 STATE(r) STATE(g) STATE(b)
 #undef STATE
 
@@ -94,7 +94,7 @@ void yh::rec::Led_rgb_analog::begin () {
     #undef CONFIG_PINMODE
 }
 
-#define SET(x) void yh::rec::Led_rgb_analog::set_##x##(const uint8_t assign_##x##_brightness) {analogWrite(led_##x##_pin,x##_brightness=assign_##x##_brightness);}
+#define SET(x) void yh::rec::Led_rgb_analog::set_##x(const uint8_t assign_##x##_brightness) {analogWrite(led_##x##_pin,x##_brightness=assign_##x##_brightness);}
 SET(r) SET(g) SET(b)
 #undef SET
 
