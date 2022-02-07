@@ -5,6 +5,7 @@
 #include <Arduino.h>
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
+// for function turnOffPWM
 #include "wiring_digital.c"
 
 namespace yh {
