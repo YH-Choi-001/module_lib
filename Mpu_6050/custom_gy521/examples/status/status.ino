@@ -27,10 +27,10 @@ void loop () {
     // calls Custom_gy521::update_gyro() method without arguments
     // in order to use calibrated values for readings from Custom_gy521.cal_gyro()
     gy521.update_gyro();
-    Serial.print(gy521.get_roll());
+    Serial.print(gy521.roll);
     Serial.print('\t');
-    Serial.print(gy521.get_pitch());
+    Serial.print(gy521.pitch);
     Serial.print('\t');
-    Serial.print(gy521.get_yaw());
+    Serial.print(gy521.yaw);
     Serial.print('\n');
 }

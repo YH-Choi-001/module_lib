@@ -24,10 +24,9 @@ void setup () {
 void loop () {
 
     // prints out the current heading of the chip
-    // 0 is inputed as the correction of the yaw as this correction differs on every GY-521 chip
-    Serial.println(gy521.update_yaw(0));
+    Serial.println(gy521.update_yaw());
 
     // the compass reset button is pressed, reset the current heading to 0
-    if (digitalRead(reset_compass_button_pin)) gy521.reset_yaw();
+    if (digitalRead(reset_compass_button_pin)) gy521.yaw = 0;
 
 }
