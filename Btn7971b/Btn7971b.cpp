@@ -158,8 +158,11 @@ void yh::rec::Btn7971b::set_spd (const int16_t input_speed) {
 }
 
 void yh::rec::Btn7971b::stop_motor () {
-    turnOffPWM(pwm_pin_timer);
-    (*pwm_pin_output_register) &= (~pwm_pin_mask); // this line replaces digitalWrite(pwm_pin, LOW);
+    // turnOffPWM(pwm_pin_timer);
+    // (*pwm_pin_output_register) &= (~pwm_pin_mask); // this line replaces digitalWrite(pwm_pin, LOW);
+    // some Arduino boards have DAC, which do not use PWM to generate fake analog outputs
+    // use the IDE-support function to ensure this is not buggy
+    analogWrite(pwm_pin, 0);
     (*dir_pin_output_register) &= (~dir_pin_mask); // this line replaces digitalWrite(dir_pin, LOW);
 }
 
