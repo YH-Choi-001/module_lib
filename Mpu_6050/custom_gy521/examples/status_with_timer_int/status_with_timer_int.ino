@@ -1,5 +1,5 @@
 // Please do the following:
-// connect Vcc on GY-521 to 5V on arduino
+// connect Vcc on GY-521 to 3.3V on arduino
 // connect Gnd on GY-521 to GND on arduino
 // connect SDA on GY-521 to SDA on arduino
 // connect SCL on GY-521 to SCL on arduino
@@ -35,7 +35,7 @@ void loop () {
     // prints out the current heading of the chip
     // calls Custom_gy521::update_gyro() method without arguments
     // in order to use calibrated values for readings from Custom_gy521.cal_gyro()
-    gy521.update_gyro();
+    // gy521.update_gyro();
 //    const unsigned long dt = micros() - prev;
 //    static unsigned long maxt = 0;
 //    if (dt > maxt) maxt = dt;

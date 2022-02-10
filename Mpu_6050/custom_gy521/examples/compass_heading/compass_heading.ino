@@ -1,5 +1,5 @@
 // Please do the following:
-// connect Vcc on GY-521 to 5V on arduino
+// connect Vcc on GY-521 to 3.3V on arduino
 // connect Gnd on GY-521 to GND on arduino
 // connect SDA on GY-521 to SDA on arduino
 // connect SCL on GY-521 to SCL on arduino
