@@ -29,9 +29,9 @@ class Custom_gy521 {
 
         // gyro features:
         // the current value of the angles [0:359.99999999999999999999]
-        double roll, pitch, yaw;
+        volatile double roll, pitch, yaw;
         // the correction added to every reading from the chip
-        double corr_roll, corr_pitch, corr_yaw;
+        volatile double corr_roll, corr_pitch, corr_yaw;
         // inits the 7-bit I2C address of the chip to init_i2c_address
         Custom_gy521 (const uint8_t init_i2c_address);
         // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
