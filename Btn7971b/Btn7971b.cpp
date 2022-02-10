@@ -152,7 +152,7 @@ void yh::rec::Btn7971b::set_spd (const int16_t input_speed) {
     // a cheating act: do not attempt to reform this unless you know
     // how negative numbers are stored in the 2's complement
 
-    // note that the (input_spd < 0) ensures dir_pin_state is LOW when the input_spd is 0
+    // note that when the input_spd is 0, the (input_spd < 0) ensures dir_pin_state is LOW
     // then the analogWrite writes 0
     // since both pins are completely LOW, the H-bridge circuit is opened, and the motor is stopped
 }
