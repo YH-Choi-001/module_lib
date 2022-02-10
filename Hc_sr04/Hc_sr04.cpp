@@ -34,7 +34,7 @@ void yh::rec::Hc_sr04_fast::begin () {
     pinMode(echo_pin, INPUT);
 }
 
-void yh::rec::Hc_sr04_fast::trig_wave () {
+inline void yh::rec::Hc_sr04_fast::trig_wave () {
     (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
     delayMicroseconds(2);
     // send the pulse
@@ -116,6 +116,38 @@ uint16_t yh::rec::Hc_sr04::read_dist_cm (const unsigned long limiting_time_in_us
 
 uint16_t yh::rec::Hc_sr04::previous_dist_cm () {
     return dist_read_mm / 10;
+}
+
+yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const Hc_sr04_timer_int &init_obj) :
+    Hc_sr04_fast(init_obj.trig_pin, init_obj.echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0)
+{
+    //
+}
+
+yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const uint16_t init_trig_and_echo_pin) :
+    Hc_sr04_fast(init_trig_and_echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0)
+{
+    //
+}
+
+yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const uint8_t init_trig_pin, const uint8_t init_echo_pin) :
+    Hc_sr04_fast(init_trig_pin, init_echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0)
+{
+    //
+}
+
+void yh::rec::Hc_sr04_timer_int::begin () {
+    pinMode(trig_pin, OUTPUT);
+    pinMode(echo_pin, INPUT);
+    trig_wave();
+}
+
+void yh::rec::Hc_sr04_timer_int::set_limiting_dist (const uint16_t request_limiting_dist) {
+    set_limiting_time(request_limiting_dist/0.017);
+}
+
+void yh::rec::Hc_sr04_timer_int::set_limiting_time (const unsigned long request_limiting_time) {
+    limiting_time = request_limiting_time < 23530 ? request_limiting_time : 23530;
 }
 
 #endif //#ifndef HC_SR04_CPP
