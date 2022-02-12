@@ -1,6 +1,0 @@
-Custom_gy521		KEYWORD1
-
-begin			KEYWORD2
-reset_yaw		KEYWORD2
-update_yaw		KEYWORD2
-get_yaw			KEYWORD2
