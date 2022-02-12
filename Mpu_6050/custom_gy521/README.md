@@ -48,6 +48,7 @@ You may assign them to 0 or a value that you have achieved by previous calibrati
   
 6. `void Custom_gy521::cal_gyro ( sampling_amount )` method  
 Syntax: `gy521.cal_gyro();` or `gy521.cal_gyro(100);`  
+**ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
 This `cal_gyro()` function calibrates all 3-axes of gyroscope of the chip.  
 This function repeats reading the gyroscope values of the 3 axes and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
 The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  
@@ -61,6 +62,7 @@ This `update_gyro()` function updates the roll, pitch and yaw in the object.
   
 8. `void Custom_gy521::cal_roll ( sampling_amount )` method  
 Syntax: `gy521.cal_roll();` or `gy521.cal_roll(100);`  
+**ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
 This `cal_roll()` function **only calibrates the x-axis of gyroscope** of the chip.  
 This function repeats reading the gyroscope values of the **x-axis** and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
 The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  
@@ -71,6 +73,7 @@ This `update_roll()` function **only updates the member `roll`** in the object.
   
 10. `void Custom_gy521::cal_pitch ( sampling_amount )` method  
 Syntax: `gy521.cal_pitch();` or `gy521.cal_pitch(100);`  
+**ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
 This `cal_pitch()` function **only calibrates the y-axis of gyroscope** of the chip.  
 This function repeats reading the gyroscope values of the **y-axis** and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
 The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  
@@ -81,6 +84,7 @@ This `update_pitch()` function **only updates the member `pitch`** in the object
   
 12. `void Custom_gy521::cal_yaw ( sampling_amount )` method  
 Syntax: `gy521.cal_yaw();` or `gy521.cal_yaw(100);`  
+**ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
 This `cal_yaw()` function **only calibrates the z-axis of gyroscope** of the chip.  
 This function repeats reading the gyroscope values of the **z-axis** and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
 The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  

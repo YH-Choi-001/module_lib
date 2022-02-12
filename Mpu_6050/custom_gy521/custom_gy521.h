@@ -44,27 +44,27 @@ class Custom_gy521 {
         uint8_t who_am_i ();
 
         // calibrates the gyroscope, and give the corrections to corr_roll, corr_pitch, corr_yaw respectively
-        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A STEADY SURFACE,
+        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
         // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
         void cal_gyro (const uint16_t sampling_amount = 8192);
         // gets 6 bytes from gyro (uses calibrated data to correct)
         void update_gyro ();
 
         // calibrates roll, and give the corrections to corr_roll
-        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A STEADY SURFACE,
-        // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
+        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
+        // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS EXITED
         double cal_roll (const uint16_t sampling_amount = 8192);
         // gets 2 bytes from roll (uses calibrated data to correct)
         double update_roll ();
         // calibrates pitch, and give the corrections to corr_pitch
-        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A STEADY SURFACE,
-        // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
+        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
+        // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS EXITED
         double cal_pitch (const uint16_t sampling_amount = 8192);
         // gets 2 bytes from pitch (uses calibrated data to correct)
         double update_pitch ();
         // calibrates yaw, and give the corrections to corr_yaw
-        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A STEADY SURFACE,
-        // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
+        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
+        // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS EXITED
         double cal_yaw (const uint16_t sampling_amount = 8192);
         // gets 2 bytes from yaw (uses calibrated data to correct)
         double update_yaw ();
