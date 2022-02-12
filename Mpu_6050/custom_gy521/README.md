@@ -14,8 +14,8 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 3. You are advised to check the who_am_i value of the chip before usage, since there are many reports that an MPU6500 chip was installed on an MPU9250 board. The appearance of the module may fake you. The check is to let you understand what is the model of the chip that is really inside the module you are holding.  
   
 ### How to use:  
-1. Constructor of a GY-521 object  
-Syntax: ` Custom_gy521 gy521 ( I2C_address ); `  
+1. Constructor of a GY-521 object ` Custom_gy521::Custom_gy521 ( I2C_address ) `  
+Syntax: ` Custom_gy521 gy521 (0x68); `  
 The line above calls the constructor of a GY-521 object.  
 You should declare an object of the Custom_gy521 outside any any functions.  
 In the `()`, input the I2C address of the chip (which is 0x68 by default).  
@@ -40,7 +40,7 @@ If the value returned by this function is 0x71 (or 107 in decimal), then this ch
 Syntax: `gy521.cal_gyro();` or `gy521.cal_gyro(100);`  
 This `cal_gyro()` function calibrates all 3-axes of gyroscope of the chip.  
 This function repeats reading the gyroscope values of 3 axes and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
-The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, it is 8192 times 
+The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  
   
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
   
