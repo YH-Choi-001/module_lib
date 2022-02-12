@@ -13,8 +13,6 @@
 
 namespace yh {
     namespace rec {
-        // note that the implementation has set restrictions on the farest distance it can read
-        // since the soccer field in RCJ soccer has a limited area
         class Hc_sr04_fast {
             private:
                 //
@@ -76,6 +74,14 @@ namespace yh {
                 // returns the saved reading of the last update (unit is cm)
                 uint16_t previous_dist_cm ();
         };
+        /* Using Hc_sr04 with timer interrupts to scan the status of echo pins is tested and failed
+           where the reason is still unknown.
+           Using Hc_sr04 with hardware interrupts to get the time interval is tested and failed
+           where the reason is still unknown.
+
+
+
+
         // This class does not use pulseIn, but instead
         // relies on programmer-defined timer interrupts.
         // It is suggested to set the timer interrupt between every 58 - 59 us
@@ -86,23 +92,19 @@ namespace yh {
             protected:
                 // different from other classes that counts time based on precise pulseIn()
                 // the current ultrasound reading (unit is cm)
-                uint16_t dist_read_cm;
+                volatile uint16_t dist_read_cm;
                 // maximum time to be waited before declaring the distance is undetectable
                 unsigned long limiting_time;
                 // the time that the wave was triggered (unit is microsecond)
-                unsigned long trig_time_micros;
+                volatile unsigned long trig_time_micros;
+                // the flag to indicate whether the returning pulse is received
+                volatile bool pulse_received;
+                // the ticks counted in the ISR
+                volatile unsigned long timer_tick;
+                //
+                volatile unsigned long test_time;
                 // // the flag to indicate whether the ISR should continue update the sensor
                 // bool autoscan;
-                // ISR-function
-                // ask the ultrasound to pulse a sound wave
-                inline void trig_wave () {
-                    (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
-                    delayMicroseconds(2);
-                    (*trig_pin_output_register) |= trig_pin_mask;  // this line replaces digitalWrite(trig_pin, HIGH);
-                    delayMicroseconds(10);
-                    (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
-                    trig_time_micros = micros();
-                }
             public:
                 // constructor that calls inputs another constructor
                 Hc_sr04_timer_int (const Hc_sr04_timer_int &init_obj);
@@ -133,20 +135,158 @@ namespace yh {
                 // inline void turn_off_autoscan () { autoscan = false; dist_read_cm = 0; }
 
                 // ISR-function
+
+                // writes the trig_pin to HIGH
+                inline void write_trig_pin_high () { (*trig_pin_output_register) |= trig_pin_mask; }
+                // writes the trig_pin to LOW
+                inline void write_trig_pin_low () { (*trig_pin_output_register) &= ~trig_pin_mask; }
+
+                // triggers the ultrasound to pulse a sound wave
+                inline void trig_wave () {
+                    if (pulse_received) {
+                        pulse_received = false;
+                        (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
+                        delayMicroseconds(2);
+                        (*trig_pin_output_register) |= trig_pin_mask;  // this line replaces digitalWrite(trig_pin, HIGH);
+                        delayMicroseconds(10);
+                        (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
+                        #if defined(HC_SR04_USE_MICROS)
+                        trig_time_micros = micros();
+                        #endif // #if defined(HC_SR04_USE_MICROS)
+                        #if defined(HC_SR04_USE_COUNTER_TICKS)
+                        timer_tick = 0;
+                        #endif // #if defined(HC_SR04_USE_COUNTER_TICKS)
+                    }
+                }
+
+                #if defined(HC_SR04_USE_TEST_TIMER)
+                inline void polling_refresh () {
+                    if (test_time) {
+                        (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
+                        delayMicroseconds(2);
+                        (*trig_pin_output_register) |= trig_pin_mask;  // this line replaces digitalWrite(trig_pin, HIGH);
+                        delayMicroseconds(10);
+                        (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
+                        dist_read_cm = (test_time - trig_time_micros) * 0.017;
+                        trig_time_micros = micros();
+                        test_time = 0;
+                    }
+                }
+                #endif // #if defined(HC_SR04_USE_TEST_TIMER)
+
+                #if defined(HC_SR04_USE_TEST_TIMER)
+                inline void timer_int_isr_update () {
+                    if (!( ((*echo_pin_input_register) & echo_pin_mask) || test_time)) { // echo pin is LOW and test_time is empty
+                        test_time = micros();
+                    }
+                }
+                #else // #elif defined(HC_SR04_USE_TEST_TIMER)
+                // ISR-function
                 // call me in the ISR to update
                 inline void timer_int_isr_update () {
                     // if (autoscan) {
-                    if (!((*echo_pin_input_register) & echo_pin_mask)) { // echo pin reads LOW
+                    if (!pulse_received) {
+                    #if defined(HC_SR04_USE_MICROS)
+                    static bool prev_echo_pin_state = ((*echo_pin_input_register) & echo_pin_mask);
+                    const bool curr_echo_pin_state = ((*echo_pin_input_register) & echo_pin_mask);
+                    if (!curr_echo_pin_state && prev_echo_pin_state) { // echo pin falls
                         dist_read_cm = (micros() - trig_time_micros) * 0.017; // calculate the distance to obstacles
-                        trig_wave(); // triggers another wave again
+                        pulse_received = true;
+                        // trig_wave(); // triggers another wave again
                     } else if (micros() - trig_time_micros > limiting_time) { // checks if the time length exceeds the limit
                         dist_read_cm = 888; // error distance
-                        trig_wave(); // re-trigger the wave
-                        }
-                    // }
+                        pulse_received = true;
+                        // trig_wave(); // re-trigger the wave
+                    }
+                    prev_echo_pin_state = curr_echo_pin_state;
+                    #elif defined(HC_SR04_USE_COUNTER_TICKS)
+                    static bool prev_echo_pin_state = ((*echo_pin_input_register) & echo_pin_mask);
+                    const bool curr_echo_pin_state = ((*echo_pin_input_register) & echo_pin_mask);
+                    if (!curr_echo_pin_state && prev_echo_pin_state) { // echo pin falls
+                        dist_read_cm = timer_tick;
+                        pulse_received = true;
+                        // trig_wave(); // triggers another wave again
+                    } else if (timer_tick > 221) { // checks if the dist length exceeds 400 cm
+                        dist_read_cm = 888; // error distance
+                        pulse_received = true;
+                        // trig_wave(); // re-trigger the wave
+                    } else {
+                        timer_tick++;
+                    }
+                    prev_echo_pin_state = curr_echo_pin_state;
+                    #endif // #elif defined(HC_SR04_USE_COUNTER_TICKS)
+                    }
                 }
+                #endif // line 178 #else // #elif defined(HC_SR04_USE_TEST_TIMER)
 
         };
+        class Hc_sr04_timer_int_beta : protected Hc_sr04_fast {
+            // start clearup process
+            private:
+                //
+            protected:
+                // different from other classes that counts time based on precise pulseIn()
+                // the current ultrasound reading (unit is cm)
+                volatile uint16_t dist_read_cm;
+                // the time that the wave was triggered (unit is microsecond)
+                volatile unsigned long trig_time_micros;
+                // the time that the sensor receives the returning wave (unit is microsecond)
+                volatile unsigned long wave_returning_time_micros;
+                // // the flag to indicate whether the ISR should continue update the sensor
+                // bool autoscan;
+            public:
+                // constructor that calls inputs another constructor
+                Hc_sr04_timer_int_beta (const Hc_sr04_timer_int_beta &init_obj) :
+    Hc_sr04_fast(init_obj.trig_pin, init_obj.echo_pin), dist_read_cm(0), trig_time_micros(0), wave_returning_time_micros(1) {}
+                // inits both trigger pin and echo pin with one argument only
+                // you should combine 2 pins like this: (trig_pin << 8) | echo_pin
+                Hc_sr04_timer_int_beta (const uint16_t init_trig_and_echo_pin) :
+    Hc_sr04_fast(init_trig_and_echo_pin), dist_read_cm(0), trig_time_micros(0), wave_returning_time_micros(1) {}
+                // inits the trigger pin number and echo pin number to this Uts object
+                Hc_sr04_timer_int_beta (const uint8_t init_trig_pin, const uint8_t init_echo_pin) :
+    Hc_sr04_fast(init_trig_pin, init_echo_pin), dist_read_cm(999), trig_time_micros(0), wave_returning_time_micros(1) {}
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // calls pinMode function and config the pin modes
+                // also auto calls trig_wave() one time to kick off the interrupt
+                void begin () {
+                    pinMode(trig_pin, OUTPUT);
+                    pinMode(echo_pin, INPUT);
+                }
+                // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is mm)
+                // returns 888 when the returning sound wave is undetectable
+                // for compatibility with original Hc_sr04 series above
+                inline uint16_t read_dist_mm () { return dist_read_cm * 10; }
+                // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is cm)
+                // returns 888 when the returning sound wave is undetectable
+                // for compatibility with original Hc_sr04 series above
+                inline uint16_t read_dist_cm () { return dist_read_cm; }
+                // // turn on the auto scan feature to start reading the distance
+                // inline void turn_on_autoscan () { autoscan = true; trig_wave(); }
+                // // turn off the auto scan feature and stop reading the distance
+                // inline void turn_off_autoscan () { autoscan = false; dist_read_cm = 0; }
+
+                // ISR-function
+
+                inline void polling_refresh () {
+                    if (wave_returning_time_micros) {
+                        (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
+                        delayMicroseconds(2);
+                        (*trig_pin_output_register) |= trig_pin_mask;  // this line replaces digitalWrite(trig_pin, HIGH);
+                        delayMicroseconds(10);
+                        (*trig_pin_output_register) &= ~trig_pin_mask; // this line replaces digitalWrite(trig_pin, LOW);
+                        const uint16_t temp_dist_read_cm = (wave_returning_time_micros - trig_time_micros) * 0.017;
+                        if (temp_dist_read_cm) dist_read_cm = temp_dist_read_cm; // locking mechanism to prevent always 0-reporting
+                        trig_time_micros = micros();
+                        wave_returning_time_micros = 0;
+                    }
+                }
+                inline void timer_int_isr_update () {
+                    if (!( ((*echo_pin_input_register) & echo_pin_mask) || wave_returning_time_micros)) { // echo pin is LOW and test_time is empty
+                        wave_returning_time_micros = micros();
+                    }
+                }
+        };
+        */
     }
 }
 

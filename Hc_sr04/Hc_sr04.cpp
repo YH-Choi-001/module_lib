@@ -94,6 +94,7 @@ void yh::rec::Hc_sr04::custom_pulseIn (const unsigned long limiting_time_in_us) 
         countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask,
             microsecondsToClockCycles( (limiting_time_in_us > 23530 ? 23530 : limiting_time_in_us) ) / 16);
     dist_read_mm = width ? (clockCyclesToMicroseconds(width * 16 + 16) * 0.17) : 8888;
+    // the lines above replaces the following
     // const unsigned long duration = pulseIn(echo_pin, HIGH, (limiting_time_in_us > 23530 ? 23530 : limiting_time_in_us));
     // dist_read_mm = duration ? duration * 0.17 : 8888;
 }
@@ -118,20 +119,23 @@ uint16_t yh::rec::Hc_sr04::previous_dist_cm () {
     return dist_read_mm / 10;
 }
 
+
+/*
+
 yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const Hc_sr04_timer_int &init_obj) :
-    Hc_sr04_fast(init_obj.trig_pin, init_obj.echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0)
+    Hc_sr04_fast(init_obj.trig_pin, init_obj.echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0), pulse_received(false), test_time(1)
 {
     //
 }
 
 yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const uint16_t init_trig_and_echo_pin) :
-    Hc_sr04_fast(init_trig_and_echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0)
+    Hc_sr04_fast(init_trig_and_echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0), pulse_received(false), test_time(1)
 {
     //
 }
 
 yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const uint8_t init_trig_pin, const uint8_t init_echo_pin) :
-    Hc_sr04_fast(init_trig_pin, init_echo_pin), dist_read_cm(0), limiting_time(13000), trig_time_micros(0)
+    Hc_sr04_fast(init_trig_pin, init_echo_pin), dist_read_cm(999), limiting_time(13000), trig_time_micros(0), pulse_received(false), test_time(1)
 {
     //
 }
@@ -139,7 +143,8 @@ yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const uint8_t init_trig_pin, cons
 void yh::rec::Hc_sr04_timer_int::begin () {
     pinMode(trig_pin, OUTPUT);
     pinMode(echo_pin, INPUT);
-    trig_wave();
+    pulse_received = true;
+    // trig_wave();
 }
 
 void yh::rec::Hc_sr04_timer_int::set_limiting_dist (const uint16_t request_limiting_dist) {
@@ -149,5 +154,7 @@ void yh::rec::Hc_sr04_timer_int::set_limiting_dist (const uint16_t request_limit
 void yh::rec::Hc_sr04_timer_int::set_limiting_time (const unsigned long request_limiting_time) {
     limiting_time = request_limiting_time < 23530 ? request_limiting_time : 23530;
 }
+
+*/
 
 #endif //#ifndef HC_SR04_CPP

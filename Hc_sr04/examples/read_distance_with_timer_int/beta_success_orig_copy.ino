@@ -1,5 +1,7 @@
-/* The features used in this example are failed
-   Do not use the code below
+#if 0
+
+//#define HC_SR04_USE_COUNTER_TICKS 1
+#define HC_SR04_USE_TEST_TIMER 1
 
 #include <Hc_sr04.h>
 #include <Led_w.h>
@@ -15,7 +17,7 @@ yh::rec::Led_w_fast leds [8] = {
 };
 
 void setup () {
-    // Serial.begin(2000000);
+//    Serial.begin(2000000);
     for (int i = 0; i < 8; i++) {
       leds[i].begin();
     }
@@ -28,8 +30,8 @@ ISR(TIMER1_COMPA_vect) {
 }
 
 void loop () {
-    uts.polling_refresh();
-    // Serial.println(uts.read_dist_cm());
+//    uts.timer_int_isr_update();
+//    Serial.println(uts.read_dist_cm());
     leds[0].set_led(uts.read_dist_cm() & 0x01);
     leds[1].set_led(uts.read_dist_cm() & 0x02);
     leds[2].set_led(uts.read_dist_cm() & 0x04);
@@ -38,12 +40,12 @@ void loop () {
     leds[5].set_led(uts.read_dist_cm() & 0x20);
     leds[6].set_led(uts.read_dist_cm() & 0x40);
     leds[7].set_led(uts.read_dist_cm() == 888);
+    uts.polling_refresh();
 }
 
 // copied from Timer_int.cpp
 
 inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler) {
-#error I SAID ALREADY THAT DO NOT USE THIS EXAMPLE CODE
   TCCR1A = 0; // set entire TCCR1A register to 0
   TCCR1B = 0; // same for TCCR1B
   TCNT1  = 0; // initialize counter value to 0
@@ -214,4 +216,5 @@ if (!request_prescaler) {
   TIMSK1 |= (1 << OCIE1A);
   return 0;
 }
-*/
+
+#endif

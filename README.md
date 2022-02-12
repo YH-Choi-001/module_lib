@@ -2,7 +2,7 @@
 
 ### This repository is a collection of libraries of different modules
 
-**Written exclusively for Arduino boards (excluding Arduino Due as its max I/O voltage allowed is 3.3V)**
+**Written exclusively for Arduino Pro Mini, Nano, Uno, Mega, Mega2560, Mega2560 pro**
 
 You may download the whole repository as a zip to your local drive, and then open your Arduino IDE.
 
@@ -20,10 +20,8 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.
 
-**This repository is written and maintained by YH Choi,**
-
-**tested with hardware modules provided by CSWCSS REC**
-
+**This repository is written and maintained by YH Choi,**  
+**tested with hardware modules provided by CSWCSS REC**  
 **and technically supported by CSWCSS REC hardware team.**
 
 ![](./Ningor_ir/ball_pulse_graph.png)

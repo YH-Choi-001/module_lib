@@ -39,7 +39,7 @@ class Custom_gy521 {
         void begin ();
 
         // gets the who_am_i value to clarify whether this chip is mpu6050, mpu6500, or mpu9250
-        // if the chip is mpu6050, the returned value should be 0x68
+        // if the chip is mpu6000 or mpu6050, the returned value should be 0x68
         // if the chip is mpu6500, the returned value should be 0x70
         // if the chip is mpu9250, the returned value should be 0x71
         uint8_t who_am_i ();

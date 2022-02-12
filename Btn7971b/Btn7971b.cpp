@@ -145,7 +145,7 @@ void yh::rec::Btn7971b::begin () {
 void yh::rec::Btn7971b::set_spd (const int16_t input_speed) {
     speed = constrain(input_speed, slowest_spd, fastest_spd);
     const bool dir_pin_state = (input_speed < 0);
-    // this line replaces digitalWrite(dir_pin, dir_pin_state);
+    // the line below replaces digitalWrite(dir_pin, dir_pin_state);
     dir_pin_state ? ((*dir_pin_output_register) |= dir_pin_mask) : ((*dir_pin_output_register) &= (~dir_pin_mask));
 
     analogWrite(pwm_pin, dir_pin_state ? (speed & 0xff) - 1 : speed);

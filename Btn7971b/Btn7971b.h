@@ -57,6 +57,11 @@ namespace yh {
                 int16_t operator -- ();
         };
         //*
+        //    IN1 : IN2   
+        //    LOW : LOW    => stop
+        //    LOW : HIGH   => clockwise
+        //   HIGH : LOW    => anti-clockwise
+        //    LOW : LOW    => stop
         #define Btn7971b Btn7971b_alpha
         class Btn7971b {
             private:
