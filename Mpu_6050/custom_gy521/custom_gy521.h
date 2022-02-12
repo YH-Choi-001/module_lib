@@ -10,8 +10,7 @@
 // this class has been customized for RCJ soccer robots use only
 class Custom_gy521 {
     private:
-        // get myself
-        Custom_gy521 &myself () { return *this; }
+        //
     protected:
         // the 7-bit I2C address of the chip [0x00:0x7f]
         const uint8_t i2c_address;
