@@ -21,7 +21,7 @@ void setup () {
 void loop () {
 
     Serial.print("0x");
-    Serial.println(gy521.who_am_i());
+    Serial.println(gy521.who_am_i(), HEX);
 
     delay(3000);
 

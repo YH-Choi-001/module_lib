@@ -10,7 +10,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 1. This library is applicable to GY-521 (MPU6000 or MPU6050), GY-6500 (MPU6500), GY-9250 (MPU9250),
     just treat the word gy-521 as the module you are holding right now.  
 2. This library has configured some parameters to the module by default values which are based on RCJ soccer purpose.
-    (The resolution of gyroscope is default to 1000 degrees per second)  
+    (The resolution of gyroscope is default to 1000 degrees per second.)  
 3. You are advised to check the who_am_i value of the chip before usage, since there are many reports that an MPU6500 chip was installed on an MPU9250 board. The appearance of the module may fake you. The check is to let you understand what is the model of the chip that is really inside the module you are holding.  
   
 ## How to use:  
