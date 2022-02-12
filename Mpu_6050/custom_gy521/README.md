@@ -15,7 +15,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
   
 ## How to use:  
 1. Constructor of a GY-521 object ` Custom_gy521::Custom_gy521 ( I2C_address ) `  
-Syntax: ` Custom_gy521 gy521 (0x68); `  
+Syntax: ` Custom_gy521 gy521 (0x68); ` or `Custom_gy521 gy521 (0x69);`  
 The line above calls the constructor of a GY-521 object.  
 You should declare an object of the Custom_gy521 outside any any functions.  
 In the `()`, input the I2C address of the chip (which is 0x68 by default).  
