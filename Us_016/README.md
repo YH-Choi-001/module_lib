@@ -43,7 +43,7 @@ This `read_dist_mm()` function gets the previous distance read between this ultr
 Syntax: `uint16_t distance_read = us_016.get_previous_dist_cm();`  
 This `read_dist_mm()` function gets the previous distance read between this ultrasound sensor and the obstacle in front of it in centimeters.  
   
-7. `uint16_t yh::rec::Us_016::set_resolution ( resolution )` **method** (also applicable to `yh::rec::Us_016_fast`)  
+7. `void yh::rec::Us_016::set_resolution ( resolution )` **method** (also applicable to `yh::rec::Us_016_fast`)  
 Syntax: `us_016.set_resolution(1);` or `us_016.set_resolution(3);`  
 This `set_resolution()` function sets the resolution of the module to either 1 millimeter or 3 millimeters.  
 When the resolution is set to 1 millimeter, the detectable range of the module will be limited to 1 meter.  
