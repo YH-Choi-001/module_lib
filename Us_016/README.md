@@ -13,6 +13,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
   
 ## How to use:  
 1. Constructor of an US-016 object ` yh::rec::Us_016::Us_016 () `  
+<!--
 Syntax: ` Custom_gy521 gy521 (0x68); ` or `Custom_gy521 gy521 (0x69);`  
 The line above calls the constructor of a GY-521 object.  
 You should declare an object of the Custom_gy521 outside any any functions.  
@@ -91,6 +92,7 @@ The argument `sampling_amount` tells the function how many times it should get d
 Syntax: `gy521.update_yaw();`  
 This `update_yaw()` function **only updates the member `yaw`** in the object.  
   
+-->
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
   
 **This repository is written and maintained by YH Choi,**  

@@ -10,7 +10,7 @@ yh::rec::Sen_1930_fast grayscale (A0);
 void setup () {
     Serial.begin(9600);
     grayscale.begin();
-    grayscale.set_lower_limit_of_white(700);
+    grayscale.threshold(700);
 }
 
 void loop () {
