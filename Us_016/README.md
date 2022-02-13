@@ -15,11 +15,11 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 3. When 3 or more US-016 modules are used on the same Arduino board, only 2 of them can read useful readings, while the other modules can only read garbage readings.  
   
 ## How to use:  
-1. **Constructor of an US-016 object** ` yh::rec::Us_016::Us_016 ( digital_pin, analog_pin, range ) ` (also applicable to `yh::rec::Us_016_fast`)  
+1. **Constructor of an US-016 object** ` yh::rec::Us_016::Us_016 ( digital_pin, analog_pin, resolution ) ` (also applicable to `yh::rec::Us_016_fast`)  
 Syntax: `yh::rec::Us_016 us_016 (13, A0);` or `yh::rec::Us_016 us_016 (13, A0, 3);`  
 The line above calls the constructor of an US-016 object.  
 You should declare an object of the Us_016 type outside any any functions.  
-In the `()`, first input the digital pin on the Arduino that is connected to the range pin on the US-016, then input the analog pin on the Arduino that is connected to the out pin on the US-016. Last, you can input the range of the US-016 module, either 1 for 1 meter or 3 for 3 meters. It is by default set to 3 meters, so it is optional. For more details, see `set_resolution(...)` method.  
+In the `()`, first input the digital pin on the Arduino that is connected to the range pin on the US-016, then input the analog pin on the Arduino that is connected to the out pin on the US-016. Last, you can input the resolution of the US-016 module, either 1 for 1 millimeter or 3 for 3 millimeters. It is by default set to 3 millimeters, so it is optional. For more details, see `set_resolution(...)` method.  
   
 2. `void yh::rec::Us_016::begin ()` **method** (also applicable to `yh::rec::Us_016_fast`)  
 Syntax: `us_016.begin();`  
@@ -46,8 +46,8 @@ This `read_dist_mm()` function gets the previous distance read between this ultr
 7. `void yh::rec::Us_016::set_resolution ( resolution )` **method** (also applicable to `yh::rec::Us_016_fast`)  
 Syntax: `us_016.set_resolution(1);` or `us_016.set_resolution(3);`  
 This `set_resolution()` function sets the resolution of the module to either 1 millimeter or 3 millimeters.  
-When the resolution is set to 1 millimeter, the detectable range of the module will be limited to 1 meter.  
-When the resolution is set to 3 millimeters, the detectable range of the module will be limited to 3 meters.  
+When the resolution is set to 1 millimeter, the detectable range of the module will be limited to 1023 millimeters.  
+When the resolution is set to 3 millimeters, the detectable range of the module will be limited to 3069 millimeters.  
 You should either input `1` or `3` to the argument `resolution`.  
   
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
