@@ -11,6 +11,7 @@ yh::rec::Us_016_fast us_016 (52, A15);
 void setup () {
     Serial.begin(9600);
     us_016.begin();
+    us_016.set_resolution(3);
 }
 
 void loop () {

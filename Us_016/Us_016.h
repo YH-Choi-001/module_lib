@@ -20,8 +20,8 @@ namespace yh {
                 volatile uint8_t *range_pin_output_port;
                 // the pin to read the soundwave sensor
                 const uint8_t out_pin;
-                // the flag to indicate if the resolution is 3 meters
-                bool is_resolution_3m;
+                // the flag to indicate if the resolution is 3 millimeters
+                bool is_resolution_3mm;
             public:
                 Us_016_fast (const Us_016_fast &init_obj);
                 // inits the range pin number and out pin number to this Uts object
@@ -33,7 +33,7 @@ namespace yh {
                 virtual uint16_t read_dist_mm ();
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is cm)
                 virtual uint16_t read_dist_cm ();
-                // set the resolution to either 1 or 3 meters
+                // set the resolution to either 1 or 3 millimeters
                 void set_resolution (const uint8_t resolution);
         };
         class Us_016 : public Us_016_fast {
