@@ -24,9 +24,6 @@ namespace yh {
                 bool is_resolution_3m;
             public:
                 Us_016_fast (const Us_016_fast &init_obj);
-                // inits both range pin and out pin with one argument only
-                // you should combine 2 pins like this: (range_pin << 8) | out_pin
-                Us_016_fast (const uint32_t init_range_and_out_pin_and_resolution);
                 // inits the range pin number and out pin number to this Uts object
                 Us_016_fast (const uint8_t init_range_pin, const uint8_t init_out_pin, const uint8_t init_resolution = 3);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
@@ -43,23 +40,20 @@ namespace yh {
             private:
                 //
             protected:
-                // the current ultrasound reading (unit is mm or 3mm)
-                uint16_t raw_dist_read;
+                // the current ultrasound reading (unit is mm)
+                uint16_t raw_dist_read_mm;
             public:
                 Us_016 (const Us_016 &init_obj);
-                // inits both range pin and out pin with one argument only
-                // you should combine 2 pins like this: (range_pin << 8) | out_pin
-                Us_016 (const uint32_t init_range_and_out_pin_and_resolution);
                 // inits the range pin number and out pin number to this Uts object
                 Us_016 (const uint8_t init_range_pin, const uint8_t init_out_pin, const uint8_t init_resolution = 3);
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is mm)
                 uint16_t read_dist_mm ();
-                // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is mm)
-                uint16_t read_dist_mm (const bool refresh);
+                // gets the previous distance read between this ultrasound sensor and the obstacle in front of it (unit is mm)
+                uint16_t get_previous_dist_mm ();
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is cm)
                 uint16_t read_dist_cm ();
-                // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is cm)
-                uint16_t read_dist_cm (const bool refresh);
+                // gets the previous distance read between this ultrasound sensor and the obstacle in front of it (unit is cm)
+                uint16_t get_previous_dist_cm ();
         };
     }
 }

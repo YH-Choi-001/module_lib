@@ -15,12 +15,6 @@ yh::rec::Hc_sr04_fast::Hc_sr04_fast (const Hc_sr04_fast &init_obj) :
     CONFIG_MASK_N_PORTS()
 }
 
-yh::rec::Hc_sr04_fast::Hc_sr04_fast (const uint16_t init_trig_and_echo_pin) :
-    trig_pin(init_trig_and_echo_pin >> 8), echo_pin(init_trig_and_echo_pin & 0xff)
-{
-    CONFIG_MASK_N_PORTS()
-}
-
 yh::rec::Hc_sr04_fast::Hc_sr04_fast (const uint8_t init_trig_pin, const uint8_t init_echo_pin) :
     trig_pin(init_trig_pin), echo_pin(init_echo_pin)
 {
@@ -69,12 +63,6 @@ uint16_t yh::rec::Hc_sr04_fast::read_dist_cm (const unsigned long limiting_time_
 
 yh::rec::Hc_sr04::Hc_sr04 (const Hc_sr04 &init_obj) :
     Hc_sr04_fast(init_obj.trig_pin, init_obj.echo_pin)
-{
-    CONFIG_MASK_N_PORTS()
-}
-
-yh::rec::Hc_sr04::Hc_sr04 (const uint16_t init_trig_and_echo_pin) :
-    Hc_sr04_fast(init_trig_and_echo_pin)
 {
     CONFIG_MASK_N_PORTS()
 }

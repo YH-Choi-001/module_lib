@@ -1,5 +1,7 @@
 # You should use code only when you understand them  
-
+  
+**Written exclusively for Arduino Pro Mini, Nano, Uno, Mega, Mega2560, Mega2560 pro**  
+  
 You may download this folder to ANYWHERE YOU LIKE in your local disk, and then open your Arduino IDE.  
 Select from the IDE's toolbar: Sketch -> Include Library -> Add .ZIP library... -> and select the folder named Us_016 that you have just downloaded.  
 Then you can use the library of this module.  
@@ -8,32 +10,32 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
   
 ## Remarks:  
 1. This library has configured some parameters to the module by default values which are based on RCJ soccer purpose.
-    (The range of the sensor is default to 3069 millimeters.)  
-2. When 3 or more US-016 modules are used on the same Arduino board, only 2 of them can read useful readings, while the other modules can only read garbage readings.  
+    (The range of the sensor is default to 3069 millimeters with a resolution of 3mm.)  
+2. This library provides a fast type and a normal type of the class for the module, where the fast type does not store the readings of the sensor to variables, while the normal type stores the readings of the sensor to variables, and allows the programmer to read them without updating the sensors again.  
+3. When 3 or more US-016 modules are used on the same Arduino board, only 2 of them can read useful readings, while the other modules can only read garbage readings.  
   
 ## How to use:  
-1. Constructor of an US-016 object ` yh::rec::Us_016::Us_016 () `  
-<!--
-Syntax: ` Custom_gy521 gy521 (0x68); ` or `Custom_gy521 gy521 (0x69);`  
-The line above calls the constructor of a GY-521 object.  
-You should declare an object of the Custom_gy521 outside any any functions.  
-In the `()`, input the I2C address of the chip (which is 0x68 by default).  
-If you connect the AD0 pin of the chip to a pin written HIGH, the I2C address of the chip will be changed to 0x69.  
-Therefore, you should input `0x68` to the `()` unless the AD0 pin of the chip is written HIGH, then you should input `0x69`.  
+1. Constructor  
+- A. Constructor of an US-016 (fast) object ` yh::rec::Us_016::Us_016_fast ( digital_pin, analog_pin, range ) `  
+Syntax: `yh::rec::Us_016_fast us_016 (13, A0);` or `yh::rec::Us_016_fast us_016 (13, A0, 3);`  
+The line above calls the constructor of an US-016 (fast) object.  
+You should declare an object of the Us_016 (fast) type outside any any functions.  
+In the `()`, first input the digital pin on the Arduino that is connected to the range pin on the US-016, then input the analog pin on the Arduino that is connected to the out pin on the US-016. Last, you can input the range of the US-016 module, either 1 for 1 meter or 3 for 3 meters. It is by default set to 3 meters, so it is optional.  
+- B. Constructor of an US-016 object ` yh::rec::Us_016::Us_016 ( digital_pin, analog_pin, range ) `  
+Syntax: `yh::rec::Us_016 us_016 (13, A0);` or `yh::rec::Us_016 us_016 (13, A0, 3);`  
+The line above calls the constructor of an US-016 object.  
+You should declare an object of the Us_016 type outside any any functions.  
+In the `()`, first input the digital pin on the Arduino that is connected to the range pin on the US-016, then input the analog pin on the Arduino that is connected to the out pin on the US-016. Last, you can input the range of the US-016 module, either 1 for 1 meter or 3 for 3 meters. It is by default set to 3 meters, so it is optional.  
   
-2. `void Custom_gy521::begin ()` method  
-Syntax: `gy521.begin();`  
-This `begin()` function configures the I2C communication from Wire.h (which is a built-in library with Arduino IDE).  
+2. `void yh::rec::Us_016::begin ()` method  
+Syntax: `us_016.begin();`  
+This `begin()` function configures the pin modes of the pins occupied by this individual module.  
 You must call this begin() in void setup () function to use this object properly.  
 No arguments should be inputed when calling this function.  
   
-3. `uint8_t Custom_gy521::who_am_i ()` method  
-Syntax: `uint8_t who_am_i = gy521.who_am_i();`  
-This `who_am_i()` function asks the chip to give a value to identify itself.  
-The value returned by this method can tell you whether this chip is MPU6000, MPU6050, MPU6500 or MPU9250.  
-If the value returned by this function is 0x68 (or 104 in decimal), then this chip is MPU6000 or MPU6050.  
-If the value returned by this function is 0x70 (or 106 in decimal), then this chip is MPU6500.  
-If the value returned by this function is 0x71 (or 107 in decimal), then this chip is MPU9250.  
+3. `uint16_t yh::rec::Us_016::read_dist_mm ()` method  
+Syntax: `uint16_t distance_read = gy521.read_dist_mm();`  
+This `read_dist_mm()` function asks the module to return the distance between it and the obstacle it has detected.  
   
 4. `volatile double Custom_gy521::roll, Custom_gy521::pitch, Custom_gy521::yaw` members  
 These 3 members with the data type of `double` stores the current roll, pitch and yaw values of chip facing at.  
@@ -92,7 +94,6 @@ The argument `sampling_amount` tells the function how many times it should get d
 Syntax: `gy521.update_yaw();`  
 This `update_yaw()` function **only updates the member `yaw`** in the object.  
   
--->
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
   
 **This repository is written and maintained by YH Choi,**  

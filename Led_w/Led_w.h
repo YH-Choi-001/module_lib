@@ -55,8 +55,7 @@ namespace yh {
         };
         // This class uses analogWrite(pin, val) function,
         // which allows varying brightness of the led.
-        // note 1: only analog pins and pwm pins are able to use this class
-        // note 2: analogWrite(...) is very slow
+        // note: only pwm pins are able to use this class
         class Led_w_analog {
             private:
                 //

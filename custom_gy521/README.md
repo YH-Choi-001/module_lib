@@ -1,5 +1,7 @@
 # You should use code only when you understand them  
-
+  
+**Written exclusively for Arduino Pro Mini, Nano, Uno, Mega, Mega2560, Mega2560 pro**  
+  
 You may download this folder to ANYWHERE YOU LIKE in your local disk, and then open your Arduino IDE.  
 Select from the IDE's toolbar: Sketch -> Include Library -> Add .ZIP library... -> and select the folder named custom_gy521 that you have just downloaded.  
 Then you can use the library of this module.  
@@ -17,9 +19,9 @@ In the photo above, the left ones are MPU-9250, while the right ones are MPU-650
   
 ## How to use:  
 1. Constructor of a GY-521 object ` Custom_gy521::Custom_gy521 ( I2C_address ) `  
-Syntax: ` Custom_gy521 gy521 (0x68); ` or `Custom_gy521 gy521 (0x69);`  
+Syntax: `Custom_gy521 gy521 (0x68);` or `Custom_gy521 gy521 (0x69);`  
 The line above calls the constructor of a GY-521 object.  
-You should declare an object of the Custom_gy521 outside any any functions.  
+You should declare an object of the Custom_gy521 type outside any any functions.  
 In the `()`, input the I2C address of the chip (which is 0x68 by default).  
 If you connect the AD0 pin of the chip to a pin written HIGH, the I2C address of the chip will be changed to 0x69.  
 Therefore, you should input `0x68` to the `()` unless the AD0 pin of the chip is written HIGH, then you should input `0x69`.  

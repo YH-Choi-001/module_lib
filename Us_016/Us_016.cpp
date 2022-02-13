@@ -14,15 +14,6 @@ yh::rec::Us_016_fast::Us_016_fast (const Us_016_fast &init_obj) :
     range_pin_output_port = (portOutputRegister(digitalPinToPort(range_pin)));
 }
 
-yh::rec::Us_016_fast::Us_016_fast (const uint32_t init_range_and_out_pin_and_resolution) :
-    range_pin((init_range_and_out_pin_and_resolution >> 16) & 0xff),
-    out_pin((init_range_and_out_pin_and_resolution >> 8) & 0xff),
-    is_resolution_3m((init_range_and_out_pin_and_resolution & 0xff) != 1)
-{
-    range_pin_mask = (digitalPinToBitMask(range_pin));
-    range_pin_output_port = (portOutputRegister(digitalPinToPort(range_pin)));
-}
-
 yh::rec::Us_016_fast::Us_016_fast (const uint8_t init_range_pin, const uint8_t init_out_pin, const uint8_t init_resolution) :
     range_pin(init_range_pin), out_pin(init_out_pin), is_resolution_3m(init_resolution != 1)
 {
@@ -55,41 +46,31 @@ void yh::rec::Us_016_fast::set_resolution (const uint8_t resolution) {
 }
 
 yh::rec::Us_016::Us_016 (const yh::rec::Us_016 &init_obj) :
-    Us_016_fast(init_obj.range_pin, init_obj.out_pin, init_obj.is_resolution_3m), raw_dist_read(0)
-{
-    //
-}
-
-yh::rec::Us_016::Us_016 (const uint32_t init_range_and_out_pin_and_resolution) :
-    Us_016_fast(init_range_and_out_pin_and_resolution), raw_dist_read(0)
+    Us_016_fast(init_obj.range_pin, init_obj.out_pin, init_obj.is_resolution_3m), raw_dist_read_mm(0)
 {
     //
 }
 
 yh::rec::Us_016::Us_016 (const uint8_t init_range_pin, const uint8_t init_out_pin, const uint8_t init_resolution) :
-    Us_016_fast(init_range_pin, init_out_pin, init_resolution), raw_dist_read(0)
+    Us_016_fast(init_range_pin, init_out_pin, init_resolution), raw_dist_read_mm(0)
 {
     //
 }
 
 uint16_t yh::rec::Us_016::read_dist_mm () {
-    raw_dist_read = analogRead(out_pin);
-    return is_resolution_3m ? (raw_dist_read * 3) : raw_dist_read;
+    return raw_dist_read_mm = (is_resolution_3m ? (analogRead(out_pin) * 3) : analogRead(out_pin));
 }
 
-uint16_t yh::rec::Us_016::read_dist_mm (const bool refresh) {
-    if (refresh) raw_dist_read = analogRead(out_pin);
-    return is_resolution_3m ? (raw_dist_read * 3) : raw_dist_read;
+uint16_t yh::rec::Us_016::get_previous_dist_mm () {
+    return raw_dist_read_mm;
 }
 
 uint16_t yh::rec::Us_016::read_dist_cm () {
-    raw_dist_read = analogRead(out_pin);
-    return (is_resolution_3m ? (raw_dist_read * 3) : raw_dist_read) / 10;
+    return (raw_dist_read_mm = (is_resolution_3m ? (analogRead(out_pin) * 3) : analogRead(out_pin))) / 10;
 }
 
-uint16_t yh::rec::Us_016::read_dist_cm (const bool refresh) {
-    if (refresh) raw_dist_read = analogRead(out_pin);
-    return (is_resolution_3m ? (raw_dist_read * 3) : raw_dist_read) / 10;
+uint16_t yh::rec::Us_016::get_previous_dist_cm () {
+    return raw_dist_read_mm / 10;
 }
 
 #endif //#ifndef US_016_CPP

@@ -28,8 +28,6 @@ namespace yh {
                 volatile uint8_t *led_b_pin_output_register;
             public:
                 Led_rgb_fast (const Led_rgb_fast &init_obj);
-                // inits the red, green, blue led pins to the object with single argument
-                Led_rgb_fast (const uint32_t init_led_r_g_b_pin);
                 // inits the red, green, blue led pins to the object
                 Led_rgb_fast (const uint8_t init_led_r_pin, const uint8_t init_led_g_pin, const uint8_t init_led_b_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
@@ -72,8 +70,7 @@ namespace yh {
         };
         // This class uses analogWrite(pin, val) function,
         // which allows varying brightness of led of each color.
-        // note 1: only analog pins and pwm pins are able to use this class
-        // note 2: analogWrite(...) is very slow
+        // note: only pwm pins are able to use this class
         class Led_rgb_analog {
             private:
                 //
@@ -93,8 +90,6 @@ namespace yh {
                 uint8_t b_brightness;
             public:
                 Led_rgb_analog (const Led_rgb_analog &init_obj);
-                // inits the red, green, blue led pins to the object with single argument
-                Led_rgb_analog (const uint32_t init_led_r_g_b_pin);
                 // inits the red, green, blue led pins to the object
                 Led_rgb_analog (const uint8_t init_led_r_pin, const uint8_t init_led_g_pin, const uint8_t init_led_b_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY

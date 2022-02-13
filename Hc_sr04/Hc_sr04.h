@@ -9,7 +9,6 @@
 
 // pulseIn is simplified to countPulseASM, so the following libraries are included
 #include "wiring_private.h"
-#include "pins_arduino.h"
 
 namespace yh {
     namespace rec {
@@ -30,9 +29,6 @@ namespace yh {
                 virtual inline void trig_wave ();
             public:
                 Hc_sr04_fast (const Hc_sr04_fast &init_obj);
-                // inits both trigger pin and echo pin with one argument only
-                // you should combine 2 pins like this: (trig_pin << 8) | echo_pin
-                Hc_sr04_fast (const uint16_t init_trig_and_echo_pin);
                 // inits the trigger pin number and echo pin number to this Uts object
                 Hc_sr04_fast (const uint8_t init_trig_pin, const uint8_t init_echo_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
@@ -57,9 +53,6 @@ namespace yh {
                 void custom_pulseIn (const unsigned long limiting_time_in_us);
             public:
                 Hc_sr04 (const Hc_sr04 &init_obj);
-                // inits both trigger pin and echo pin with one argument only
-                // you should combine 2 pins like this: (trig_pin << 8) | echo_pin
-                Hc_sr04 (const uint16_t init_trig_and_echo_pin);
                 // inits the trigger pin number and echo pin number to this Uts object
                 Hc_sr04 (const uint8_t init_trig_pin, const uint8_t init_echo_pin);
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is mm)

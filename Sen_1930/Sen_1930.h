@@ -1,3 +1,5 @@
+// This library is proved to be working on 13 Feb 2022 at 16:53
+
 #ifndef SEN_1930_H
 #define SEN_1930_H __DATE__ ", " __TIME__
 

@@ -18,12 +18,6 @@ yh::rec::Led_rgb_fast::Led_rgb_fast (const Led_rgb_fast &init_obj) :
     CONFIG_MASK_N_PORT(r)CONFIG_MASK_N_PORT(g)CONFIG_MASK_N_PORT(b)
 }
 
-yh::rec::Led_rgb_fast::Led_rgb_fast (const uint32_t init_led_r_g_b_pin) :
-    led_r_pin((init_led_r_g_b_pin >> 16) & 0xff), led_g_pin((init_led_r_g_b_pin >> 8) & 0xff), led_b_pin(init_led_r_g_b_pin & 0xff)
-{
-    CONFIG_MASK_N_PORT(r)CONFIG_MASK_N_PORT(g)CONFIG_MASK_N_PORT(b)
-}
-
 yh::rec::Led_rgb_fast::Led_rgb_fast (const uint8_t init_led_r_pin, const uint8_t init_led_g_pin, const uint8_t init_led_b_pin) :
     led_r_pin(init_led_r_pin), led_g_pin(init_led_g_pin), led_b_pin(init_led_b_pin)
 {
@@ -72,12 +66,6 @@ void yh::rec::Led_rgb_fast::set_rgb (const bool r, const bool g, const bool b) {
 
 yh::rec::Led_rgb_analog::Led_rgb_analog (const Led_rgb_analog &init_obj) :
     led_r_pin(init_obj.led_r_pin), led_g_pin(init_obj.led_g_pin), led_b_pin(init_obj.led_b_pin)
-{
-    //
-}
-
-yh::rec::Led_rgb_analog::Led_rgb_analog (const uint32_t init_led_r_g_b_pin) :
-    led_r_pin((init_led_r_g_b_pin >> 16) & 0xff), led_g_pin((init_led_r_g_b_pin >> 8) & 0xff), led_b_pin(init_led_r_g_b_pin & 0xff)
 {
     //
 }
