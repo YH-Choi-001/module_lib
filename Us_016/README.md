@@ -35,11 +35,11 @@ This `read_dist_mm()` function reads the distance between this ultrasound sensor
 Syntax: `uint16_t distance_read = us_016.read_dist_cm();`  
 This `read_dist_mm()` function reads the distance between this ultrasound sensor and the obstacle in front of it in centimeters.  
   
-5. `uint16_t yh::rec::Us_016::get_previous_dist_mm ()` **method** (**not** applicable to `yh::rec::Us_016_fast`)  
+5. `uint16_t yh::rec::Us_016::get_previous_dist_mm ()` **method**  
 Syntax: `uint16_t distance_read = us_016.get_previous_dist_mm();`  
 This `read_dist_mm()` function gets the previous distance read between this ultrasound sensor and the obstacle in front of it in millimeters.  
   
-6. `uint16_t yh::rec::Us_016::get_previous_dist_cm ()` **method** (**not** applicable to `yh::rec::Us_016_fast`)  
+6. `uint16_t yh::rec::Us_016::get_previous_dist_cm ()` **method**  
 Syntax: `uint16_t distance_read = us_016.get_previous_dist_cm();`  
 This `read_dist_mm()` function gets the previous distance read between this ultrasound sensor and the obstacle in front of it in centimeters.  
   
