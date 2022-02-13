@@ -50,7 +50,7 @@ namespace yh {
                 uint16_t dist_read_mm;
                 // does pulseIn on the echo pin and saves the distance read to dist_read_mm
                 // !! call trig_wave() method before calling me !!
-                void custom_pulseIn (const unsigned long limiting_time_in_us);
+                inline void custom_pulseIn (const unsigned long limiting_time_in_us);
             public:
                 Hc_sr04 (const Hc_sr04 &init_obj);
                 // inits the trigger pin number and echo pin number to this Uts object
@@ -59,13 +59,13 @@ namespace yh {
                 // returns 888 when the returning sound wave is undetectable
                 // has better performance under noInterrupts() environment
                 uint16_t read_dist_mm (const unsigned long limiting_time_in_us = 13000U);
-                // returns the saved reading of the last update (unit is mm)
-                uint16_t previous_dist_mm ();
+                // gets the previous distance read between this ultrasound sensor and the obstacle in front of it (unit is mm)
+                uint16_t get_previous_dist_mm ();
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is cm)
                 // returns 888 when the returning sound wave is undetectable
                 uint16_t read_dist_cm (const unsigned long limiting_time_in_us = 13000U);
-                // returns the saved reading of the last update (unit is cm)
-                uint16_t previous_dist_cm ();
+                // gets the previous distance read between this ultrasound sensor and the obstacle in front of it (unit is cm)
+                uint16_t get_previous_dist_cm ();
         };
         /* Using Hc_sr04 with timer interrupts to scan the status of echo pins is tested and failed
            where the reason is still unknown.

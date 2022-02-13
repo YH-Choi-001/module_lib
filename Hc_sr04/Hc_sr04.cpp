@@ -75,7 +75,7 @@ yh::rec::Hc_sr04::Hc_sr04 (const uint8_t init_trig_pin, const uint8_t init_echo_
 
 #undef CONFIG_MASK_N_PORTS
 
-void yh::rec::Hc_sr04::custom_pulseIn (const unsigned long limiting_time_in_us) {
+inline void yh::rec::Hc_sr04::custom_pulseIn (const unsigned long limiting_time_in_us) {
     // duration_in_us * 0.17 < 4000 mm
     // duration_in_us < 23529.4117
     const unsigned long width =
@@ -93,7 +93,7 @@ uint16_t yh::rec::Hc_sr04::read_dist_mm (const unsigned long limiting_time_in_us
     return dist_read_mm;
 }
 
-uint16_t yh::rec::Hc_sr04::previous_dist_mm () {
+uint16_t yh::rec::Hc_sr04::get_previous_dist_mm () {
     return dist_read_mm;
 }
 
@@ -103,7 +103,7 @@ uint16_t yh::rec::Hc_sr04::read_dist_cm (const unsigned long limiting_time_in_us
     return dist_read_mm / 10;
 }
 
-uint16_t yh::rec::Hc_sr04::previous_dist_cm () {
+uint16_t yh::rec::Hc_sr04::get_previous_dist_cm () {
     return dist_read_mm / 10;
 }
 
