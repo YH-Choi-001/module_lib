@@ -44,12 +44,15 @@ class Custom_gy521 {
         uint8_t who_am_i ();
 
         // gets 6 bytes from accelerometer
-        void update_accel ();
+        // void update_accel ();
+
+        // gets temperature in degree Celsius
+        double update_temp ();
 
         // calibrates the gyroscope, and give the corrections to corr_roll, corr_pitch, corr_yaw respectively
         // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
         // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
-        void cal_gyro (const uint16_t sampling_amount = 8192, const void (*updating_function)(void) = NULL);
+        void cal_gyro (const uint16_t sampling_amount = 8192, void (*updating_function)(void) = NULL);
         // gets 6 bytes from gyroscope (uses calibrated data to correct)
         void update_gyro ();
 

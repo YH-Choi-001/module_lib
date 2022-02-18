@@ -1,13 +1,13 @@
 #include "custom_gy521.h"
 
-uint16_t read_i2c_data_2_bytes (const uint8_t i2c_address, const uint8_t register_no) {
-    Wire.beginTransmission(i2c_address);
-    Wire.write(register_no);
-    Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
-    while (Wire.available() < 2) {}
-    return (Wire.read() << 8) | Wire.read();
-}
+// uint16_t read_i2c_data_2_bytes (const uint8_t i2c_address, const uint8_t register_no) {
+//     Wire.beginTransmission(i2c_address);
+//     Wire.write(register_no);
+//     Wire.endTransmission();
+//     Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
+//     while (Wire.available() < 2) {}
+//     return (Wire.read() << 8) | Wire.read();
+// }
 
 Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
     i2c_address(init_i2c_address), roll(0), pitch(0), yaw(0), corr_roll(0), corr_pitch(0), corr_yaw(0)
@@ -51,7 +51,17 @@ uint8_t Custom_gy521::who_am_i () {
     return Wire.read();
 }
 
-void Custom_gy521::cal_gyro (const uint16_t sampling_amount, const void (*updating_function)(void) = NULL) {
+double Custom_gy521::update_temp () {
+    Wire.beginTransmission(i2c_address);
+    Wire.write(0x41);
+    Wire.endTransmission();
+    Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
+    while (Wire.available() < 2) {}
+    const uint16_t raw_val = Wire.read() << 8 | Wire.read();
+    return (raw_val - 0/*room_temp_offset*/) / 500.0 + 21.0;
+}
+
+void Custom_gy521::cal_gyro (const uint16_t sampling_amount, void (*updating_function)(void) = NULL) {
     corr_roll = 0;
     corr_pitch = 0;
     corr_yaw = 0;

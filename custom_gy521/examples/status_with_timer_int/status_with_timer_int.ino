@@ -13,7 +13,7 @@ inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, co
 
 void update_progress () {
     static uint16_t progress = 0;
-    Serial.print((progress++) / 8192.0);
+    Serial.println((progress++) / 400.0);
 }
 
 void setup () {
@@ -25,7 +25,7 @@ void setup () {
     gy521.begin();
 
     // calibrate the gyroscope
-    gy521.cal_gyro(8192, update_progress);
+    gy521.cal_gyro(400, update_progress);
 
     // note: it is suggested not to input a time interval that is less than 600 microseconds
     // as update_gyro() takes 500 - 550 microseconds when you have set the I2C clock frequency to 400KHz
