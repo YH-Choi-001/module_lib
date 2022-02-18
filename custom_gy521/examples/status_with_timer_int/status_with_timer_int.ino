@@ -22,35 +22,41 @@ void setup () {
     // calibrate the gyroscope
     gy521.cal_gyro();
 
-    // configure the registers to set the timer interrupt in timer 1
-    // the 5000 here stands for calling the interrupt every 5000 microseconds
+    // note: it is suggested not to input a time interval that is less than 600 microseconds
+    // as update_gyro() takes 500 - 550 microseconds when you have set the I2C clock frequency to 400KHz
     // note: it is suggested not to input a time interval that is less than 1300 microseconds
-    // as update_gyro() takes 1100 - 1200 microseconds
-    setup_timer_1A_interrupt(5000);
+    // as update_gyro() takes 1100 - 1200 microseconds when you have set the I2C clock frequency to 100KHz
+    // note: 400KHz frequency is selected by Custom_gy521::begin() method.
+    // configure the registers to set the timer interrupt in timer 1
+    // the 1000 here stands for calling the interrupt every 1000 microseconds
+    setup_timer_1A_interrupt(1000);
 }
 
 void loop () {
 
-//    const unsigned long prev = micros();
     // prints out the current heading of the chip
     // calls Custom_gy521::update_gyro() method without arguments
     // in order to use calibrated values for readings from Custom_gy521.cal_gyro()
-    // gy521.update_gyro();
-//    const unsigned long dt = micros() - prev;
-//    static unsigned long maxt = 0;
-//    if (dt > maxt) maxt = dt;
-//    Serial.print(dt);
-//    Serial.print('\t');
-//    Serial.println(maxt);
-//    // from the data logged above,
-//    // every update_gyro() call takes 1100 - 1200 us
-//    // every timer interrupt should have at least 1300 us distance
+    #ifdef FIND_TIME_INTERVAL
+    const unsigned long prev = micros();
+    gy521.update_gyro();
+    const unsigned long dt = micros() - prev;
+    static unsigned long maxt = 0;
+    if (dt > maxt) maxt = dt;
+    Serial.print(dt);
+    Serial.print('\t');
+    Serial.println(maxt);
+    // from the data logged above,
+    // every update_gyro() call takes 1100 - 1200 us
+    // every timer interrupt should have at least 1300 us distance
+    #else // !defined(FIND_TIME_INTERVAL)
     Serial.print(gy521.roll);
     Serial.print('\t');
     Serial.print(gy521.pitch);
     Serial.print('\t');
     Serial.print(gy521.yaw);
     Serial.print('\n');
+    #endif // !defined(FIND_TIME_INTERVAL)
 }
 
 ISR(TIMER1_COMPA_vect) {
