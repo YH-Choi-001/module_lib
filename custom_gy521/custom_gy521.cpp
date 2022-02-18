@@ -4,7 +4,7 @@ uint16_t read_i2c_data_2_bytes (const uint8_t i2c_address, const uint8_t registe
     Wire.beginTransmission(i2c_address);
     Wire.write(register_no);
     Wire.endTransmission();
-    Wire.requestFrom(i2c_address, 2);
+    Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
     while (Wire.available() < 2);
     return (Wire.read() << 8) | Wire.read();
 }
@@ -18,6 +18,7 @@ Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
 void Custom_gy521::begin () {
     // init settings to the GY-521 module through I2C
     Wire.begin();
+    Wire.setClock(400000);
     // Wire.beginTransmission(i2c_address);
     // switch (Wire.endTransmission()) { // perform check to ensure i2c_address is correct
     //     case 0:
@@ -45,7 +46,7 @@ uint8_t Custom_gy521::who_am_i () {
     Wire.write(0x75);
     const uint8_t err = Wire.endTransmission();
     if (err) return 0;
-    Wire.requestFrom(i2c_address,1);
+    Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
     while (Wire.available() < 1);
     return Wire.read();
 }
@@ -55,7 +56,7 @@ void Custom_gy521::cal_gyro (const uint16_t sampling_amount) {
         Wire.beginTransmission(i2c_address);
         Wire.write(0x43);
         Wire.endTransmission();
-        Wire.requestFrom(i2c_address,6);
+        Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U));
         // commands above take around 944 - 952 us
         while (Wire.available() < 6) {}
         corr_roll += static_cast<double>((Wire.read() << 8) | Wire.read());
@@ -73,9 +74,9 @@ void Custom_gy521::update_gyro () {
     Wire.beginTransmission(i2c_address);
     Wire.write(0x43);
     Wire.endTransmission();
-    Wire.requestFrom(i2c_address,6);
+    Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U));
     // commands above take around 944 - 952 us
-    while (Wire.available() < 6);
+    while (Wire.available() < 6) {}
         const unsigned long t_diff = micros() - previous_micros_reading;
         roll += ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 32800000.0 * t_diff; // angle change per sec * time past in secs
         pitch -= ( ((Wire.read()<<8) | Wire.read()) + corr_pitch) / 32800000.0 * t_diff; // angle change per sec * time past in secs
