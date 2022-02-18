@@ -11,6 +11,11 @@ Custom_gy521 gy521 (0x68); // change argument to 0x69 if AD0 is HIGH
 // copied from Timer_int.h
 inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
 
+void update_progress () {
+    static uint16_t progress = 0;
+    Serial.print((progress++) / 8192.0);
+}
+
 void setup () {
 
     // sets baud rate to 9600
@@ -20,7 +25,7 @@ void setup () {
     gy521.begin();
 
     // calibrate the gyroscope
-    gy521.cal_gyro();
+    gy521.cal_gyro(8192, update_progress);
 
     // note: it is suggested not to input a time interval that is less than 600 microseconds
     // as update_gyro() takes 500 - 550 microseconds when you have set the I2C clock frequency to 400KHz

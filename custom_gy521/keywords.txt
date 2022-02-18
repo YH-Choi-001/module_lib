@@ -10,9 +10,3 @@ begin			KEYWORD2
 who_am_i		KEYWORD2
 cal_gyro		KEYWORD2
 update_gyro		KEYWORD2
-cal_roll		KEYWORD2
-update_roll		KEYWORD2
-cal_pitch		KEYWORD2
-update_pitch		KEYWORD2
-cal_yaw			KEYWORD2
-update_yaw		KEYWORD2

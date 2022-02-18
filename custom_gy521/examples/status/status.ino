@@ -8,16 +8,21 @@
 
 Custom_gy521 gy521 (0x68); // change argument to 0x69 if AD0 is HIGH
 
- void setup () {
+void update_progress () {
+    static uint16_t progress = 0;
+    Serial.print((progress++) / 8192.0);
+}
 
-     // sets baud rate to 9600
-     Serial.begin(9600);
+void setup () {
 
-     // sets the GY-521 chip to desired settings
-     gy521.begin();
+    // sets baud rate to 9600
+    Serial.begin(9600);
 
-     // calibrate the gyroscope
-     gy521.cal_gyro();
+    // sets the GY-521 chip to desired settings
+    gy521.begin();
+
+    // calibrate the gyroscope
+    gy521.cal_gyro(8192, update_progress);
 
  }
 
