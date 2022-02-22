@@ -61,7 +61,7 @@ namespace yh {
         //    LOW : LOW    => stop
         //    LOW : HIGH   => clockwise
         //   HIGH : LOW    => anti-clockwise
-        //    LOW : LOW    => stop
+        //   HIGH : HIGH   => stop
         // now let pwm be IN1, dir be IN2
         class Btn7971b {
             private:

@@ -18,7 +18,7 @@ Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
 void Custom_gy521::begin () {
     // init settings to the GY-521 module through I2C
     Wire.begin();
-    Wire.setClock(400000);
+    Wire.setClock(400000); // set I2C to fast mode for faster communication
     // Wire.beginTransmission(i2c_address);
     // switch (Wire.endTransmission()) { // perform check to ensure i2c_address is correct
     //     case 0:
@@ -42,18 +42,18 @@ void Custom_gy521::begin () {
 }
 
 uint8_t Custom_gy521::who_am_i () {
-    Wire.beginTransmission(i2c_address);
-    Wire.write(0x75);
+    Wire.beginTransmission(i2c_address); // talk to GY-521
+    Wire.write(0x75); // accessing the who am I register
     const uint8_t err = Wire.endTransmission();
-    if (err) return 0;
+    if (err) return 0; // an error occured while communicating with the chip
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
     while (Wire.available() < 1) {}
     return Wire.read();
 }
 
 double Custom_gy521::update_temp () {
-    Wire.beginTransmission(i2c_address);
-    Wire.write(0x41);
+    Wire.beginTransmission(i2c_address); // talk to GY-521
+    Wire.write(0x41); // accessing the register of thermometer, which has 2 bytes, from 0x41 to 0x42
     Wire.endTransmission();
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
     while (Wire.available() < 2) {}
@@ -66,31 +66,31 @@ void Custom_gy521::cal_gyro (const uint16_t sampling_amount, void (*updating_fun
     corr_pitch = 0;
     corr_yaw = 0;
     for (uint16_t i = 0; i < sampling_amount; i++) {
-        Wire.beginTransmission(i2c_address);
-        Wire.write(0x43);
+        Wire.beginTransmission(i2c_address); // talk to GY-521
+        Wire.write(0x43); // accessing the registers of gyroscope x, y, z, where each axis has 2 bytes, from 0x43 to 0x48
         Wire.endTransmission();
         Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U));
-        // commands above take around 944 - 952 us
+        // commands above take around 944 - 952 us in 100 KHz clock frequency
         while (Wire.available() < 6) {}
-        corr_roll += static_cast<double>((Wire.read() << 8) | Wire.read());
-        corr_pitch += static_cast<double>((Wire.read() << 8) | Wire.read());
-        corr_yaw += static_cast<double>((Wire.read() << 8) | Wire.read());
+        corr_roll -= static_cast<double>((Wire.read() << 8) | Wire.read());
+        corr_pitch -= static_cast<double>((Wire.read() << 8) | Wire.read());
+        corr_yaw -= static_cast<double>((Wire.read() << 8) | Wire.read());
         delayMicroseconds(10);
         if (updating_function)
             updating_function();
     }
-    corr_roll /= -static_cast<double>(sampling_amount);
-    corr_pitch /= -static_cast<double>(sampling_amount);
-    corr_yaw /= -static_cast<double>(sampling_amount);
+    corr_roll /= static_cast<double>(sampling_amount);
+    corr_pitch /= static_cast<double>(sampling_amount);
+    corr_yaw /= static_cast<double>(sampling_amount);
 }
 
 void Custom_gy521::update_gyro () {
     static unsigned long previous_micros_reading = micros();
-    Wire.beginTransmission(i2c_address);
-    Wire.write(0x43);
+    Wire.beginTransmission(i2c_address); // talk to GY-521
+    Wire.write(0x43); // accessing the registers of gyroscope x, y, z, where each axis has 2 bytes, from 0x43 to 0x48
     Wire.endTransmission();
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U));
-    // commands above take around 944 - 952 us
+    // commands above take around 944 - 952 us in 100 KHz clock frequency
     while (Wire.available() < 6) {}
     const unsigned long t_diff = micros() - previous_micros_reading;
     roll += ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 32800000.0 * t_diff; // angle change per sec * time past in secs

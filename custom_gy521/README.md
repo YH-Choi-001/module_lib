@@ -12,6 +12,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 2. This library has configured some parameters to the module by default values which are based on RCJ soccer purpose.
     (The resolution of gyroscope is default to 1000 degrees per second.)  
 3. You are advised to check the who_am_i value of the chip before usage, since there are many reports that an MPU6500 chip was installed on an MPU9250 board. The appearance of the module may fake you. The check is to let you understand what is the model of the chip that is really inside the module you are holding.  
+4. This library sets the I2C clock to 400 KHz frequency (fast mode) to achieve faster communication.
   
 ## How to use:  
 1. Constructor of a GY-521 object ` Custom_gy521::Custom_gy521 ( I2C_address ) `  
