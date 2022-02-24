@@ -58,7 +58,7 @@ double Custom_gy521::update_temp () {
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
     while (Wire.available() < 2) {}
     const uint16_t raw_val = Wire.read() << 8 | Wire.read();
-    return (raw_val - 0/*room_temp_offset*/) / 500.0 + 21.0;
+    return (raw_val - 21/*room_temp_offset*/) / 333.87/*sensitivity in LSB per degree Celsius */ + 21.0; // this formula is from register map
 }
 
 void Custom_gy521::cal_gyro (const uint16_t sampling_amount, void (*updating_function)(void) = NULL) {

@@ -97,6 +97,30 @@ Syntax: `gy521.update_yaw();`
 This `update_yaw()` function **only updates the member `yaw`** in the object.  
 -->
   
+## Datasheets and Register Maps:  
+The links below are the datasheets and register maps of the 3 types of chips mentioned above.  
+This library is written based on the datasheets and register maps below.  
+Note that some important information, such as the way to interpret raw data, are written in the register map instead of the datasheet.  
+If you would like to write your own library, please read the whole document before writing any code in order to let you know the features and limits of the module.  
+  
+MPU-60X0 (for MPU-6050)  
+- datasheet  
+https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf  
+- register map  
+https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf  
+  
+MPU-6500  
+- datasheet  
+http://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2020/06/PS-MPU-6500A-01-v1.3.pdf  
+- register map  
+https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6500-Register-Map2.pdf  
+  
+MPU-9250  
+- datasheet  
+https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf  
+- register map  
+https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf  
+  
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
   
 **This repository is written and maintained by YH Choi,**  

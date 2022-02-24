@@ -1,3 +1,25 @@
+// for your reference only
+
+// MPU-60X0 (for MPU-6050)
+    // datasheet
+    // https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Datasheet1.pdf
+    // register map
+    // https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6000-Register-Map1.pdf
+
+// MPU-6500
+    // datasheet
+    // http://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2020/06/PS-MPU-6500A-01-v1.3.pdf
+    // register map
+    // https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6500-Register-Map2.pdf
+
+// MPU-9250
+    // datasheet
+    // https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf
+    // register map
+    // https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf
+
+
+
 #ifndef CUSTOM_GY521_H
 #define CUSTOM_GY521_H __DATE__ ", " __TIME__
 
