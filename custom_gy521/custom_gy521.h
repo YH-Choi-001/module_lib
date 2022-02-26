@@ -16,7 +16,7 @@
     // datasheet
     // https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf
     // register map
-    // https://cdn.sparkfun.com/assets/learn_tutorials/5/5/0/MPU-9250-Register-Map.pdf
+    // https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2017/11/RM-MPU-9250A-00-v1.6.pdf
 
 
 
@@ -28,6 +28,11 @@
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
 #include <Wire.h>
+
+#define MPU6000 0x68
+#define MPU6050 0x68
+#define MPU6500 0x70
+#define MPU9250 0x71
 
 // this class has been customized for RCJ soccer robots use only
 class Custom_gy521 {
@@ -57,7 +62,7 @@ class Custom_gy521 {
         Custom_gy521 (const uint8_t init_i2c_address);
         // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
         // calls pinMode function and config the pin modes
-        void begin ();
+        virtual void begin ();
 
         // gets the who_am_i value to clarify whether this chip is mpu6050, mpu6500, or mpu9250
         // if the chip is mpu6000 or mpu6050, the returned value should be 0x68
@@ -96,6 +101,9 @@ class Custom_gy521 {
         // double cal_yaw (const uint16_t sampling_amount = 8192);
         // // gets 2 bytes from yaw (uses calibrated data to correct)
         // double update_yaw ();
+
+        // specially made for the external AK8963 magnetometer attached to MPU-9250
+        void enable_ext_i2c_slave_sensors ();
 };
 
 #endif // #ifndef CUSTOM_GY521_H

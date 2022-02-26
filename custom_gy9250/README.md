@@ -1,3 +1,5 @@
+# This library is still under development, thus is not available. Please do not use any code from this custom_gy9250 folder.
+<!--
 # You should use code only when you understand them  
 
 You may download this folder to ANYWHERE YOU LIKE in your local disk, and then open your Arduino IDE.  
@@ -33,7 +35,7 @@ No arguments should be inputed when calling this function.
 Syntax: `uint8_t who_am_i = gy521.who_am_i();`  
 This `who_am_i()` function asks the chip to give a value to identify itself.  
 The value returned by this method can tell you whether this chip is MPU6000, MPU6050, MPU6500 or MPU9250.  
-If the value returned by this function is 0x68 (or 104 in decimal), then this chip is MPU6000 or MPU6050 (or maybe it is MPU9150, but you can tell it by the appearance of the module).  
+If the value returned by this function is 0x68 (or 104 in decimal), then this chip is MPU6000 or MPU6050.  
 If the value returned by this function is 0x70 (or 106 in decimal), then this chip is MPU6500.  
 If the value returned by this function is 0x71 (or 107 in decimal), then this chip is MPU9250.  
   

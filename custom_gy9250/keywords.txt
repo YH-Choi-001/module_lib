@@ -1,0 +1,28 @@
+Custom_gy521		KEYWORD1
+roll			KEYWORD1
+pitch			KEYWORD1
+yaw			KEYWORD1
+corr_roll		KEYWORD1
+corr_pitch		KEYWORD1
+corr_yaw		KEYWORD1
+
+begin			KEYWORD2
+who_am_i		KEYWORD2
+cal_gyro		KEYWORD2
+update_gyro		KEYWORD2
+
+################################
+
+Custom_gy9250		KEYWORD1
+Custom_ak8963		KEYWORD1
+mag			KEYWORD1
+raw_x			KEYWORD1
+raw_y			KEYWORD1
+raw_z			KEYWORD1
+adj_x			KEYWORD1
+adj_y			KEYWORD1
+adj_z			KEYWORD1
+
+who_i_am		KEYWORD2
+update_raw		KEYWORD2
+update_adjusted		KEYWORD2

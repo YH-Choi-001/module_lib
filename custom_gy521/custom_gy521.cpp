@@ -1,3 +1,6 @@
+#ifndef CUSTOM_GY521_CPP
+#define CUSTOM_GY521_CPP __DATE__ ", " __TIME__
+
 #include "custom_gy521.h"
 
 // uint16_t read_i2c_data_2_bytes (const uint8_t i2c_address, const uint8_t register_no) {
@@ -17,8 +20,10 @@ Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
 
 void Custom_gy521::begin () {
     // init settings to the GY-521 module through I2C
-    Wire.begin();
-    Wire.setClock(400000); // set I2C to fast mode for faster communication
+    if (!(TWCR & _BV(TWEN))) { // if (TwoWireENable bit is off) { begin I2C communication }
+        Wire.begin();
+        Wire.setClock(400000); // set I2C to fast mode for faster communication
+    }
     // Wire.beginTransmission(i2c_address);
     // switch (Wire.endTransmission()) { // perform check to ensure i2c_address is correct
     //     case 0:
@@ -32,9 +37,13 @@ void Custom_gy521::begin () {
     //         return;
     // }
     Wire.beginTransmission(i2c_address); // talk to GY-521
-    Wire.write(0x6B); // accessing the register 6B - Power Management
-    Wire.write(0b00000000); // setting SLEEP register to 0
-    Wire.endTransmission();  
+    Wire.write(0x6B); // accessing the register 6B - Power Management 1
+    Wire.write(0b00000000); // setting SLEEP bit to 0
+    Wire.endTransmission();
+    Wire.beginTransmission(i2c_address); // talk to GY-521
+    Wire.write(0x6C); // accessing the register 6C - Power Management 2
+    Wire.write(0b00000000); // enabling accel x y z, enabling gyro x y z
+    Wire.endTransmission();
     Wire.beginTransmission(i2c_address); // talk to GY-521
     Wire.write(0x1B); // accessing the register 1B - Gyroscope Configuration
     Wire.write(0b00010000); // setting the gyro to scale +/- 1000deg./s (2 of [0:3]) assume that the robot cannot rotate more than 2.5 circles per second
@@ -57,8 +66,14 @@ double Custom_gy521::update_temp () {
     Wire.endTransmission();
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
     while (Wire.available() < 2) {}
-    const uint16_t raw_val = Wire.read() << 8 | Wire.read();
-    return (raw_val - 21/*room_temp_offset*/) / 333.87/*sensitivity in LSB per degree Celsius */ + 21.0; // this formula is from register map
+    const int16_t TEMP_OUT = Wire.read() << 8 | Wire.read();
+    if (this->who_am_i() == 0x68) {
+    // MPU-6000 or MPU-6050
+        return TEMP_OUT / 340.0 + 36.53; // this formula is from register map
+    } else {
+        // MPU-6500 or MPU-9250
+        return (TEMP_OUT - 21/*room_temp_offset*/) / 333.87/*sensitivity in LSB per degree Celsius */ + 21.0; // this formula is from register map
+    }
 }
 
 void Custom_gy521::cal_gyro (const uint16_t sampling_amount, void (*updating_function)(void) = NULL) {
@@ -139,3 +154,19 @@ void Custom_gy521::update_gyro () {
 // UPDATE_(yaw,-,0x47)
 
 // #undef UPDATE_
+
+void Custom_gy521::enable_ext_i2c_slave_sensors () {
+    Wire.beginTransmission(i2c_address);
+    Wire.write(0x37);
+    Wire.endTransmission();
+    Wire.requestFrom(i2c_address, 1);
+    while (Wire.available() < 1);
+    const uint8_t old_val = Wire.read();
+    // write new value to MPU-9250 at register 0x37 with BYPASS_EN bit set HIGH
+    Wire.beginTransmission(i2c_address);
+    Wire.write(0x37);
+    Wire.write(old_val | 0x02);
+    Wire.endTransmission();
+}
+
+#endif // #ifndef CUSTOM_GY521_CPP

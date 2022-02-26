@@ -1,10 +1,11 @@
 // Please do the following:
-// connect one pwm input on Btn7971b to pin 4 on arduino
-// connect the other pwm input on Btn7971b to pin 5 on arduino
+// connect the IN1 pin on Btn7971b to pin 6 on arduino
+// connect the IN2 pin on Btn7971b to pin 7 on arduino
 
 #include <Btn7971b.h>
 
-yh::rec::Btn7971b motor(4, 5);
+// first pin must support PWM, second pin need not support PWM
+yh::rec::Btn7971b motor(6, 7);
 
 void setup () {
     Serial.begin(9600);
