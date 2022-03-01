@@ -3,7 +3,7 @@
 ## The jumper wires are found to be heated, thus decreased its electrical conductivity.  
 ## The age of the MPU-series modules are suspected.  
 ## Since jumper wires are scarce and limited resources, and the loss is severe, it is forced to suspend the development of this library until new resources are supplied.  
-# By the way, it was promised that the final project of the new robot will be using completely new modules. I am looking forward to that. 
+# By the way, it was promised that the final product of the new robot will be using completely new modules. I am looking forward to that. 
 
 ### Although I achieved dozens of successful results, it is my fault that I didn't filmed any of them.  
 ### Logged by David Choi on 1st March, 2022, at 20:07:09.  
