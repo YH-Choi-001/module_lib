@@ -1,4 +1,12 @@
-# This library is still under development, thus is not available. Please do not use any code from this custom_gy9250 folder.
+# This library is still under development, thus is not available. Please do not use any code from this custom_gy9250 folder.  
+  
+## The jumper wires are found to be heated, thus decreased its electrical conductivity.  
+## The age of the MPU-series modules are suspected.  
+## Since jumper wires are scarce and limited resources, and the loss is severe, it is forced to suspend the development of this library until new resources are supplied.  
+# By the way, it was promised that the final project of the new robot will be using completely new modules. I am looking forward to that. 
+
+### Although I achieved dozens of successful results, it is my fault that I didn't filmed any of them.  
+### Logged by David Choi on 1st March, 2022, at 20:07:09.  
 <!--
 # You should use code only when you understand them  
 
@@ -122,6 +130,8 @@ MPU-9250
 https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf  
 - register map  
 https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2017/11/RM-MPU-9250A-00-v1.6.pdf  
+- AK8963 datasheet and register map  
+https://cdn.datasheetspdf.com/pdf-down/A/K/8/AK8963-AsahiKaseiMicrosystems.pdf  
   
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
   

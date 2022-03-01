@@ -4,17 +4,9 @@
 #include "custom_gy9250.h"
 #include "../custom_gy521/custom_gy521.cpp"
 
-// uint16_t read_i2c_data_2_bytes (const uint8_t i2c_address, const uint8_t register_no) {
-//     Wire.beginTransmission(i2c_address);
-//     Wire.write(register_no);
-//     Wire.endTransmission();
-//     Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
-//     while (Wire.available() < 2) {}
-//     return (Wire.read() << 8) | Wire.read();
-// }
-
 Custom_ak8963::Custom_ak8963 (const uint8_t init_i2c_address) :
-    i2c_address(init_i2c_address), ASA_X(0), ASA_Y(0), ASA_Z(0), raw_x(0), raw_y(0), raw_z(0), adj_x(0), adj_y(0), adj_z(0)
+    i2c_address(init_i2c_address), ASA_X(0), ASA_Y(0), ASA_Z(0), x_mean(0), y_mean(0), z_mean(0),
+    raw_x(0), raw_y(0), raw_z(0), rz_heading(0)
 {
     //
 }
@@ -37,7 +29,71 @@ void Custom_ak8963::begin () {
     ASA_X = Wire.read();
     ASA_Y = Wire.read();
     ASA_Z = Wire.read();
+    // set power mode to power-down mode first before other modes, required by datasheet to change power modes
+    Wire.beginTransmission(i2c_address); // talk to AK8963
+    Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select power-down mode
+    Wire.write(0x00); // select power-down mode
+    Wire.endTransmission();
+    delayMicroseconds(128); // delay at least 100us, required by datasheet to change power modes
 }
+
+inline void Custom_ak8963::update_raw (const unsigned long delay_time_micros) {
+    // refresh magnetometer
+    Wire.beginTransmission(i2c_address); // talk to AK8963
+    Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select single-measurement mode
+    Wire.write(0x01); // select single-measurement mode
+    Wire.endTransmission();
+    // delayMicroseconds(delay_time_micros);
+    //
+    uint8_t ST1 = 0;
+    do
+    {
+        Wire.beginTransmission(i2c_address); // talk to AK8963
+        Wire.write(0x02); // accessing the register 0x02 - ST1 register
+        Wire.endTransmission();
+        Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)); // see if new data is ready
+        ST1 = Wire.read();
+    } while (!ST1);
+    Wire.beginTransmission(i2c_address); // talk to AK8963
+    Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
+    Wire.endTransmission();
+    Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U));
+    while (Wire.available() < 7) {}
+    raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
+    raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
+    raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
+    Wire.read(); // reading the ST2 register to complete the whole process, but we don't need its data
+}
+
+// inline void Custom_ak8963::polling_update_raw () {
+//     Wire.beginTransmission(i2c_address); // talk to AK8963
+//     Wire.write(0x02); // accessing the register 0x02 - ST1 register
+//     Wire.endTransmission();
+//     Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)); // see if new data is ready
+//     if (Wire.read()) {
+//         // new data is ready
+
+//         // update raw values
+//         Wire.beginTransmission(i2c_address); // talk to AK8963
+//         Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
+//         Wire.endTransmission();
+//         Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U));
+//         while (Wire.available() < 7) {}
+//         raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
+//         raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
+//         raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
+//         Wire.read(); // reading the ST2 register to complete the whole process, but we don't need its data
+
+//         // select the single-measurement mode again for next reading
+//         Wire.beginTransmission(i2c_address); // talk to AK8963
+//         Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select single-measurement mode
+//         Wire.write(0x01); // select single-measurement mode
+//         Wire.endTransmission();
+//     } else {
+//         // new data is not ready
+//         // nothing to be refreshed
+//     }
+// }
 
 uint8_t Custom_ak8963::who_i_am () {
     Wire.beginTransmission(i2c_address); // talk to AK8963
@@ -49,36 +105,45 @@ uint8_t Custom_ak8963::who_i_am () {
     return Wire.read();
 }
 
-void Custom_ak8963::update_raw () {
-    Wire.beginTransmission(i2c_address); // talk to AK8963
-    Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select single-measurement mode
-    // Wire.write(0x01); // select single-measurement mode
-    Wire.write(0b0010); // select continuous measurement mode 1
-    Wire.endTransmission();
-
-    Wire.beginTransmission(i2c_address); // talk to AK8963
-    Wire.write(0x02); // accessing the register 0x02 - ST1 register
-    Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
-    while (Wire.available() < 1) {}
-    if (Wire.read() & 0x01) {
-        Wire.beginTransmission(i2c_address); // talk to AK8963
-        Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
-        Wire.endTransmission();
-        Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U));
-        while (Wire.available() < 7) {}
-        raw_x = Wire.read() | Wire.read() << 8;
-        raw_y = Wire.read() | Wire.read() << 8;
-        raw_z = Wire.read() | Wire.read() << 8;
-        Wire.read();
-    }
+void Custom_ak8963::single_calibrate () {
+    static int32_t max_x = 0, max_y = 0, max_z = 0;
+    static int32_t min_x = 0, min_y = 0, min_z = 0;
+    update_raw(10000);
+    // update max values
+    if (raw_x > max_x) max_x = raw_x;
+    if (raw_y > max_y) max_y = raw_y;
+    if (raw_z > max_z) max_z = raw_z;
+    // update min values
+    if (raw_x < min_x) min_x = raw_x;
+    if (raw_y < min_y) min_y = raw_y;
+    if (raw_z < min_z) min_z = raw_z;
+    x_mean = (max_x + min_x) / 2;
+    y_mean = (max_y + min_y) / 2;
+    z_mean = (max_z + min_z) / 2;
 }
 
-void Custom_ak8963::update_adjusted () {
-    update_raw();
-    adj_x = raw_x * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
-    adj_y = raw_y * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
-    adj_z = raw_z * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
+void Custom_ak8963::reset_heading () {
+    rz_heading = get_heading();
+}
+
+double Custom_ak8963::get_heading (const unsigned long delay_time_micros) {
+    update_raw(delay_time_micros);
+    const double
+        cal_x = raw_x - x_mean,
+        cal_y = raw_y - y_mean,
+        cal_z = raw_z - z_mean;
+    const double dir = atan2(cal_x, cal_y) / M_PI * 180 - rz_heading;
+    return (dir < 0.0) ? (dir + 360.0) : ((dir > 360.0) ? (dir - 360.0) : dir);
+}
+
+double Custom_ak8963::get_heading (double (*atan2_function)(double, double)) {
+    update_raw(10000);
+    const double
+        cal_x = raw_x - x_mean,
+        cal_y = raw_y - y_mean,
+        cal_z = raw_z - z_mean;
+    const double dir = ((atan2_function == NULL) ? (atan2(cal_x, cal_y) / M_PI * 180) : (atan2_function(cal_x, cal_y) / M_PI * 180)) - rz_heading;
+    return (dir < 0.0) ? (dir + 360.0) : ((dir > 360.0) ? (dir - 360.0) : dir);
 }
 
 Custom_gy9250::Custom_gy9250 (const uint8_t init_i2c_address) :

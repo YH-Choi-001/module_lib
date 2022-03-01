@@ -8,11 +8,6 @@
 
 Custom_gy9250 gy9250 (0x68); // change argument to 0x69 if AD0 is HIGH
 
-void update_progress () {
-    static uint16_t progress = 0;
-    Serial.println((progress++) / 400.0);
-}
-
 void setup () {
 
     // sets baud rate to 9600
@@ -20,23 +15,20 @@ void setup () {
 
     // sets the GY-9250 chip to desired settings
     gy9250.begin();
+
+    // you must call this function to enable AK8963 magnetometer inside the MPU-9250 chip
     gy9250.enable_ext_i2c_slave_sensors();
+
+    // sets the AK8963 magnetometer to desired settings
     gy9250.mag.begin();
 
-    // calibrate the gyroscope
-    gy9250.cal_gyro(400, update_progress);
-
- }
+}
 
 void loop () {
 
-    // prints out the current values of the chip
-    gy9250.mag.update_adjusted();
-    Serial.print(gy9250.mag.adj_x);
-    Serial.print('\t');
-    Serial.print(gy9250.mag.adj_y);
-    Serial.print('\t');
-    Serial.print(gy9250.mag.adj_z);
-    Serial.print('\n');
+    Serial.print("0x");
+    Serial.println(gy9250.mag.who_i_am(), HEX);
+
+    delay(3000);
 
 }

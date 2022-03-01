@@ -17,6 +17,8 @@
     // https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf
     // register map
     // https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2017/11/RM-MPU-9250A-00-v1.6.pdf
+    // AK8963 datasheet and register map
+    // https://cdn.datasheetspdf.com/pdf-down/A/K/8/AK8963-AsahiKaseiMicrosystems.pdf
 
 
 
@@ -32,15 +34,23 @@ class Custom_ak8963 {
     protected:
         // the 7-bit I2C address of the chip [0x00:0x7f]
         const uint8_t i2c_address;
+        // sensitivity adjustment value of the axes
         // the correction ratio multiplied to every reading from the chip
-        double ASA_X, ASA_Y, ASA_Z;
-    public:
-        // mag features:
+        uint8_t ASA_X, ASA_Y, ASA_Z;
+        // the mean of the max and min values read by each axis respectively
+        // used for compass purpose only
+        // you don't need this if you want to measure the electromagnetic field in uT
+        double x_mean, y_mean, z_mean;
         // the current value of the raw magnetic field strength
         // note: must be a signed 16-bit integer
         volatile int16_t raw_x, raw_y, raw_z;
-        // the current value of the adjusted magnetic field strength
-        volatile double adj_x, adj_y, adj_z;
+        // update raw x, y, z
+        inline void update_raw (const unsigned long delay_time_micros);
+        // use this to do polling
+        // inline void polling_update_raw ();
+    public:
+        // the return-to-zero heading
+        double rz_heading;
         // inits the 7-bit I2C address of the chip to init_i2c_address
         Custom_ak8963 (const uint8_t init_i2c_address);
         // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
@@ -51,11 +61,18 @@ class Custom_ak8963 {
         // if the chip is ak8963, the returned value should be 0x48
         uint8_t who_i_am ();
 
-        // update raw x, y, z
-        void update_raw ();
+        // calibrates the magnetometer, and give the mean values to x_mean, y_mean, z_mean for compass usage
+        // ATTENTION: WHEN MAGNETOMETER CALIBRATION IS IN PROGRESS, SWING THE CHIP IN ALL DIRECTIONS OF X, Y AND Z.
+        void single_calibrate ();
 
-        // update adjusted x, y, z
-        void update_adjusted ();
+        // sets the current heading to 0
+        void reset_heading ();
+
+        // get heading of the chip
+        double get_heading (const unsigned long delay_time_micros = 10000);
+
+        // get heading of the chip
+        double get_heading (double (*atan2_function)(double, double));
 };
 
 // this class has been customized for RCJ soccer robots use only

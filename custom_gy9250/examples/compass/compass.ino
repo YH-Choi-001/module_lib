@@ -8,21 +8,37 @@
 
 Custom_gy9250 gy9250 (0x68); // change argument to 0x69 if AD0 is HIGH
 
+// optional: connect a signal pin of a button to pin 4
+const uint8_t button_pin = 4;
+
 void setup () {
+
+    // set the pinMode of button to INPUT
+    pinMode(button_pin, INPUT);
 
     // sets baud rate to 9600
     Serial.begin(9600);
 
     // sets the GY-9250 chip to desired settings
     gy9250.begin();
+
+    // you must call this function to enable AK8963 magnetometer inside the MPU-9250 chip
     gy9250.enable_ext_i2c_slave_sensors();
+
+    // sets the AK8963 magnetometer to desired settings
     gy9250.mag.begin();
- }
+    for (uint16_t i = 0; i < 5000; i++) {
+        gy9250.mag.single_calibrate();
+        Serial.print(i/50);
+        Serial.println('%');
+    }
+}
 
 void loop () {
 
-    // prints out the atan2 of y, x of the chip
-    gy9250.mag.update_adjusted();
-    Serial.println(atan2(gy9250.mag.adj_y, gy9250.mag.adj_x) / M_PI * 180);
+    // prints out the heading of the chip
+    Serial.println(gy9250.mag.get_heading());
+    // if button is pressed, reset the heading of the chip
+    if (digitalRead(button_pin) == HIGH) gy9250.mag.reset_heading();
 
 }

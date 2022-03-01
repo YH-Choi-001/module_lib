@@ -120,6 +120,8 @@ MPU-9250
 https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2015/02/PS-MPU-9250A-01-v1.1.pdf  
 - register map  
 https://3cfeqx1hf82y3xcoull08ihx-wpengine.netdna-ssl.com/wp-content/uploads/2017/11/RM-MPU-9250A-00-v1.6.pdf  
+- AK8963 datasheet and register map  
+https://cdn.datasheetspdf.com/pdf-down/A/K/8/AK8963-AsahiKaseiMicrosystems.pdf  
   
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
   
