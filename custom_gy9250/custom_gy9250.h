@@ -39,13 +39,15 @@ class Custom_ak8963 {
         uint8_t ASA_X, ASA_Y, ASA_Z;
         // the mean of the max and min values read by each axis respectively
         // used for compass purpose only
-        // you don't need this if you want to measure the electromagnetic field in uT
-        double x_mean, y_mean, z_mean;
+        // you don't need this if you want to measure the strength of electromagnetic field only
+        //
+        int32_t max_x, max_y, max_z;
+        int32_t min_x, min_y, min_z;
         // the current value of the raw magnetic field strength
         // note: must be a signed 16-bit integer
         volatile int16_t raw_x, raw_y, raw_z;
         // update raw x, y, z
-        inline void update_raw (const unsigned long delay_time_micros);
+        inline void update_raw ();
         // use this to do polling
         // inline void polling_update_raw ();
     public:
@@ -69,7 +71,7 @@ class Custom_ak8963 {
         void reset_heading ();
 
         // get heading of the chip
-        double get_heading (const unsigned long delay_time_micros = 10000);
+        double get_heading ();
 
         // get heading of the chip
         double get_heading (double (*atan2_function)(double, double));
