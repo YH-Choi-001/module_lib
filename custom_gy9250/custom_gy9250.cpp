@@ -6,7 +6,7 @@
 
 Custom_ak8963::Custom_ak8963 (const uint8_t init_i2c_address) :
     i2c_address(init_i2c_address), ASA_X(0), ASA_Y(0), ASA_Z(0), max_x(0), max_y(0), max_z(0), min_x(0), min_y(0), min_z(0),
-    raw_x(0), raw_y(0), raw_z(0), rz_heading(0)
+    range_x(0), range_y(0), range_z(0), raw_x(0), raw_y(0), raw_z(0), rz_heading(0)
 {
     //
 }
