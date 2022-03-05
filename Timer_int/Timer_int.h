@@ -6,9 +6,11 @@
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
 inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 inline int8_t setup_timer_3A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
 inline int8_t setup_timer_4A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
 inline int8_t setup_timer_5A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
+#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 inline int8_t off_timer_1A_interrupt ();
 inline int8_t off_timer_3A_interrupt ();
@@ -260,9 +262,11 @@ if (!request_prescaler) { \
 }
 
 // SETUP_TIMER_16bit_INTERRUPT(1,A)
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 SETUP_TIMER_16bit_INTERRUPT(3,A)
 SETUP_TIMER_16bit_INTERRUPT(4,A)
 SETUP_TIMER_16bit_INTERRUPT(5,A)
+#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 #undef SETUP_TIMER_16bit_INTERRUPT
 
@@ -284,10 +288,11 @@ inline int8_t off_timer_##timer_no##abc##_interrupt () { \
   OCR##timer_no##abc = 0; \
   TIMSK##timer_no &= ~(1 << OCIE##timer_no##abc); \
 }
-
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 OFF_TIMER_16bit_INTERRUPT(3,A)
 OFF_TIMER_16bit_INTERRUPT(4,A)
 OFF_TIMER_16bit_INTERRUPT(5,A)
+#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 #undef OFF_TIMER_16bit_INTERRUPT
 
