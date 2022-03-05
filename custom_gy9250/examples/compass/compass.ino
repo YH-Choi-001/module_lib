@@ -27,9 +27,9 @@ void setup () {
 
     // sets the AK8963 magnetometer to desired settings
     gy9250.mag.begin();
-    for (uint16_t i = 0; i < 5000; i++) {
+    for (uint16_t i = 0; i < 2000; i++) {
         gy9250.mag.single_calibrate();
-        Serial.print(i/50);
+        Serial.print(i/20);
         Serial.println('%');
     }
 }

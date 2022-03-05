@@ -58,6 +58,8 @@ class Custom_gy521 {
         // gyro features:
         // the current value of the angles [0:359.99999999999999999999]
         volatile double roll, pitch, yaw;
+        // the linear difference of roll, pitch, yaw between the latest and the further previous measurement
+        volatile double d_roll, d_pitch, d_yaw;
         // the correction added to every reading from the chip
         volatile double corr_roll, corr_pitch, corr_yaw;
         // inits the 7-bit I2C address of the chip to init_i2c_address
@@ -105,6 +107,7 @@ class Custom_gy521 {
         // double update_yaw ();
 
         // specially made for the external AK8963 magnetometer attached to MPU-9250
+        // but this is also applicable to MPU-6050 chip, so I put this method over here instead of inside Custom_gy9250
         void enable_ext_i2c_slave_sensors ();
 };
 

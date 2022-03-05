@@ -36,74 +36,38 @@ void Custom_ak8963::begin () {
     Wire.endTransmission();
     delayMicroseconds(128); // delay at least 100us, required by datasheet to change power modes
     // // select continuous measurement 2 that samples the magnetic field strength in 100 KHz (this is already the limit of the speed of the chip)
-    // Wire.beginTransmission(i2c_address); // talk to AK8963
-    // Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select continuous measurement 2 mode
-    // Wire.write(0x00); // select continuous measurement 2 mode
-    // Wire.endTransmission();
+    Wire.beginTransmission(i2c_address); // talk to AK8963
+    Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select continuous measurement 2 mode
+    Wire.write(0x06); // select continuous measurement 2 mode
+    Wire.endTransmission();
 }
 
 inline void Custom_ak8963::update_raw () {
-    // refresh magnetometer
+    // // refresh magnetometer
     Wire.beginTransmission(i2c_address); // talk to AK8963
-    Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select single-measurement mode
-    Wire.write(0x01); // select single-measurement mode // (and also select output to 14-bit output)
+    Wire.write(0x02); // accessing the register 0x02 - ST1 register
     Wire.endTransmission();
-    //
-    uint8_t ST1 = 0;
-    do
-    {
+    Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)); // see if new data is ready
+    while (Wire.available() < 1) {}
+    if (Wire.read() & 0x01) {
+        // new data is ready
         Wire.beginTransmission(i2c_address); // talk to AK8963
-        Wire.write(0x02); // accessing the register 0x02 - ST1 register
+        Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
         Wire.endTransmission();
-        Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)); // see if new data is ready
-        ST1 = Wire.read();
-    } while (!(ST1 & 0x01)); // this waiting process is really long, takes ~10 000 us, since the chip immediately
-    Wire.beginTransmission(i2c_address); // talk to AK8963
-    Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
-    Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U));
-    while (Wire.available() < 7) {}
-    const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
-    const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
-    const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
-    if (!(Wire.read() & 0x10)) { // reading the ST2 register to check if magnetometer overflow has occured
-        // no overflow has occured
-        // update raw_x, raw_y, raw_z
-        raw_x = temp_raw_x;
-        raw_y = temp_raw_y;
-        raw_z = temp_raw_z;
+        Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U));
+        while (Wire.available() < 7) {}
+        const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
+        const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
+        const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
+        if (!(Wire.read() & 0x10)) { // reading the ST2 register to check if magnetometer overflow has occured
+            // no overflow has occured
+            // update raw_x, raw_y, raw_z
+            raw_x = temp_raw_x;
+            raw_y = temp_raw_y;
+            raw_z = temp_raw_z;
+        }
     }
 }
-
-// inline void Custom_ak8963::polling_update_raw () {
-//     Wire.beginTransmission(i2c_address); // talk to AK8963
-//     Wire.write(0x02); // accessing the register 0x02 - ST1 register
-//     Wire.endTransmission();
-//     Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)); // see if new data is ready
-//     if (Wire.read()) {
-//         // new data is ready
-
-//         // update raw values
-//         Wire.beginTransmission(i2c_address); // talk to AK8963
-//         Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
-//         Wire.endTransmission();
-//         Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U));
-//         while (Wire.available() < 7) {}
-//         raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
-//         raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
-//         raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
-//         Wire.read(); // reading the ST2 register to complete the whole process, but we don't need its data
-
-//         // select the single-measurement mode again for next reading
-//         Wire.beginTransmission(i2c_address); // talk to AK8963
-//         Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select single-measurement mode
-//         Wire.write(0x01); // select single-measurement mode
-//         Wire.endTransmission();
-//     } else {
-//         // new data is not ready
-//         // nothing to be refreshed
-//     }
-// }
 
 uint8_t Custom_ak8963::who_i_am () {
     Wire.beginTransmission(i2c_address); // talk to AK8963
@@ -128,27 +92,34 @@ void Custom_ak8963::single_calibrate () {
     // x_mean = (max_x + min_x) / 2;
     // y_mean = (max_y + min_y) / 2;
     // z_mean = (max_z + min_z) / 2;
+    range_x = max_x - min_x;
+    range_y = max_y - min_y;
+    range_z = max_z - min_z;
 }
 
 void Custom_ak8963::reset_heading () {
     rz_heading = get_heading();
 }
 
-double map_private (long x, long in_min, long in_max, long out_min, long out_max)
-{
-  return (x - in_min) * (out_max - out_min) / static_cast<double>(in_max - in_min) + out_min;
-}
+// double map_private (long x, long in_min, long in_max, long out_min, long out_max)
+// {
+//   return (x - in_min) * (out_max - out_min) / static_cast<double>(in_max - in_min) + out_min;
+// }
 
 double Custom_ak8963::get_heading () {
     update_raw();
     // const double
-    //     cal_x = raw_x - x_mean,
-    //     cal_y = raw_y - y_mean,
-    //     cal_z = raw_z - z_mean;
+    //     cal_x = raw_x - (min_x + max_x) / 2,
+    //     cal_y = raw_y - (min_y + max_y) / 2,
+    //     cal_z = raw_z - (min_z + max_z) / 2;
+    // const double
+    //     cal_x = map_private(raw_x, min_x, max_x, -1023, 1023),
+    //     cal_y = map_private(raw_y, min_y, max_y, -1023, 1023),
+    //     cal_z = map_private(raw_z, min_z, max_z, -1023, 1023);
     const double
-        cal_x = map_private(raw_x, min_x, max_x, -1023, 1023),
-        cal_y = map_private(raw_x, min_x, max_x, -1023, 1023),
-        cal_z = map_private(raw_x, min_x, max_x, -1023, 1023);
+        cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
+        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,
+        cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
     const double dir = atan2(cal_x, cal_y) / M_PI * 180 - rz_heading;
     return (dir < 0.0) ? (dir + 360.0) : ((dir > 360.0) ? (dir - 360.0) : dir);
 }
@@ -156,13 +127,17 @@ double Custom_ak8963::get_heading () {
 double Custom_ak8963::get_heading (double (*atan2_function)(double, double)) {
     update_raw();
     // const double
-    //     cal_x = raw_x - x_mean,
-    //     cal_y = raw_y - y_mean,
-    //     cal_z = raw_z - z_mean;
+    //     cal_x = raw_x - (min_x + max_x) / 2,
+    //     cal_y = raw_y - (min_y + max_y) / 2,
+    //     cal_z = raw_z - (min_z + max_z) / 2;
+    // const double
+    //     cal_x = map_private(raw_x, min_x, max_x, -1023, 1023),
+    //     cal_y = map_private(raw_y, min_y, max_y, -1023, 1023),
+    //     cal_z = map_private(raw_z, min_z, max_z, -1023, 1023);
     const double
-        cal_x = map_private(raw_x, min_x, max_x, -1023, 1023),
-        cal_y = map_private(raw_x, min_x, max_x, -1023, 1023),
-        cal_z = map_private(raw_x, min_x, max_x, -1023, 1023);
+        cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
+        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,
+        cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
     const double dir = ((atan2_function == NULL) ? (atan2(cal_x, cal_y) / M_PI * 180) : (atan2_function(cal_x, cal_y) / M_PI * 180)) - rz_heading;
     return (dir < 0.0) ? (dir + 360.0) : ((dir > 360.0) ? (dir - 360.0) : dir);
 }

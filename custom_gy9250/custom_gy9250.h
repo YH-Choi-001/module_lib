@@ -43,6 +43,7 @@ class Custom_ak8963 {
         //
         int32_t max_x, max_y, max_z;
         int32_t min_x, min_y, min_z;
+        int32_t range_x, range_y, range_z;
         // the current value of the raw magnetic field strength
         // note: must be a signed 16-bit integer
         volatile int16_t raw_x, raw_y, raw_z;

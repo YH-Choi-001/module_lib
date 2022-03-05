@@ -108,9 +108,12 @@ void Custom_gy521::update_gyro () {
     // commands above take around 944 - 952 us in 100 KHz clock frequency
     while (Wire.available() < 6) {}
     const unsigned long t_diff = micros() - previous_micros_reading;
-    roll += ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-    pitch -= ( ((Wire.read()<<8) | Wire.read()) + corr_pitch) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-    yaw -= ( ((Wire.read()<<8) | Wire.read()) + corr_yaw) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+    d_roll = ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+    d_pitch = -( ((Wire.read()<<8) | Wire.read()) + corr_pitch) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+    d_yaw = -( ((Wire.read()<<8) | Wire.read()) + corr_yaw) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+    roll += d_roll; // angle change per sec * time past in secs
+    pitch += d_pitch; // angle change per sec * time past in secs
+    yaw += d_yaw; // angle change per sec * time past in secs
     previous_micros_reading += t_diff;
     if (roll >= 360.0) roll -= 360.0;
     if (roll < 0.0) roll += 360.0;
@@ -165,7 +168,7 @@ void Custom_gy521::enable_ext_i2c_slave_sensors () {
     // write new value to MPU-9250 at register 0x37 with BYPASS_EN bit set HIGH
     Wire.beginTransmission(i2c_address);
     Wire.write(0x37);
-    Wire.write(old_val | 0x02);
+    Wire.write(old_val | 0x02); // 0x02 is the BYPASS_EN bit
     Wire.endTransmission();
 }
 
