@@ -120,8 +120,9 @@ double Custom_ak8963::get_heading () {
         cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
         cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,
         cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
-    const double dir = atan2(cal_x, cal_y) / M_PI * 180 - rz_heading;
-    return (dir < 0.0) ? (dir + 360.0) : ((dir > 360.0) ? (dir - 360.0) : dir);
+    double dir = atan2(cal_x, cal_y) / M_PI * 180 - rz_heading;
+    while (dir < 0.0) { dir += 360.0; }
+    return dir;
 }
 
 double Custom_ak8963::get_heading (double (*atan2_function)(double, double)) {
@@ -138,8 +139,9 @@ double Custom_ak8963::get_heading (double (*atan2_function)(double, double)) {
         cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
         cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,
         cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
-    const double dir = ((atan2_function == NULL) ? (atan2(cal_x, cal_y) / M_PI * 180) : (atan2_function(cal_x, cal_y) / M_PI * 180)) - rz_heading;
-    return (dir < 0.0) ? (dir + 360.0) : ((dir > 360.0) ? (dir - 360.0) : dir);
+    double dir = ((atan2_function == NULL) ? (atan2(cal_x, cal_y) / M_PI * 180) : (atan2_function(cal_x, cal_y) / M_PI * 180)) - rz_heading;
+    while (dir < 0.0) { dir += 360.0; }
+    return dir;
 }
 
 Custom_gy9250::Custom_gy9250 (const uint8_t init_i2c_address) :

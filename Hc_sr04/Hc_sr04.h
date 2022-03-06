@@ -110,7 +110,7 @@ namespace yh {
                 // read the distance of the previous measurement
                 // you can also call me when the current measurement is still in progress
                 inline double read_previous_dist_cm () {
-                    if (ending_tick) {
+                    if (ending_tick) { // no need to disable interrupts before reading ending_tick, bc i just treat it as a flag in this line
                         uint8_t oldSREG = SREG;
                         noInterrupts();
                         prev_dist_read = ending_tick * us_per_tick / 58.823; // prevent ending_tick being updated while we are reading it
