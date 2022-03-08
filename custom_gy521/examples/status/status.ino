@@ -24,7 +24,7 @@ void setup () {
     // calibrate the gyroscope
     gy521.cal_gyro(400, update_progress);
 
- }
+}
 
 void loop () {
 
@@ -32,6 +32,12 @@ void loop () {
     // calls Custom_gy521::update_gyro() method without arguments
     // in order to use calibrated values for readings from Custom_gy521.cal_gyro()
     gy521.update_gyro();
+    Serial.print(gy521.d_roll);
+    Serial.print('\t');
+    Serial.print(gy521.d_pitch);
+    Serial.print('\t');
+    Serial.print(gy521.d_yaw);
+    Serial.print("\t\t\t");
     Serial.print(gy521.roll);
     Serial.print('\t');
     Serial.print(gy521.pitch);

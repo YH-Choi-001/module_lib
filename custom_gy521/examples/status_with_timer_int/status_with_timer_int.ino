@@ -55,6 +55,12 @@ void loop () {
     // every update_gyro() call takes 1100 - 1200 us
     // every timer interrupt should have at least 1300 us distance
     #else // !defined(FIND_TIME_INTERVAL)
+    Serial.print(gy521.d_roll);
+    Serial.print('\t');
+    Serial.print(gy521.d_pitch);
+    Serial.print('\t');
+    Serial.print(gy521.d_yaw);
+    Serial.print("\t\t\t");
     Serial.print(gy521.roll);
     Serial.print('\t');
     Serial.print(gy521.pitch);
