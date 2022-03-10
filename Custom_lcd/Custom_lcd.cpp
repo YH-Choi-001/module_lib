@@ -2,6 +2,7 @@
 #define CUSTOM_LCD_CPP __DATE__ ", " __TIME__
 
 #include "Custom_lcd.h"
+#include "../Custom_print/Custom_print.cpp"
 
 // sends the data in 4-bit mode
 inline void send_data_in_4bit_mode (Custom_lcd *lcd, const uint8_t val);
@@ -144,16 +145,6 @@ Custom_lcd::Custom_lcd (
     en_pin(init_en_pin),
     data_pins{d0_pin, d1_pin, d2_pin, d3_pin, d4_pin, d5_pin, d6_pin, d7_pin}
 {
-    CONFIG_OUTPUT_REG_N_MASKS(rs);
-    CONFIG_OUTPUT_REG_N_MASKS(en);
-    CONFIG_OUTPUT_REG_N_MASKS(d0);
-    CONFIG_OUTPUT_REG_N_MASKS(d1);
-    CONFIG_OUTPUT_REG_N_MASKS(d2);
-    CONFIG_OUTPUT_REG_N_MASKS(d3);
-    CONFIG_OUTPUT_REG_N_MASKS(d4);
-    CONFIG_OUTPUT_REG_N_MASKS(d5);
-    CONFIG_OUTPUT_REG_N_MASKS(d6);
-    CONFIG_OUTPUT_REG_N_MASKS(d7);
     lcd_function = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
 }
 
@@ -164,22 +155,12 @@ Custom_lcd::Custom_lcd (
     const uint8_t d0_pin,
     const uint8_t d1_pin,
     const uint8_t d2_pin,
-    const uint8_t d3_pin,
-    const uint8_t d4_pin,
-    const uint8_t d5_pin,
-    const uint8_t d6_pin,
-    const uint8_t d7_pin
+    const uint8_t d3_pin
 ) :
     rs_pin(init_rs_pin),
     en_pin(init_en_pin),
     data_pins{d0_pin, d1_pin, d2_pin, d3_pin, 0, 0, 0, 0}
 {
-    CONFIG_OUTPUT_REG_N_MASKS(rs);
-    CONFIG_OUTPUT_REG_N_MASKS(en);
-    CONFIG_OUTPUT_REG_N_MASKS(d0);
-    CONFIG_OUTPUT_REG_N_MASKS(d1);
-    CONFIG_OUTPUT_REG_N_MASKS(d2);
-    CONFIG_OUTPUT_REG_N_MASKS(d3);
     lcd_function = LCD_8BITMODE | LCD_1LINE | LCD_5x8DOTS;
 }
 
@@ -205,6 +186,8 @@ void Custom_lcd::begin (const uint8_t cols, const uint8_t rows, const uint8_t do
     for (uint8_t i = 0; i < ( (lcd_function & LCD_8BITMODE) ? 8 : 4 ); i++) {
         pinMode(data_pins[i], OUTPUT);
     }
+    CONFIG_OUTPUT_REG_N_MASKS(rs);
+    CONFIG_OUTPUT_REG_N_MASKS(en);
 
     // SEE PAGE 45/46 FOR INITIALIZATION SPECIFICATION!
     // according to datasheet, we need at least 40ms after power rises above 2.7V
@@ -217,6 +200,10 @@ void Custom_lcd::begin (const uint8_t cols, const uint8_t rows, const uint8_t do
     
     //put the LCD into 4 bit or 8 bit mode
     if (lcd_function & LCD_8BITMODE) {
+        for (uint8_t i = 0; i < 8; i++) {
+            data_pins_output_reg[i] = portOutputRegister(digitalPinToPort(data_pins[i]));
+            data_pins_mask[i] = digitalPinToBitMask(data_pins[i]);
+        }
         // this is according to the hitachi HD44780 datasheet
         // page 45 figure 23
 
@@ -231,6 +218,10 @@ void Custom_lcd::begin (const uint8_t cols, const uint8_t rows, const uint8_t do
         // third go
         write_command(LCD_FUNCTIONSET | lcd_function);
     } else {
+        for (uint8_t i = 0; i < 4; i++) {
+            data_pins_output_reg[i] = portOutputRegister(digitalPinToPort(data_pins[i]));
+            data_pins_mask[i] = digitalPinToBitMask(data_pins[i]);
+        }
         // this is according to the hitachi HD44780 datasheet
         // figure 24, pg 46
 
@@ -240,7 +231,7 @@ void Custom_lcd::begin (const uint8_t cols, const uint8_t rows, const uint8_t do
         (*(data_pins_output_reg[2]) &= ~data_pins_mask[2]);
         (*(data_pins_output_reg[1]) |= data_pins_mask[1]);
         (*(data_pins_output_reg[0]) |= data_pins_mask[0]);
-        lcd->pulse_en_pin();
+        pulse_en_pin();
         delayMicroseconds(4500); // wait min 4.1ms
 
         // second try
@@ -249,7 +240,7 @@ void Custom_lcd::begin (const uint8_t cols, const uint8_t rows, const uint8_t do
         (*(data_pins_output_reg[2]) &= ~data_pins_mask[2]);
         (*(data_pins_output_reg[1]) |= data_pins_mask[1]);
         (*(data_pins_output_reg[0]) |= data_pins_mask[0]);
-        lcd->pulse_en_pin();
+        pulse_en_pin();
         delayMicroseconds(4500); // wait min 4.1ms
         
         // third go!
@@ -258,7 +249,7 @@ void Custom_lcd::begin (const uint8_t cols, const uint8_t rows, const uint8_t do
         (*(data_pins_output_reg[2]) &= ~data_pins_mask[2]);
         (*(data_pins_output_reg[1]) |= data_pins_mask[1]);
         (*(data_pins_output_reg[0]) |= data_pins_mask[0]);
-        lcd->pulse_en_pin();
+        pulse_en_pin();
         delayMicroseconds(150);
 
         // finally, set to 4-bit interface
@@ -267,7 +258,7 @@ void Custom_lcd::begin (const uint8_t cols, const uint8_t rows, const uint8_t do
         (*(data_pins_output_reg[2]) &= ~data_pins_mask[2]);
         (*(data_pins_output_reg[1]) |= data_pins_mask[1]);
         (*(data_pins_output_reg[0]) &= ~data_pins_mask[0]);
-        lcd->pulse_en_pin();
+        pulse_en_pin();
     }
 
     // finally, set # lines, font size, etc.
@@ -375,7 +366,7 @@ void Custom_lcd::createChar (uint8_t location, uint8_t charmap[]) {
 
 // ==================================================================================================== commands
 
-void Custom_lcd::setCursor (const uint8_t x, const uint8_t y) {
+void Custom_lcd::setCursor (const uint8_t x, uint8_t y) {
     const size_t max_lines = sizeof(offset_of_rows) / sizeof(offset_of_rows[0]);
     if ( y >= max_lines ) {
         y = max_lines - 1;    // we count rows starting with 0
@@ -383,113 +374,11 @@ void Custom_lcd::setCursor (const uint8_t x, const uint8_t y) {
     if ( y >= number_of_rows ) {
         y = number_of_rows - 1;    // we count rows starting with 0
     }
-    write_command(LCD_SETDDRAMADDR | (x + _row_offsets[y]));
+    write_command(LCD_SETDDRAMADDR | (x + offset_of_rows[y]));
 }
 
-void Custom_lcd::print (const char char_to_be_printed) {
+void Custom_lcd::print_single_char (const char char_to_be_printed) {
     write_data(char_to_be_printed);
-}
-
-void Custom_lcd::print (const char *str) {
-    while (*str != NULL) {
-        print(*str);
-        str++;
-    }
-}
-
-uint32_t pow_base_10 (const uint8_t exp) {
-    uint32_t to_be_returned = 1;
-    for (uint8_t i = 0; i < exp; to_be_returned *= 10, i++) { }
-    return to_be_returned;
-}
-
-void Custom_lcd::print (const uint8_t val) {
-    bool began_printing = false;
-    for (uint8_t base = 100U; base; base /= 10U) {
-        const uint8_t to_be_printed = val / base;
-        if (began_printing || to_be_printed) {
-            print('0' + to_be_printed);
-            began_printing = true;
-        }
-    }
-}
-
-void Custom_lcd::print (const uint16_t val) {
-    bool began_printing = false;
-    for (uint16_t base = 10000U; base; base /= 10U) {
-        const uint8_t to_be_printed = val / base;
-        if (began_printing || to_be_printed) {
-            print('0' + to_be_printed);
-            began_printing = true;
-        }
-    }
-}
-
-void Custom_lcd::print (const uint32_t val) {
-    bool began_printing = false;
-    for (uint32_t base = 1000000000UL; base; base /= 10UL) {
-        const uint8_t to_be_printed = val / base;
-        if (began_printing || to_be_printed) {
-            print('0' + to_be_printed);
-            began_printing = true;
-        }
-    }
-}
-
-void Custom_lcd::print (const int8_t val) {
-    if (val < 0) print('-');
-    bool began_printing = false;
-    for (int8_t base = 100; base; base /= 10) {
-        const uint8_t to_be_printed = val / base;
-        if (began_printing || to_be_printed) {
-            print('0' + to_be_printed);
-            began_printing = true;
-        }
-    }
-}
-
-void Custom_lcd::print (const int16_t val) {
-    if (val < 0) print('-');
-    bool began_printing = false;
-    for (int16_t base = 10000; base; base /= 10) {
-        const uint8_t to_be_printed = val / base;
-        if (began_printing || to_be_printed) {
-            print('0' + to_be_printed);
-            began_printing = true;
-        }
-    }
-}
-
-void Custom_lcd::print (const int32_t val) {
-    if (val < 0) print('-');
-    bool began_printing = false;
-    for (int32_t base = 1000000000L; base; base /= 10L) {
-        const uint8_t to_be_printed = val / base;
-        if (began_printing || to_be_printed) {
-            print('0' + to_be_printed);
-            began_printing = true;
-        }
-    }
-}
-
-void Custom_lcd::print (const float val) {
-    print(static_cast<double>(val));
-}
-
-void Custom_lcd::print (const double val, const uint8_t dp) {
-    double pcs_val;
-    if (val < 0) {
-        print('-');
-        pcs_val = -val;
-    } else {
-        pcs_val = val;
-    }
-    print(static_cast<uint32_t>(pcs_val));
-    pcs_val -= static_cast<uint32_t>(pcs_val);
-    pcs_val += 0.5 / pow_base_10(dp);
-    for (uint8_t i = 0; i < dp; i++) {
-        print('0' + static_cast<char>(pcs_val *= 10));
-    }
 }
 
 #endif // #ifndef CUSTOM_LCD_CPP

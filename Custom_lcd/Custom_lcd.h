@@ -5,6 +5,8 @@
 #include <Arduino.h>
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
+#include "../Custom_print/Custom_print.h"
+
 // commands
 #define LCD_CLEARDISPLAY 0x01
 #define LCD_RETURNHOME 0x02
@@ -44,7 +46,7 @@
 #define LCD_5x8DOTS 0x00
 
 // just connect RW pin to ground, because we will be writing data to lcd only
-class Custom_lcd {
+class Custom_lcd : public Custom_print {
     private:
         //
     protected:
@@ -144,24 +146,10 @@ class Custom_lcd {
             createChar (uint8_t location, uint8_t charmap[]);
 
         // commands
-        void setCursor (const uint8_t x, const uint8_t y);
+        void setCursor (const uint8_t x, uint8_t y);
 
         // high level control for programmer use
-        // the only method to print a character onto the lcd
-        void print (const char char_to_be_printed);
-        //
-        void print (const char *str);
-        //
-        void print (const uint8_t val);
-        void print (const uint16_t val);
-        void print (const uint32_t val);
-        //
-        void print (const int8_t val);
-        void print (const int16_t val);
-        void print (const int32_t val);
-        //
-        void print (const float val, const uint8_t dp = 2); // dp stands for decimal places
-        void print (const double val, const uint8_t dp = 2); // how many decimal places do you want to correct it to
+        void print_single_char (const char char_to_be_printed);
 };
 
 #endif // #ifndef CUSTOM_LCD_H
