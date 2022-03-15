@@ -107,6 +107,10 @@ namespace yh {
                 virtual void begin ();
                 // tells the object the time distance between each isr_individual_sensor_routine() called
                 inline void set_time_interval_between_interrupts (const double time_interval_between_interrupts) { us_per_tick = time_interval_between_interrupts; }
+                // checks if new data is ready @return true when data is ready
+                inline bool is_data_ready () { return ending_tick ? true : false; }
+                // checks if new data is not ready @return true when data is not ready
+                inline bool is_data_not_ready () { return !ending_tick; }
                 // read the distance of the previous measurement
                 // you can also call me when the current measurement is still in progress
                 inline double read_previous_dist_cm () {
@@ -131,6 +135,8 @@ namespace yh {
                     delayMicroseconds(10);
                     (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
                     //
+                    while ((*echo_pin_input_register) & echo_pin_mask) {} // while HIGH
+                    while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     current_tick = 0;
@@ -145,7 +151,7 @@ namespace yh {
                 }
 
                 // only call me in an ISR for each sensor
-                inline void isr_individual_sensor_routine () {
+                inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
                     // if (echo_pin == HIGH) && (ending_tick == 0)
                         // measurement is in progress
                         // increment to current_tick

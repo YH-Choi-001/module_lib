@@ -6,18 +6,102 @@ yh::rec::Hc_sr04_test_timer_int uts (4, 5);
 
 const uint8_t time_interval_between_interrupt = 59; // the unit of this variable is microseconds, so we update every 59 microseconds in timer interrupt
 
-void setup () {
-    Serial.begin(9600);
-    uts.begin();
-    uts.set_time_interval_between_interrupts(time_interval_between_interrupt);
-    setup_timer_1A_interrupt(time_interval_between_interrupt);
-}
+// void setup () {
+//     Serial.begin(9600);
+//     uts.begin();
+//     uts.set_time_interval_between_interrupts(time_interval_between_interrupt);
+//     setup_timer_1A_interrupt(time_interval_between_interrupt);
+// }
 
 ISR (TIMER1_COMPA_vect) {
     uts.isr_individual_sensor_routine();
 }
 
+// void loop () {
+//     Serial.println(uts.polling_update());
+//     while (uts.is_data_not_ready());
+// }
+
+// const uint8_t trig_pin = 2, echo_pin = 3;
+
+// volatile unsigned long ending_time;
+// unsigned long starting_time;
+
+// void lowered_isr () {
+//     if (!ending_time)
+//         ending_time = micros();
+// }
+
+// void trig () {
+//     noInterrupts();
+//     ending_time = 0;
+//     digitalWrite(trig_pin, LOW);
+//     delayMicroseconds(2);
+//     digitalWrite(trig_pin, HIGH);
+//     delayMicroseconds(10);
+//     digitalWrite(trig_pin, LOW);
+//     starting_time = micros();
+//     interrupts();
+// }
+
+// void setup () {
+//     Serial.begin(9600);
+//     // uts.begin();
+//     pinMode(trig_pin, OUTPUT);
+//     pinMode(echo_pin, INPUT);
+//     starting_time = 0;
+//     ending_time = 0;
+//     attachInterrupt(digitalPinToInterrupt(echo_pin), lowered_isr, FALLING);
+//     trig();
+// }
+
+// void loop () {
+//     if (ending_time) {
+//         const unsigned long buf = ending_time - starting_time;
+//         Serial.println(buf * 0.017);
+//         Serial.flush();
+//         trig();
+//     }
+// }
+
+const uint8_t trig_pin = 2, echo_pin = 3;
+
+unsigned long starting_time;
+
+void trig () {
+    noInterrupts();
+    digitalWrite(trig_pin, LOW);
+    delayMicroseconds(2);
+    digitalWrite(trig_pin, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(trig_pin, LOW);
+    starting_time = micros();
+    interrupts();
+}
+
+void setup () {
+    Serial.begin(9600);
+    uts.begin();
+    uts.set_time_interval_between_interrupts(time_interval_between_interrupt);
+    setup_timer_1A_interrupt(time_interval_between_interrupt);
+
+    // uts.begin();
+    pinMode(trig_pin, OUTPUT);
+    pinMode(echo_pin, INPUT);
+    starting_time = 0;
+}
+
 void loop () {
+    trig();
+    // while (digitalRead(echo_pin)) {} // while HIGH
+    // while (!digitalRead(echo_pin)) {} // while LOW
+    // starting_time = micros();
+    // while (digitalRead(echo_pin)) {} // while HIGH
+    // const unsigned long buf = micros() - starting_time;
+    // Serial.println(buf * 0.017);
+    // Serial.println(pulseInLong(echo_pin, HIGH, 13000UL) * 0.017);
+    Serial.print(pulseIn(echo_pin, HIGH, 13000UL) * 0.017);
+    Serial.print('\t');
     Serial.println(uts.polling_update());
     Serial.flush();
 }
