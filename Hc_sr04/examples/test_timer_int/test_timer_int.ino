@@ -2,7 +2,7 @@
 
 inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
 
-yh::rec::Hc_sr04_test_timer_int uts (4, 5);
+yh::rec::Hc_sr04_timer_int uts (2, 3);
 
 const uint8_t time_interval_between_interrupt = 59; // the unit of this variable is microseconds, so we update every 59 microseconds in timer interrupt
 

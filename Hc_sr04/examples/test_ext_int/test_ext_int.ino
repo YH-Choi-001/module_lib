@@ -1,6 +1,6 @@
 #include <Hc_sr04.h>
 
-yh::rec::Hc_sr04_test_ext_int uts (2, 3);
+yh::rec::Hc_sr04_ext_int uts (2, 3);
 
 void pin3_fall_isr () {
     uts.isr_individual_sensor_routine();
