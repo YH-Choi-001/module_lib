@@ -1,3 +1,9 @@
+// Please do the following:
+// connect Vcc on HC-SR04 to 5V on arduino
+// connect Gnd on HC-SR04 to GND on arduino
+// connect trig pin on HC-SR04 to pin 2 on arduino
+// connect echo pin on HC-SR04 to pin 3 on arduino
+
 #include <Hc_sr04.h>
 
 inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);

@@ -12,14 +12,4 @@ void setup_pcint (const uint8_t pin) {
     PCICR |= (1 << digitalPinToPCICRbit(pin)); // enable interrupt for the group
 }
 
-void empty () {
-    static uint8_t prev_status = 0;
-    const uint8_t curr_status = 0;
-    const uint8_t raising_pins = (~prev_status) & curr_status;
-    const uint8_t falling_pins = prev_status & (~curr_status);
-    const uint8_t changing_pins = prev_status ^ curr_status;
-    isr (raising_pins, falling_pins, changing_pins);
-    prev_status = curr_status;
-}
-
 #endif // #ifndef PCINT_H
