@@ -5,12 +5,17 @@
 #include <Arduino.h>
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
-inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
-inline int8_t setup_timer_2A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
+// @param us_per_interrupt must be < 4194368 as this is the maximum value
+inline int8_t setup_timer_1A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler = 0);
+// @param us_per_interrupt must be < 16448 as this is the maximum value
+inline int8_t setup_timer_2A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler = 0);
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-inline int8_t setup_timer_3A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
-inline int8_t setup_timer_4A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
-inline int8_t setup_timer_5A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
+// @param us_per_interrupt must be < 4194368 as this is the maximum value
+inline int8_t setup_timer_3A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler = 0);
+// @param us_per_interrupt must be < 4194368 as this is the maximum value
+inline int8_t setup_timer_4A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler = 0);
+// @param us_per_interrupt must be < 4194368 as this is the maximum value
+inline int8_t setup_timer_5A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler = 0);
 #endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 inline int8_t off_timer_1A_interrupt ();
@@ -19,7 +24,7 @@ inline int8_t off_timer_3A_interrupt ();
 inline int8_t off_timer_4A_interrupt ();
 inline int8_t off_timer_5A_interrupt ();
 
-inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler) {
+inline int8_t setup_timer_1A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler) {
     TCCR1A = 0; // set entire TCCR1A register to 0
     TCCR1B = 0; // same for TCCR1B
     TCNT1  = 0; // initialize counter value to 0
@@ -191,7 +196,7 @@ inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, co
     return 0;
 }
 
-inline int8_t setup_timer_2A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler) {
+inline int8_t setup_timer_2A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler) {
     TCCR2A = 0; // set entire TCCR2A register to 0
     TCCR2B = 0; // same for TCCR2B
     TCNT2  = 0; // initialize counter value to 0
@@ -357,7 +362,7 @@ inline int8_t setup_timer_2A_interrupt (const unsigned long us_per_interrupt, co
 }
 
 #define SETUP_TIMER_16bit_INTERRUPT(timer_no,abc) \
-inline int8_t setup_timer_##timer_no##abc##_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler) { \
+inline int8_t setup_timer_##timer_no##abc##_interrupt (const double us_per_interrupt, const uint16_t request_prescaler) { \
   TCCR##timer_no##A = 0; \
   TCCR##timer_no##B = 0; \
   TCNT##timer_no = 0; \
