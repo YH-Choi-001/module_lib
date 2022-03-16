@@ -641,14 +641,14 @@ namespace yh {
         #define Custom_pin (Custom_pin_is_a_forbidden_keyword_to_programmer)
         #endif
         namespace custom_pins {
-            inline void pin_mode (const uint8_t pin, const uint8_t mode)    __attribute__((__always_inline__));
-            inline void pin_mode (const uint8_t pin, const uint8_t mode)                                        { pins[pin].pin_mode(mode); }
-            inline void digital_write (const uint8_t pin, const bool val)   __attribute__((__always_inline__));
-            inline void digital_write (const uint8_t pin, const bool val)                                       { pins[pin].digital_write(val); }
-            inline bool digital_read (const uint8_t pin)                    __attribute__((__always_inline__));
-            inline bool digital_read (const uint8_t pin)                                                        { return pins[pin].digital_read(); }
-            inline void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__));
-            inline void analog_write (const uint8_t pin, const uint8_t val)                                     { pins[pin].analog_write(val); }
+            void pin_mode (const uint8_t pin, const uint8_t mode)    __attribute__((__always_inline__));
+            void pin_mode (const uint8_t pin, const uint8_t mode)                                        { pins[pin].pin_mode(mode); }
+            void digital_write (const uint8_t pin, const bool val)   __attribute__((__always_inline__));
+            void digital_write (const uint8_t pin, const bool val)                                       { pins[pin].digital_write(val); }
+            bool digital_read (const uint8_t pin)                    __attribute__((__always_inline__));
+            bool digital_read (const uint8_t pin)                                                        { return pins[pin].digital_read(); }
+            void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__));
+            void analog_write (const uint8_t pin, const uint8_t val)                                     { pins[pin].analog_write(val); }
         }
     }
 }

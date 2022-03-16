@@ -13,7 +13,7 @@
 // }
 
 Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
-    i2c_address(init_i2c_address), roll(0), pitch(0), yaw(0), corr_roll(0), corr_pitch(0), corr_yaw(0)
+    i2c_address(init_i2c_address), roll(0), pitch(0), yaw(0), corr_roll(0), corr_pitch(0), corr_yaw(0), q(1, 0, 0, 0)
 {
     //
 }
@@ -124,6 +124,13 @@ void Custom_gy521::cal_gyro (const uint32_t sampling_amount, void (*updating_fun
     // Wire.endTransmission();
 }
 
+void Custom_gy521::reset_gyro () {
+    q.w = 1;
+    q.x = 0;
+    q.y = 0;
+    q.z = 0;
+}
+
 #define DMP_QUAT_EULER_CONVERSION
 
 void Custom_gy521::update_gyro () {
@@ -151,7 +158,6 @@ void Custom_gy521::update_gyro () {
     #ifdef DMP_QUAT_EULER_CONVERSION
         #define Ver1
         #ifdef Ver1
-        static Quaternion q (1, 0, 0, 0);
         struct Some_vectors {
             double x, y, z;
         } gravity;
@@ -173,6 +179,7 @@ void Custom_gy521::update_gyro () {
             cr * cp * sy - sr * sp * cy
         );
         q = q.getProduct(delta);
+        q.normalize();
 
         //
         // dmpGetGravity(...) expansion
@@ -180,7 +187,7 @@ void Custom_gy521::update_gyro () {
         gravity.y = 2 * (q.w * q.x + q.y * q.z);
         gravity.z = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
         // dmpGetYawPitchRoll(...) expansion
-        roll = atan(gravity . y / sqrt(gravity.x * gravity.x + gravity.z * gravity.z)) * RAD_TO_DEG;
+        roll = atan(gravity.y / sqrt(gravity.x * gravity.x + gravity.z * gravity.z)) * RAD_TO_DEG;
         pitch = atan(gravity.x / sqrt(gravity.y * gravity.y + gravity.z * gravity.z)) * RAD_TO_DEG;
         yaw = atan2(2 * q.x * q.y - 2 * q.w * q.z, 2 * q.w * q.w + 2 * q.x * q.x - 1) * RAD_TO_DEG;
         #else

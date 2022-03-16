@@ -90,6 +90,8 @@ class Custom_gy521 {
     protected:
         // the 7-bit I2C address of the chip [0x00:0x7f]
         const uint8_t i2c_address;
+        // the quaternion of the current status
+        Quaternion q;
     public:
         // accel features: // not published
         // using the equations of motions
@@ -131,6 +133,8 @@ class Custom_gy521 {
         // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
         // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
         void cal_gyro (const uint32_t sampling_amount = 8192, void (*updating_function)(void) = NULL);
+        // resets the roll, pitch and yaw values
+        void reset_gyro ();
         // gets 6 bytes from gyroscope (uses calibrated data to correct)
         void update_gyro ();
 
