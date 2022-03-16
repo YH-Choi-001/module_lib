@@ -12,6 +12,8 @@ namespace yh {
                 static volatile uint16_t adc_data [NUM_ANALOG_INPUTS];
             }
         }
+        Custom_pin pins [NUM_DIGITAL_PINS];
+        uint8_t Custom_pin::auto_object_counter = 0; // initialize the counter to 0
     }
 }
 
@@ -20,7 +22,8 @@ void yh::rec::custom_pins::begin_analog_read () {
 	// ADSC: ADC start new conversion
     // ADIF: ADC interrupt flag
     // ADIE: ADC interrupt enable
-    ADCSRA |= (1 << ADEN) | (1 << ADSC) | (1 << ADIF) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+    // ADPS == 0b111: ADC prescaler factor = 128
+    ADCSRA |= (1 << ADEN) | (1 << ADSC) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
 }
 
 uint16_t yh::rec::custom_pins::analog_read (uint8_t pin_or_channel) {

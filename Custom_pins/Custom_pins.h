@@ -1,3 +1,6 @@
+// warning: This library disables the original pinMode and I/O functions on the pins.
+// This library aims to provide a faster I/O communication with the pins.
+
 #ifndef CUSTOM_PINS_H
 #define CUSTOM_PINS_H __DATE__ ", " __TIME__
 
@@ -11,13 +14,27 @@ namespace yh {
             // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
             // kicks off the first ADC conversion, and let it run on
             void begin_analog_read ();
-            // @param pin the analog pin to be read (or channel to be read)
+            // @param pin the analog pin to be read (or channel to be read for backwards compatibility)
             // @return the analog voltage value reference to AREF pin (or 5V if not connected)
             uint16_t analog_read (uint8_t pin_or_channel);
-            //
+
+            #define FUNCTION_PWM 0
+
+
+
+            #if FUNCTION_PWM
+
+            #ifndef sbi
+            #define sbi(x,y) (x|=(1<<y))
+            #endif
+            #ifndef cbi
+            #define cbi(x,y) (x&=~(1<<y))
+            #endif
+
             // expanded analogWrite(...) functions
             // XXX fix needed for atmega8
             #if defined(TCCR0) && defined(COM00) && !defined(__AVR_ATmega8__)
+            void set_COM00_PWM (const uint8_t val) __attribute__((__always_inline__));
             void set_COM00_PWM (const uint8_t val) {
                 // connect pwm to pin on timer 0
                 sbi(TCCR0, COM00);
@@ -26,7 +43,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR0A) && defined(COM0A1)
-            void set_COM0A1_PWM (const uint8_t val) {
+            inline void set_COM0A1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 0, channel A
                 sbi(TCCR0A, COM0A1);
                 OCR0A = val; // set pwm duty
@@ -34,7 +51,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR0A) && defined(COM0B1)
-            void set_COM0B1_PWM (const uint8_t val) {
+            inline void set_COM0B1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 0, channel B
                 sbi(TCCR0A, COM0B1);
                 OCR0B = val; // set pwm duty
@@ -42,7 +59,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR1A) && defined(COM1A1)
-            void set_COM1A1_PWM (const uint8_t val) {
+            inline void set_COM1A1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 1, channel A
                 sbi(TCCR1A, COM1A1);
                 OCR1A = val; // set pwm duty
@@ -50,7 +67,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR1A) && defined(COM1B1)
-            void set_COM1B1_PWM (const uint8_t val) {
+            inline void set_COM1B1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 1, channel B
                 sbi(TCCR1A, COM1B1);
                 OCR1B = val; // set pwm duty
@@ -58,7 +75,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR1A) && defined(COM1C1)
-            void set_COM1C1_PWM (const uint8_t val) {
+            inline void set_COM1C1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 1, channel C
                 sbi(TCCR1A, COM1C1);
                 OCR1C = val; // set pwm duty
@@ -66,7 +83,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR2) && defined(COM21)
-            void set_COM21_PWM (const uint8_t val) {
+            inline void set_COM21_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 2
                 sbi(TCCR2, COM21);
                 OCR2 = val; // set pwm duty
@@ -74,7 +91,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR2A) && defined(COM2A1)
-            void set_COM2A1_PWM (const uint8_t val) {
+            inline void set_COM2A1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 2, channel A
                 sbi(TCCR2A, COM2A1);
                 OCR2A = val; // set pwm duty
@@ -82,7 +99,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR2A) && defined(COM2B1)
-            void set_COM2B1_PWM (const uint8_t val) {
+            inline void set_COM2B1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 2, channel B
                 sbi(TCCR2A, COM2B1);
                 OCR2B = val; // set pwm duty
@@ -90,7 +107,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR3A) && defined(COM3A1)
-            void set_COM3A1_PWM (const uint8_t val) {
+            inline void set_COM3A1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 3, channel A
                 sbi(TCCR3A, COM3A1);
                 OCR3A = val; // set pwm duty
@@ -98,7 +115,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR3A) && defined(COM3B1)
-            void set_COM3B1_PWM (const uint8_t val) {
+            inline void set_COM3B1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 3, channel B
                 sbi(TCCR3A, COM3B1);
                 OCR3B = val; // set pwm duty
@@ -106,7 +123,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR3A) && defined(COM3C1)
-            void set_COM3C1_PWM (const uint8_t val) {
+            inline void set_COM3C1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 3, channel C
                 sbi(TCCR3A, COM3C1);
                 OCR3C = val; // set pwm duty
@@ -114,7 +131,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR4A)
-            void set_COM4A1_PWM (const uint8_t val) {
+            inline void set_COM4A1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 //connect pwm to pin on timer 4, channel A
                 sbi(TCCR4A, COM4A1);
                 #if defined(COM4A0)		// only used on 32U4
@@ -125,7 +142,7 @@ namespace yh {
             #endif
             
             #if defined(TCCR4A) && defined(COM4B1)
-            void set_COM4B1_PWM (const uint8_t val) {
+            inline void set_COM4B1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 4, channel B
                 sbi(TCCR4A, COM4B1);
                 OCR4B = val; // set pwm duty
@@ -133,7 +150,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR4A) && defined(COM4C1)
-            void set_COM4C1_PWM (const uint8_t val) {
+            inline void set_COM4C1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 4, channel C
                 sbi(TCCR4A, COM4C1);
                 OCR4C = val; // set pwm duty
@@ -141,7 +158,7 @@ namespace yh {
             #endif
                 
             #if defined(TCCR4C) && defined(COM4D1)
-            void set_COM4D1_PWM (const uint8_t val) {
+            inline void set_COM4D1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 4, channel D
                 sbi(TCCR4C, COM4D1);
                 #if defined(COM4D0)		// only used on 32U4
@@ -153,7 +170,7 @@ namespace yh {
 
                             
             #if defined(TCCR5A) && defined(COM5A1)
-            void set_COM5A1_PWM (const uint8_t val) {
+            inline void set_COM5A1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 5, channel A
                 sbi(TCCR5A, COM5A1);
                 OCR5A = val; // set pwm duty
@@ -161,7 +178,7 @@ namespace yh {
             #endif
 
             #if defined(TCCR5A) && defined(COM5B1)
-            void set_COM5B1_PWM (const uint8_t val) {
+            inline void set_COM5B1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 5, channel B
                 sbi(TCCR5A, COM5B1);
                 OCR5B = val; // set pwm duty
@@ -169,50 +186,51 @@ namespace yh {
             #endif
 
             #if defined(TCCR5A) && defined(COM5C1)
-            void set_COM5C1_PWM (const uint8_t val) {
+            inline void set_COM5C1_PWM (const uint8_t val) __attribute__((__always_inline__)) {
                 // connect pwm to pin on timer 5, channel C
                 sbi(TCCR5A, COM5C1);
                 OCR5C = val; // set pwm duty
             }
             #endif
+
+
+            #endif // #if FUNCTION_PWM
+
+
+
         }
         class Custom_pin {
             private:
+                // the counter to count how many objects has been automatically created
+                static uint8_t auto_object_counter;
                 // pins that cannot be changed:
                 // the pin that this object belongs to
                 const uint8_t pin;
                 // output port register
-                volatile uint8_t *output_reg;
+                volatile uint8_t *const output_reg;
                 // input port register
-                volatile uint8_t *input_reg;
+                volatile uint8_t *const input_reg;
                 // mode register
-                volatile uint8_t *mode_reg;
+                volatile uint8_t *const mode_reg;
                 // I/O bit mask
-                uint8_t bit_mask;
+                const uint8_t bit_mask;
                 // timer
-                uint8_t timer;
+                const uint8_t timer;
                 // timer A register
                 volatile uint8_t *timer_A_reg;
                 // PWM channel bit mask
                 uint8_t timer_pwm_bit_mask;
                 // PWM value of the pin
                 volatile uint8_t *compare_match_reg;
-                #if 0
+                #if FUNCTION_PWM
+                // pointer to the function to turn off PWM output
+                void (*off_pwm)();
                 // pointer to the function to write the PWM value for this pin
                 void (*analog_write_ptr)(const uint8_t);
                 #endif
-            public:
-                // inits the pin number into the object
-                Custom_pin (const uint8_t init_pin) :
-                pin(init_pin),
-                output_reg(portOutputRegister(digitalPinToPort(pin))),
-                input_reg(portInputRegister(digitalPinToPort(pin))),
-                mode_reg(portModeRegister(digitalPinToPort(pin))),
-                bit_mask(digitalPinToBitMask(pin)),
-                timer(digitalPinToTimer(pin))
-                {
-                    #if 0
-                    //
+                void timer_identification () {
+                    #if FUNCTION_PWM
+                    off_pwm = NULL;
                     switch(timer)
                     {
                         // XXX fix needed for atmega8
@@ -335,7 +353,7 @@ namespace yh {
                         default:
                             analog_write_ptr = NULL;
                     }
-                    #endif
+                    #else
                     switch(timer)
                     {
                         // XXX fix needed for atmega8
@@ -367,7 +385,7 @@ namespace yh {
                         case TIMER1A:
                             timer_A_reg = &TCCR1A;
                             timer_pwm_bit_mask = (1 << COM1A1);
-                            compare_match_reg = &OCR1A;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR1A);
                             break;
                         #endif
 
@@ -375,7 +393,7 @@ namespace yh {
                         case TIMER1B:
                             timer_A_reg = &TCCR1A;
                             timer_pwm_bit_mask = (1 << COM1B1);
-                            compare_match_reg = &OCR1B;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR1B);
                             break;
                         #endif
 
@@ -383,7 +401,7 @@ namespace yh {
                         case TIMER1C:
                             timer_A_reg = &TCCR1A;
                             timer_pwm_bit_mask = (1 << COM1C1);
-                            compare_match_reg = &OCR1C;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR1C);
                             break;
                         #endif
 
@@ -415,7 +433,7 @@ namespace yh {
                         case TIMER3A:
                             timer_A_reg = &TCCR3A;
                             timer_pwm_bit_mask = (1 << COM3A1);
-                            compare_match_reg = &OCR3A;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR3A);
                             break;
                         #endif
 
@@ -423,7 +441,7 @@ namespace yh {
                         case TIMER3B:
                             timer_A_reg = &TCCR3A;
                             timer_pwm_bit_mask = (1 << COM3B1);
-                            compare_match_reg = &OCR3B;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR3B);
                             break;
                         #endif
 
@@ -431,7 +449,7 @@ namespace yh {
                         case TIMER3C:
                             timer_A_reg = &TCCR3A;
                             timer_pwm_bit_mask = (1 << COM3C1);
-                            compare_match_reg = &OCR3C;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR3C);
                             break;
                         #endif
 
@@ -442,7 +460,7 @@ namespace yh {
                             #endif
                             timer_A_reg = &TCCR4A;
                             timer_pwm_bit_mask = (1 << COM4A1);
-                            compare_match_reg = &OCR4A;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR4A);
                             break;
                         #endif
                         
@@ -450,7 +468,7 @@ namespace yh {
                         case TIMER4B:
                             timer_A_reg = &TCCR4A;
                             timer_pwm_bit_mask = (1 << COM4B1);
-                            compare_match_reg = &OCR4B;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR4B);
                             break;
                         #endif
 
@@ -458,7 +476,7 @@ namespace yh {
                         case TIMER4C:
                             timer_A_reg = &TCCR4A;
                             timer_pwm_bit_mask = (1 << COM4C1);
-                            compare_match_reg = &OCR4C;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR4C);
                             break;
                         #endif
                             
@@ -469,7 +487,7 @@ namespace yh {
                             #endif
                             timer_A_reg = &TCCR4C;
                             timer_pwm_bit_mask = (1 << COM4D1);
-                            compare_match_reg = &OCR4D;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR4D);
                             break;
                         #endif
 
@@ -478,7 +496,7 @@ namespace yh {
                         case TIMER5A:
                             timer_A_reg = &TCCR5A;
                             timer_pwm_bit_mask = (1 << COM5A1);
-                            compare_match_reg = &OCR5A;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR5A);
                             break;
                         #endif
 
@@ -486,7 +504,7 @@ namespace yh {
                         case TIMER5B:
                             timer_A_reg = &TCCR5A;
                             timer_pwm_bit_mask = (1 << COM5B1);
-                            compare_match_reg = &OCR5B;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR5B);
                             break;
                         #endif
 
@@ -494,7 +512,7 @@ namespace yh {
                         case TIMER5C:
                             timer_A_reg = &TCCR5A;
                             timer_pwm_bit_mask = (1 << COM5C1);
-                            compare_match_reg = &OCR5C;
+                            compare_match_reg = reinterpret_cast<volatile uint8_t *>(&OCR5C);
                             break;
                         #endif
 
@@ -504,9 +522,40 @@ namespace yh {
                             timer_pwm_bit_mask = 0;
                             compare_match_reg = NULL;
                     }
+                    #endif // #if !FUNCTION_PWM
+                }
+            public:
+                // inits the pin number into the object
+                Custom_pin (const uint8_t init_pin) :
+                pin(init_pin),
+                output_reg(portOutputRegister(digitalPinToPort(pin))),
+                input_reg(portInputRegister(digitalPinToPort(pin))),
+                mode_reg(portModeRegister(digitalPinToPort(pin))),
+                bit_mask(digitalPinToBitMask(pin)),
+                timer(digitalPinToTimer(pin))
+                {
+                    timer_identification();
+                }
+                // directly initialized on declaration
+                Custom_pin () :
+                pin(auto_object_counter++),
+                output_reg(portOutputRegister(digitalPinToPort(pin))),
+                input_reg(portInputRegister(digitalPinToPort(pin))),
+                mode_reg(portModeRegister(digitalPinToPort(pin))),
+                bit_mask(digitalPinToBitMask(pin)),
+                timer(digitalPinToTimer(pin))
+                {
+                    // pin = auto_object_counter++;
+                    // output_reg = portOutputRegister( digitalPinToPort(pin) );
+                    // input_reg = portInputRegister( digitalPinToPort(pin) );
+                    // mode_reg = portModeRegister( digitalPinToPort(pin) );
+                    // bit_mask = digitalPinToBitMask(pin);
+                    // timer = digitalPinToTimer(pin);
+
+                    timer_identification();
                 }
                 //
-                inline void pin_mode (const uint8_t mode) {
+                void pin_mode (const uint8_t mode) {
                     if (mode == INPUT) {
                         uint8_t oldSREG = SREG;
                                 cli();
@@ -527,50 +576,88 @@ namespace yh {
                     }
                 }
                 //
-                inline void digital_write (const bool val) { val ? ((*output_reg) |= bit_mask) : ((*output_reg) &= ~bit_mask); }
+                void digital_write (const bool val) __attribute__((__always_inline__))
+                { val ? ((*output_reg) |= bit_mask) : ((*output_reg) &= ~bit_mask); }
                 //
-                inline void digital_write_HIGH () { (*output_reg) |= bit_mask; }
+                void digital_write_HIGH ()          __attribute__((__always_inline__))
+                { (*output_reg) |= bit_mask; }
                 //
-                inline void digital_write_LOW () { (*output_reg) &= ~bit_mask; }
+                void digital_write_LOW ()           __attribute__((__always_inline__))
+                { (*output_reg) &= ~bit_mask; }
                 //
-                inline void digital_write_TOGGLE () { (*output_reg) ^= bit_mask; }
+                void digital_write_TOGGLE ()        __attribute__((__always_inline__))
+                { (*output_reg) ^= bit_mask; }
                 //
-                inline bool digital_read_logical () { return (*input_reg) & bit_mask; }
+                bool digital_read_logical ()        __attribute__((__always_inline__))
+                { return (*input_reg) & bit_mask; }
                 //
-                inline bool digital_read () { return ((*input_reg) & bit_mask) ? 1 : 0; }
+                bool digital_read ()                __attribute__((__always_inline__))
+                { return ((*input_reg) & bit_mask) ? 1 : 0; }
                 //
-                inline void analog_write (const uint8_t val) {
-                    if (compare_match_reg == NULL) {
-                        if (val > 127) digital_write_HIGH();
-                        else digital_write_LOW();
+                void analog_write (const uint8_t val) __attribute__((__always_inline__))
+                {
+                    #if FUNCTION_PWM
+                    if (analog_write_ptr == NULL) {
+                        if (val > 127) (*output_reg) |= bit_mask; // write HIGH
+                        else (*output_reg) &= ~bit_mask;          // write LOW
                     } else {
                         if (!val) {
-                            (*timer_A_reg) &= ~(timer_pwm_bit_mask);
-                            digital_write_LOW();
+                            off_pwm();                               // off PWM
+                            (*output_reg) &= ~bit_mask;              // write LOW
                         } else if (val == 255) {
-                            (*timer_A_reg) &= ~(timer_pwm_bit_mask);
-                            digital_write_HIGH();
+                            off_pwm();                               // off PWM
+                            (*output_reg) |= bit_mask;               // write HIGH
                         } else {
-                            (*timer_A_reg) |= (timer_pwm_bit_mask);
-                            (*compare_match_reg) = val;
+                            analog_write_ptr(val);                   // write PWM value
                         }
                     }
+                    #else
+                    if (compare_match_reg == NULL) {
+                        if (val > 127) (*output_reg) |= bit_mask; // write HIGH
+                        else (*output_reg) &= ~bit_mask;          // write LOW
+                    } else {
+                        if (!val) {
+                            (*timer_A_reg) &= ~(timer_pwm_bit_mask); // off PWM
+                            (*output_reg) &= ~bit_mask;              // write LOW
+                        } else if (val == 255) {
+                            (*timer_A_reg) &= ~(timer_pwm_bit_mask); // off PWM
+                            (*output_reg) |= bit_mask;               // write HIGH
+                        } else {
+                            (*timer_A_reg) |= (timer_pwm_bit_mask);  // on PWM
+                            (*compare_match_reg) = val;              // write PWM value
+                        }
+                    }
+                    #endif // #if !FUNCTION_PWM
                 }
                 //
-                inline uint16_t analog_read () {
+                uint16_t analog_read () __attribute__((__always_inline__))
+                {
                     if (pin >= A0 && pin < (A0 + NUM_ANALOG_INPUTS)) return custom_pins::analog_read(pin);
-                    else return digital_read_logical() ? 1023 : 0;
+                    else return ((*input_reg) & bit_mask) ? 1023 : 0;
                 }
         };
+        extern Custom_pin pins [];
+        #ifndef CUSTOM_PINS_CPP
+        #define Custom_pin (Custom_pin_is_a_forbidden_keyword_to_programmer)
+        #endif
         namespace custom_pins {
-            inline void pin_mode (Custom_pin &pin, const uint8_t mode) { pin.pin_mode(mode); }
-            inline void digital_write (Custom_pin &pin, const bool val) { pin.digital_write(val); }
-            inline bool digital_read (Custom_pin &pin) { return pin.digital_read(); }
+            inline void pin_mode (const uint8_t pin, const uint8_t mode)    __attribute__((__always_inline__));
+            inline void pin_mode (const uint8_t pin, const uint8_t mode)                                        { pins[pin].pin_mode(mode); }
+            inline void digital_write (const uint8_t pin, const bool val)   __attribute__((__always_inline__));
+            inline void digital_write (const uint8_t pin, const bool val)                                       { pins[pin].digital_write(val); }
+            inline bool digital_read (const uint8_t pin)                    __attribute__((__always_inline__));
+            inline bool digital_read (const uint8_t pin)                                                        { return pins[pin].digital_read(); }
+            inline void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__));
+            inline void analog_write (const uint8_t pin, const uint8_t val)                                     { pins[pin].analog_write(val); }
         }
     }
 }
 
 #ifndef CUSTOM_PINS_CPP
+#define pinMode(...) yh::rec::custom_pins::pin_mode(__VA_ARGS__)
+#define digitalWrite(...) yh::rec::custom_pins::digital_write(__VA_ARGS__)
+#define digitalRead(...) yh::rec::custom_pins::digital_read(__VA_ARGS__)
+#define analogWrite(...) yh::rec::custom_pins::analog_write(__VA_ARGS__)
 #define analogRead(...) yh::rec::custom_pins::analog_read(__VA_ARGS__)
 #endif // #ifndef CUSTOM_PINS_CPP
 

@@ -1,21 +1,27 @@
 #include <Custom_pins.h>
 
 void setup() {
-    yh::rec::Custom_pins::begin_analog_read();
+    yh::rec::custom_pins::begin_analog_read();
+    pinMode(A0, INPUT);
+    pinMode(A1, INPUT);
+    pinMode(A2, INPUT);
+    pinMode(A3, INPUT);
+    pinMode(A4, INPUT);
+    pinMode(A5, INPUT);
     Serial.begin(9600);
 }
 
 void loop() {
-    Serial.print(yh::rec::Custom_pins::analog_read(A0));
+    Serial.print(analogRead(A0));
     Serial.print('\t');
-    Serial.print(yh::rec::Custom_pins::analog_read(A1));
+    Serial.print(analogRead(A1));
     Serial.print('\t');
-    Serial.print(yh::rec::Custom_pins::analog_read(A2));
+    Serial.print(analogRead(A2));
     Serial.print('\t');
-    Serial.print(yh::rec::Custom_pins::analog_read(A3));
+    Serial.print(analogRead(A3));
     Serial.print('\t');
-    Serial.print(yh::rec::Custom_pins::analog_read(A4));
+    Serial.print(analogRead(A4));
     Serial.print('\t');
-    Serial.print(yh::rec::Custom_pins::analog_read(A5));
+    Serial.print(analogRead(A5));
     Serial.print('\n');
 }
