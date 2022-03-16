@@ -15,9 +15,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 
 
 
-
-Please do not use any undocumented libraries (i.e. libraries without README.md files or versions of libraries with non-updated README.md files). These libraries are mainly under testing stage, and are not proved to be 100% working.  
-
+### Please do not use any undocumented libraries (i.e. libraries without README.md files or versions of libraries with non-updated README.md files). These libraries are mainly under testing stage, and are not proved to be 100% working.  
 
 
 
