@@ -38,10 +38,10 @@ void loop () {
     Serial.print('\t');
     Serial.print(gy521.d_yaw);
     Serial.print("\t\t\t");
-    Serial.print(gy521.roll);
-    Serial.print('\t');
-    Serial.print(gy521.pitch);
-    Serial.print('\t');
+    // Serial.print(gy521.roll);
+    // Serial.print('\t');
+    // Serial.print(gy521.pitch);
+    // Serial.print('\t');
     Serial.print(gy521.yaw);
     Serial.print('\n');
 

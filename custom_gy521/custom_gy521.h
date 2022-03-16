@@ -106,7 +106,7 @@ class Custom_gy521 {
 
         // gyro features:
         // the current value of the angles [0:359.99999999999999999999]
-        volatile double roll, pitch, yaw;
+        volatile double /*roll, pitch,*/ yaw;
         // the linear difference of roll, pitch, yaw between the latest and the further previous measurement
         volatile double d_roll, d_pitch, d_yaw;
         // the correction added to every reading from the chip
@@ -136,6 +136,7 @@ class Custom_gy521 {
         // resets the roll, pitch and yaw values
         void reset_gyro ();
         // gets 6 bytes from gyroscope (uses calibrated data to correct)
+        // this function consumes 2000 - 2150 microseconds in FAST I2C MODE
         void update_gyro ();
 
         // // calibrates roll, and give the corrections to corr_roll

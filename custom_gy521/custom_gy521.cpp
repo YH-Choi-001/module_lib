@@ -3,6 +3,16 @@
 
 #include "custom_gy521.h"
 
+// waits for the buffer to be filled, return 1 if timeout
+bool wait_i2c_buf (const uint8_t buflen) __attribute__((__always_inline__));
+bool wait_i2c_buf (const uint8_t buflen) {
+    const unsigned long starting_time = micros();
+    while (Wire.available() < buflen) {
+        if ((micros() - starting_time) > (buflen * 500)) return 1;
+    }
+    return 0;
+}
+
 // uint16_t read_i2c_data_2_bytes (const uint8_t i2c_address, const uint8_t register_no) {
 //     Wire.beginTransmission(i2c_address);
 //     Wire.write(register_no);
@@ -13,7 +23,7 @@
 // }
 
 Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
-    i2c_address(init_i2c_address), roll(0), pitch(0), yaw(0), corr_roll(0), corr_pitch(0), corr_yaw(0), q(1, 0, 0, 0)
+    i2c_address(init_i2c_address), /*roll(0), pitch(0),*/ yaw(0), corr_roll(0), corr_pitch(0), corr_yaw(0), q(1, 0, 0, 0)
 {
     //
 }
@@ -57,7 +67,7 @@ uint8_t Custom_gy521::who_am_i () {
     const uint8_t err = Wire.endTransmission();
     if (err) return 0; // an error occured while communicating with the chip
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
-    while (Wire.available() < 1) {}
+    wait_i2c_buf(1U);
     return Wire.read();
 }
 
@@ -66,7 +76,7 @@ double Custom_gy521::update_temp () {
     Wire.write(0x41); // accessing the register of thermometer, which has 2 bytes, from 0x41 to 0x42
     Wire.endTransmission();
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
-    while (Wire.available() < 2) {}
+    wait_i2c_buf(2U);
     const int16_t TEMP_OUT = Wire.read() << 8 | Wire.read();
     if (this->who_am_i() == 0x68) {
     // MPU-6000 or MPU-6050
@@ -87,7 +97,9 @@ void Custom_gy521::cal_gyro (const uint32_t sampling_amount, void (*updating_fun
         Wire.endTransmission();
         Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U));
         // commands above take around 944 - 952 us in 100 KHz clock frequency
-        while (Wire.available() < 6) {}
+        if (wait_i2c_buf(6U)) {
+            continue;
+        }
         corr_roll -= static_cast<double>((Wire.read() << 8) | Wire.read());
         corr_pitch -= static_cast<double>((Wire.read() << 8) | Wire.read());
         corr_yaw -= static_cast<double>((Wire.read() << 8) | Wire.read());
@@ -140,13 +152,20 @@ void Custom_gy521::update_gyro () {
     Wire.endTransmission();
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U));
     // commands above take around 944 - 952 us in 100 KHz clock frequency
-    while (Wire.available() < 6) {}
+    if (wait_i2c_buf(6U)) return;
     const unsigned long t_diff = micros() - previous_micros_reading;
     #ifdef DMP_QUAT_EULER_CONVERSION
     // delta roll, delta pitch, delta yaw
-    d_roll = ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-    d_pitch = ( ((Wire.read()<<8) | Wire.read()) + corr_pitch) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-    d_yaw = ( ((Wire.read()<<8) | Wire.read()) + corr_yaw) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+
+    // for sensitivity == +- 1000 degree per sec.
+    // d_roll = ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+    // d_pitch = ( ((Wire.read()<<8) | Wire.read()) + corr_pitch) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+    // d_yaw = ( ((Wire.read()<<8) | Wire.read()) + corr_yaw) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+
+    // for sensitivity == +- 2000 degree per sec.
+    d_roll = ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 16400000.0 * t_diff; // angle change per sec * time past in secs
+    d_pitch = ( ((Wire.read()<<8) | Wire.read()) + corr_pitch) / 16400000.0 * t_diff; // angle change per sec * time past in secs
+    d_yaw = ( ((Wire.read()<<8) | Wire.read()) + corr_yaw) / 16400000.0 * t_diff; // angle change per sec * time past in secs
     #else
     d_roll = ( ((Wire.read()<<8) | Wire.read()) + corr_roll) / 32800000.0 * t_diff; // angle change per sec * time past in secs
     d_pitch = -( ((Wire.read()<<8) | Wire.read()) + corr_pitch) / 32800000.0 * t_diff; // angle change per sec * time past in secs
@@ -182,13 +201,13 @@ void Custom_gy521::update_gyro () {
         q.normalize();
 
         //
-        // dmpGetGravity(...) expansion
-        gravity.x = 2 * (q.x * q.z - q.w * q.y);
-        gravity.y = 2 * (q.w * q.x + q.y * q.z);
-        gravity.z = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
+        // // dmpGetGravity(...) expansion
+        // gravity.x = 2 * (q.x * q.z - q.w * q.y);
+        // gravity.y = 2 * (q.w * q.x + q.y * q.z);
+        // gravity.z = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
         // dmpGetYawPitchRoll(...) expansion
-        roll = atan(gravity.y / sqrt(gravity.x * gravity.x + gravity.z * gravity.z)) * RAD_TO_DEG;
-        pitch = atan(gravity.x / sqrt(gravity.y * gravity.y + gravity.z * gravity.z)) * RAD_TO_DEG;
+        // roll = atan(gravity.y / sqrt(gravity.x * gravity.x + gravity.z * gravity.z)) * RAD_TO_DEG;
+        // pitch = atan(gravity.x / sqrt(gravity.y * gravity.y + gravity.z * gravity.z)) * RAD_TO_DEG;
         yaw = atan2(2 * q.x * q.y - 2 * q.w * q.z, 2 * q.w * q.w + 2 * q.x * q.x - 1) * RAD_TO_DEG;
         #else
         static Quaternion q (1, 0, 0, 0);
@@ -237,10 +256,10 @@ void Custom_gy521::update_gyro () {
     yaw += d_yaw; // angle change per sec * time past in secs
     #endif // #ifndef DMP_QUAT_EULER_CONVERSION
     previous_micros_reading += t_diff;
-    if (roll >= 360.0) roll -= 360.0;
-    if (roll < 0.0) roll += 360.0;
-    if (pitch >= 360.0) pitch -= 360.0;
-    if (pitch < 0.0) pitch += 360.0;
+    // if (roll >= 360.0) roll -= 360.0;
+    // if (roll < 0.0) roll += 360.0;
+    // if (pitch >= 360.0) pitch -= 360.0;
+    // if (pitch < 0.0) pitch += 360.0;
     if (yaw >= 360.0) yaw -= 360.0;
     if (yaw < 0.0) yaw += 360.0;
 }
@@ -285,7 +304,7 @@ void Custom_gy521::enable_ext_i2c_slave_sensors () {
     Wire.write(0x37);
     Wire.endTransmission();
     Wire.requestFrom(i2c_address, 1);
-    while (Wire.available() < 1);
+    if (wait_i2c_buf(1U)) return;
     const uint8_t old_val = Wire.read();
     // write new value to MPU-9250 at register 0x37 with BYPASS_EN bit set HIGH
     Wire.beginTransmission(i2c_address);
