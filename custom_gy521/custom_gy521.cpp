@@ -3,6 +3,53 @@
 
 #include "custom_gy521.h"
 
+class Quaternion {
+  public:
+    double w;
+    double x;
+    double y;
+    double z;
+
+    Quaternion() : w(1.0), x(0.0), y(0.0), z(0.0) { }
+
+    Quaternion(double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
+
+    Quaternion getProduct(Quaternion q) {
+        // Quaternion multiplication is defined by:
+        //     (Q1 * Q2).w = (w1w2 - x1x2 - y1y2 - z1z2)
+        //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
+        //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
+        //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
+        return Quaternion(
+                   w * q.w - x * q.x - y * q.y - z * q.z, // new w
+                   w * q.x + x * q.w + y * q.z - z * q.y, // new x
+                   w * q.y - x * q.z + y * q.w + z * q.x, // new y
+                   w * q.z + x * q.y - y * q.x + z * q.w); // new z
+    }
+
+    Quaternion getConjugate() {
+        return Quaternion(w, -x, -y, -z);
+    }
+
+    double getMagnitude() {
+        return sqrt(w * w + x * x + y * y + z * z);
+    }
+
+    void normalize() {
+        double m = getMagnitude();
+        w /= m;
+        x /= m;
+        y /= m;
+        z /= m;
+    }
+
+    Quaternion getNormalized() {
+        Quaternion r(w, x, y, z);
+        r.normalize();
+        return r;
+    }
+};
+
 // waits for the buffer to be filled, return 1 if timeout
 bool wait_i2c_buf (const uint8_t buflen) __attribute__((__always_inline__));
 bool wait_i2c_buf (const uint8_t buflen) {
@@ -12,15 +59,6 @@ bool wait_i2c_buf (const uint8_t buflen) {
     }
     return 0;
 }
-
-// uint16_t read_i2c_data_2_bytes (const uint8_t i2c_address, const uint8_t register_no) {
-//     Wire.beginTransmission(i2c_address);
-//     Wire.write(register_no);
-//     Wire.endTransmission();
-//     Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U));
-//     while (Wire.available() < 2) {}
-//     return (Wire.read() << 8) | Wire.read();
-// }
 
 Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
     i2c_address(init_i2c_address), /*roll(0), pitch(0),*/ yaw(0), corr_roll(0), corr_pitch(0), corr_yaw(0), q(1, 0, 0, 0)

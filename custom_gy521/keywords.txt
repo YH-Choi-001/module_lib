@@ -1,12 +1,16 @@
 Custom_gy521		KEYWORD1
-roll			KEYWORD1
-pitch			KEYWORD1
 yaw			KEYWORD1
+d_roll			KEYWORD1
+d_pitch			KEYWORD1
+d_yaw			KEYWORD1
 corr_roll		KEYWORD1
 corr_pitch		KEYWORD1
 corr_yaw		KEYWORD1
 
 begin			KEYWORD2
 who_am_i		KEYWORD2
+update_temp		KEYWORD2
 cal_gyro		KEYWORD2
+reset_gyro		KEYWORD2
 update_gyro		KEYWORD2
+enable_ext_i2c_slave_sensors	KEYWORD2

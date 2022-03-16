@@ -36,53 +36,6 @@
 #define MPU6500 0x70
 #define MPU9250 0x71
 
-class Quaternion {
-  public:
-    double w;
-    double x;
-    double y;
-    double z;
-
-    Quaternion() : w(1.0), x(0.0), y(0.0), z(0.0) { }
-
-    Quaternion(double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
-
-    Quaternion getProduct(Quaternion q) {
-        // Quaternion multiplication is defined by:
-        //     (Q1 * Q2).w = (w1w2 - x1x2 - y1y2 - z1z2)
-        //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
-        //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
-        //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
-        return Quaternion(
-                   w * q.w - x * q.x - y * q.y - z * q.z, // new w
-                   w * q.x + x * q.w + y * q.z - z * q.y, // new x
-                   w * q.y - x * q.z + y * q.w + z * q.x, // new y
-                   w * q.z + x * q.y - y * q.x + z * q.w); // new z
-    }
-
-    Quaternion getConjugate() {
-        return Quaternion(w, -x, -y, -z);
-    }
-
-    double getMagnitude() {
-        return sqrt(w * w + x * x + y * y + z * z);
-    }
-
-    void normalize() {
-        double m = getMagnitude();
-        w /= m;
-        x /= m;
-        y /= m;
-        z /= m;
-    }
-
-    Quaternion getNormalized() {
-        Quaternion r(w, x, y, z);
-        r.normalize();
-        return r;
-    }
-};
-
 // this class has been customized for RCJ soccer robots use only
 class Custom_gy521 {
     private:
@@ -110,7 +63,7 @@ class Custom_gy521 {
         // the linear difference of roll, pitch, yaw between the latest and the further previous measurement
         volatile double d_roll, d_pitch, d_yaw;
         // the correction added to every reading from the chip
-        volatile double corr_roll, corr_pitch, corr_yaw;
+        double corr_roll, corr_pitch, corr_yaw;
         // inits the 7-bit I2C address of the chip to init_i2c_address
         Custom_gy521 (const uint8_t init_i2c_address);
         // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
