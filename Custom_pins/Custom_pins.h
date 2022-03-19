@@ -11,25 +11,44 @@
 namespace yh {
     namespace rec {
         namespace custom_pins {
-            // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
-            // kicks off the first ADC conversion, and let it run on
-            void begin_analog_read ();
+            // let LSB of the byte be 0, each bit decides if the automated analog read should select that channel to conduct an A-to-D conversion.
+            static uint16_t analog_read_enable_byte =
+            #if defined(__AVR_ATmega32U4__)
+            // only channels 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 are in use on micro and leonardo
+            // 0b 00111111 11110011
+            // 0x    3   f    f   3
+            0x3ff3;
+            #else
+            // just enable all channels,
+            // and the logic inside ISR(ADC_vect) will wrap the channel to 0 after the channel reaches the board's largest available channel
+            0xffff;
+            #endif
+
             // @param pin the analog pin to be read (or channel to be read for backwards compatibility)
             // @return the analog voltage value reference to AREF pin (or 5V if not connected)
             uint16_t analog_read (uint8_t pin_or_channel);
+            // this function waits ~ 104 us for ADC result
+            // @param pin the analog pin to be read (or channel to be read for backwards compatibility)
+            // @return the analog voltage value reference to AREF pin (or 5V if not connected)
+            uint16_t analog_read_and_wait (uint8_t pin_or_channel);
+
+            // Pauses the automated analog read feature provided by this analog_read(uint8_t) in this library.
+            // You may continue to use analog_read_and_wait(const uint8_t pin_or_channel) function to conduct analog-to-digital conversions.
+            inline void pause_automated_analog_read () __attribute__((__always_inline__));
+            inline void pause_automated_analog_read () { ADCSRA &= ~((1 << ADSC) | (1 << ADIF) | (1 << ADIE)); }
 
             #define FUNCTION_PWM 0
 
-
-
-            #if FUNCTION_PWM
 
             #ifndef sbi
             #define sbi(x,y) (x|=(1<<y))
             #endif
             #ifndef cbi
-            #define cbi(x,y) (x&=~(1<<y))
+            #define cbi(x,y) (x&=(~(1<<y)))
             #endif
+
+
+            #if FUNCTION_PWM
 
             // expanded analogWrite(...) functions
             // XXX fix needed for atmega8
@@ -218,7 +237,7 @@ namespace yh {
                 const uint8_t timer;
                 // timer A register
                 volatile uint8_t *timer_A_reg;
-                // PWM channel bit mask
+                // PWM channel enable bit mask
                 uint8_t timer_pwm_bit_mask;
                 // PWM value of the pin
                 volatile uint8_t *compare_match_reg;
@@ -641,14 +660,20 @@ namespace yh {
         #define Custom_pin (Custom_pin_is_a_forbidden_keyword_to_programmer)
         #endif
         namespace custom_pins {
-            void pin_mode (const uint8_t pin, const uint8_t mode)    __attribute__((__always_inline__));
-            void pin_mode (const uint8_t pin, const uint8_t mode)                                        { pins[pin].pin_mode(mode); }
-            void digital_write (const uint8_t pin, const bool val)   __attribute__((__always_inline__));
-            void digital_write (const uint8_t pin, const bool val)                                       { pins[pin].digital_write(val); }
-            bool digital_read (const uint8_t pin)                    __attribute__((__always_inline__));
-            bool digital_read (const uint8_t pin)                                                        { return pins[pin].digital_read(); }
-            void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__));
-            void analog_write (const uint8_t pin, const uint8_t val)                                     { pins[pin].analog_write(val); }
+            inline void pin_mode (const uint8_t pin, const uint8_t mode)    __attribute__((__always_inline__));
+            inline void pin_mode (const uint8_t pin, const uint8_t mode)                                        { pins[pin].pin_mode(mode); }
+            inline void digital_write (const uint8_t pin, const bool val)   __attribute__((__always_inline__));
+            inline void digital_write (const uint8_t pin, const bool val)                                       { pins[pin].digital_write(val); }
+            inline bool digital_read (const uint8_t pin)                    __attribute__((__always_inline__));
+            inline bool digital_read (const uint8_t pin)                                                        { return pins[pin].digital_read(); }
+            inline void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__));
+            inline void analog_write (const uint8_t pin, const uint8_t val)                                     { pins[pin].analog_write(val); }
+            inline void digital_write_HIGH   (const uint8_t pin)   __attribute__((__always_inline__));
+            inline void digital_write_HIGH   (const uint8_t pin)                                       { pins[pin].digital_write_HIGH(); }
+            inline void digital_write_LOW    (const uint8_t pin)   __attribute__((__always_inline__));
+            inline void digital_write_LOW    (const uint8_t pin)                                       { pins[pin].digital_write_LOW(); }
+            inline void digital_write_TOGGLE (const uint8_t pin)   __attribute__((__always_inline__));
+            inline void digital_write_TOGGLE (const uint8_t pin)                                       { pins[pin].digital_write_TOGGLE(); }
         }
     }
 }
@@ -659,6 +684,9 @@ namespace yh {
 #define digitalRead(...) yh::rec::custom_pins::digital_read(__VA_ARGS__)
 #define analogWrite(...) yh::rec::custom_pins::analog_write(__VA_ARGS__)
 #define analogRead(...) yh::rec::custom_pins::analog_read(__VA_ARGS__)
+#define digitalWriteHIGH(...) yh::rec::custom_pins::digital_write_HIGH(__VA_ARGS__)
+#define digitalWriteLOW(...) yh::rec::custom_pins::digital_write_LOW(__VA_ARGS__)
+#define digitalWriteTOGGLE(...) yh::rec::custom_pins::digital_write_TOGGLE(__VA_ARGS__)
 #endif // #ifndef CUSTOM_PINS_CPP
 
 #endif // #ifndef CUSTOM_PINS_H

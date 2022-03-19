@@ -6,13 +6,13 @@
 #include "Hc_sr04.h"
 
 yh::rec::Hc_sr04::Hc_sr04 (const Hc_sr04 &init_obj) :
-    trig_pin(init_obj.trig_pin), echo_pin(init_obj.echo_pin)
+    trig_pin(init_obj.trig_pin), echo_pin(init_obj.echo_pin), max_waiting_time_in_us(23530)
 {
     //
 }
 
 yh::rec::Hc_sr04::Hc_sr04 (const uint8_t init_trig_pin, const uint8_t init_echo_pin) :
-    trig_pin(init_trig_pin), echo_pin(init_echo_pin)
+    trig_pin(init_trig_pin), echo_pin(init_echo_pin), max_waiting_time_in_us(23530)
 {
     //
 }
