@@ -20,9 +20,11 @@ inline int8_t setup_timer_5A_interrupt (const double us_per_interrupt, const uin
 
 inline int8_t off_timer_1A_interrupt ();
 inline int8_t off_timer_2A_interrupt ();
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 inline int8_t off_timer_3A_interrupt ();
 inline int8_t off_timer_4A_interrupt ();
 inline int8_t off_timer_5A_interrupt ();
+#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
 inline int8_t setup_timer_1A_interrupt (const double us_per_interrupt, const uint16_t request_prescaler) {
     TCCR1A = 0; // set entire TCCR1A register to 0
