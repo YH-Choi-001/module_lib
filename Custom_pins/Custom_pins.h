@@ -1,5 +1,7 @@
 // warning: This library disables the original pinMode and I/O functions on the pins.
 // This library aims to provide a faster I/O communication with the pins.
+// To increase speed, SRAM is sacrificed.
+// <Arduino.h> chose SRAM to give up speed, and now, we choose speed to give up SRAM.
 
 #ifndef CUSTOM_PINS_H
 #define CUSTOM_PINS_H __DATE__ ", " __TIME__
@@ -11,32 +13,6 @@
 namespace yh {
     namespace rec {
         namespace custom_pins {
-            // let LSB of the byte be 0, each bit decides if the automated analog read should select that channel to conduct an A-to-D conversion.
-            static uint16_t analog_read_enable_byte =
-            #if defined(__AVR_ATmega32U4__)
-            // only channels 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 are in use on micro and leonardo
-            // 0b 00111111 11110011
-            // 0x    3   f    f   3
-            0x3ff3;
-            #else
-            // just enable all channels,
-            // and the logic inside ISR(ADC_vect) will wrap the channel to 0 after the channel reaches the board's largest available channel
-            0xffff;
-            #endif
-
-            // @param pin the analog pin to be read (or channel to be read for backwards compatibility)
-            // @return the analog voltage value reference to AREF pin (or 5V if not connected)
-            uint16_t analog_read (uint8_t pin_or_channel);
-            // this function waits ~ 104 us for ADC result
-            // @param pin the analog pin to be read (or channel to be read for backwards compatibility)
-            // @return the analog voltage value reference to AREF pin (or 5V if not connected)
-            uint16_t analog_read_and_wait (uint8_t pin_or_channel);
-
-            // Pauses the automated analog read feature provided by this analog_read(uint8_t) in this library.
-            // You may continue to use analog_read_and_wait(const uint8_t pin_or_channel) function to conduct analog-to-digital conversions.
-            inline void pause_automated_analog_read () __attribute__((__always_inline__));
-            inline void pause_automated_analog_read () { ADCSRA &= ~((1 << ADSC) | (1 << ADIF) | (1 << ADIE)); }
-
             #define FUNCTION_PWM 0
 
 
@@ -222,9 +198,6 @@ namespace yh {
             private:
                 // the counter to count how many objects has been automatically created
                 static uint8_t auto_object_counter;
-                // pins that cannot be changed:
-                // the pin that this object belongs to
-                const uint8_t pin;
                 // output port register
                 volatile uint8_t *const output_reg;
                 // input port register
@@ -235,17 +208,18 @@ namespace yh {
                 const uint8_t bit_mask;
                 // timer
                 const uint8_t timer;
+                #if FUNCTION_PWM
+                // pointer to the function to turn off PWM output
+                void (*off_pwm)();
+                // pointer to the function to write the PWM value for this pin
+                void (*analog_write_ptr)(const uint8_t);
+                #else
                 // timer A register
                 volatile uint8_t *timer_A_reg;
                 // PWM channel enable bit mask
                 uint8_t timer_pwm_bit_mask;
                 // PWM value of the pin
                 volatile uint8_t *compare_match_reg;
-                #if FUNCTION_PWM
-                // pointer to the function to turn off PWM output
-                void (*off_pwm)();
-                // pointer to the function to write the PWM value for this pin
-                void (*analog_write_ptr)(const uint8_t);
                 #endif
                 void timer_identification () {
                     #if FUNCTION_PWM
@@ -546,30 +520,22 @@ namespace yh {
             public:
                 // inits the pin number into the object
                 Custom_pin (const uint8_t init_pin) :
-                pin(init_pin),
-                output_reg(portOutputRegister(digitalPinToPort(pin))),
-                input_reg(portInputRegister(digitalPinToPort(pin))),
-                mode_reg(portModeRegister(digitalPinToPort(pin))),
-                bit_mask(digitalPinToBitMask(pin)),
-                timer(digitalPinToTimer(pin))
+                output_reg(   portOutputRegister( digitalPinToPort(init_pin) )   ),
+                input_reg(   portInputRegister( digitalPinToPort(init_pin) )   ),
+                mode_reg(   portModeRegister( digitalPinToPort(init_pin) )   ),
+                bit_mask(digitalPinToBitMask(init_pin)),
+                timer(digitalPinToTimer(init_pin))
                 {
                     timer_identification();
                 }
                 // directly initialized on declaration
                 Custom_pin () :
-                pin(auto_object_counter++),
-                output_reg(portOutputRegister(digitalPinToPort(pin))),
-                input_reg(portInputRegister(digitalPinToPort(pin))),
-                mode_reg(portModeRegister(digitalPinToPort(pin))),
-                bit_mask(digitalPinToBitMask(pin)),
-                timer(digitalPinToTimer(pin))
+                output_reg(   portOutputRegister( digitalPinToPort(auto_object_counter) )   ),
+                input_reg(   portInputRegister( digitalPinToPort(auto_object_counter) )   ),
+                mode_reg(   portModeRegister( digitalPinToPort(auto_object_counter) )   ),
+                bit_mask(digitalPinToBitMask(auto_object_counter)),
+                timer(digitalPinToTimer(auto_object_counter++))
                 {
-                    // pin = auto_object_counter++;
-                    // output_reg = portOutputRegister( digitalPinToPort(pin) );
-                    // input_reg = portInputRegister( digitalPinToPort(pin) );
-                    // mode_reg = portModeRegister( digitalPinToPort(pin) );
-                    // bit_mask = digitalPinToBitMask(pin);
-                    // timer = digitalPinToTimer(pin);
 
                     timer_identification();
                 }
@@ -648,17 +614,8 @@ namespace yh {
                     }
                     #endif // #if !FUNCTION_PWM
                 }
-                //
-                uint16_t analog_read () __attribute__((__always_inline__))
-                {
-                    if (pin >= A0 && pin < (A0 + NUM_ANALOG_INPUTS)) return custom_pins::analog_read(pin);
-                    else return ((*input_reg) & bit_mask) ? 1023 : 0;
-                }
         };
         extern Custom_pin pins [];
-        #ifndef CUSTOM_PINS_CPP
-        #define Custom_pin (Custom_pin_is_a_forbidden_keyword_to_programmer)
-        #endif
         namespace custom_pins {
             inline void pin_mode (const uint8_t pin, const uint8_t mode)    __attribute__((__always_inline__));
             inline void pin_mode (const uint8_t pin, const uint8_t mode)                                        { pins[pin].pin_mode(mode); }
@@ -679,14 +636,15 @@ namespace yh {
 }
 
 #ifndef CUSTOM_PINS_CPP
-#define pinMode(...) yh::rec::custom_pins::pin_mode(__VA_ARGS__)
-#define digitalWrite(...) yh::rec::custom_pins::digital_write(__VA_ARGS__)
-#define digitalRead(...) yh::rec::custom_pins::digital_read(__VA_ARGS__)
-#define analogWrite(...) yh::rec::custom_pins::analog_write(__VA_ARGS__)
-#define analogRead(...) yh::rec::custom_pins::analog_read(__VA_ARGS__)
-#define digitalWriteHIGH(...) yh::rec::custom_pins::digital_write_HIGH(__VA_ARGS__)
-#define digitalWriteLOW(...) yh::rec::custom_pins::digital_write_LOW(__VA_ARGS__)
-#define digitalWriteTOGGLE(...) yh::rec::custom_pins::digital_write_TOGGLE(__VA_ARGS__)
+// the macros below override the original <Arduino.h> defined functions excluding analogRead()
+#define pinMode(pin,mode) yh::rec::pins[pin].pin_mode(mode)
+#define digitalWrite(pin,val) yh::rec::pins[pin].digital_write(val)
+#define digitalRead(pin) yh::rec::pins[pin].digital_read()
+#define analogWrite(pin,val) yh::rec::pins[pin].analog_write(val)
+// #define analogRead(...) yh::rec::custom_pins::analog_read(__VA_ARGS__) // current analogRead() function from <Arduino.h> is already the fastest when striving to preserve 10-bit resolution
+#define digitalWriteHIGH(pin) yh::rec::pins[pin].digital_write_HIGH()
+#define digitalWriteLOW(pin) yh::rec::pins[pin].digital_write_LOW()
+#define digitalWriteTOGGLE(pin) yh::rec::pins[pin].digital_write_TOGGLE()
 #endif // #ifndef CUSTOM_PINS_CPP
 
 #endif // #ifndef CUSTOM_PINS_H

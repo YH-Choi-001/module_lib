@@ -1,6 +1,8 @@
 #ifndef CUSTOM_PINS_CPP
 #define CUSTOM_PINS_CPP __DATE__ ", " __TIME__
 
+#if 0
+
 #include "Custom_pins.h"
 
 #include "wiring_analog.c"
@@ -9,7 +11,11 @@ namespace yh {
     namespace rec {
         namespace custom_pins {
             namespace {
+                #if defined(__AVR_ATmega32U4__)
+                static volatile uint16_t adc_data [14];
+                #else
                 static volatile uint16_t adc_data [NUM_ANALOG_INPUTS];
+                #endif
             }
         }
         Custom_pin pins [NUM_DIGITAL_PINS];
@@ -165,5 +171,7 @@ ISR (ADC_vect) {
     ADCSRA |= (1 << ADSC);
 
 }
+
+#endif // #if 0
 
 #endif // #ifndef CUSTOM_PINS_CPP
