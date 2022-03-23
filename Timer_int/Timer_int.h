@@ -453,6 +453,7 @@ inline int8_t off_timer_1A_interrupt () {
   OCR1A = 0;
   // disable timer compare interrupt
   TIMSK1 &= ~(1 << OCIE1A);
+  return 0;
 }
 
 inline int8_t off_timer_2A_interrupt () {
@@ -464,6 +465,7 @@ inline int8_t off_timer_2A_interrupt () {
   OCR2A = 0;
   // disable timer compare interrupt
   TIMSK2 &= ~(1 << OCIE2A);
+  return 0;
 }
 
 #define OFF_TIMER_16bit_INTERRUPT(timer_no,abc) \
@@ -472,6 +474,7 @@ inline int8_t off_timer_##timer_no##abc##_interrupt () { \
   TCCR##timer_no##B = (1 << CS##timer_no##1) | (1 << CS##timer_no##0); \
   OCR##timer_no##abc = 0; \
   TIMSK##timer_no &= ~(1 << OCIE##timer_no##abc); \
+  return 0; \
 }
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 OFF_TIMER_16bit_INTERRUPT(3,A)
