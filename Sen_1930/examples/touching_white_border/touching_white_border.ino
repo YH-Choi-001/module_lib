@@ -5,12 +5,12 @@
 
 #include <Sen_1930.h>
 
-yh::rec::Sen_1930_fast grayscale (A0);
+yh::rec::Sen_1930 grayscale (A0);
 
 void setup () {
     Serial.begin(9600);
     grayscale.begin();
-    grayscale.threshold(700);
+    grayscale.set_threshold(700);
 }
 
 void loop () {

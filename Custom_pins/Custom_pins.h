@@ -35,6 +35,10 @@ namespace yh {
                 sbi(TCCR0, COM00);
                 OCR0 = val; // set pwm duty
             }
+            void off_COM00_PWM () __attribute__((__always_inline__));
+            void off_COM00_PWM () {
+                cbi(TCCR0, COM00);
+            }
             #endif
 
             #if defined(TCCR0A) && defined(COM0A1)
@@ -42,6 +46,10 @@ namespace yh {
                 // connect pwm to pin on timer 0, channel A
                 sbi(TCCR0A, COM0A1);
                 OCR0A = val; // set pwm duty
+            }
+            void off_COM0A1_PWM () __attribute__((__always_inline__));
+            void off_COM0A1_PWM () {
+                cbi(TCCR0A, COM0A1);
             }
             #endif
 
@@ -51,6 +59,10 @@ namespace yh {
                 sbi(TCCR0A, COM0B1);
                 OCR0B = val; // set pwm duty
             }
+            void off_COM0B1_PWM () __attribute__((__always_inline__));
+            void off_COM0B1_PWM () {
+                cbi(TCCR0A, COM0B1);
+            }
             #endif
 
             #if defined(TCCR1A) && defined(COM1A1)
@@ -58,6 +70,10 @@ namespace yh {
                 // connect pwm to pin on timer 1, channel A
                 sbi(TCCR1A, COM1A1);
                 OCR1A = val; // set pwm duty
+            }
+            void off_COM1A1_PWM () __attribute__((__always_inline__));
+            void off_COM1A1_PWM () {
+                cbi(TCCR1A, COM1A1);
             }
             #endif
 
@@ -67,6 +83,10 @@ namespace yh {
                 sbi(TCCR1A, COM1B1);
                 OCR1B = val; // set pwm duty
             }
+            void off_COM1B1_PWM () __attribute__((__always_inline__));
+            void off_COM1B1_PWM () {
+                cbi(TCCR1A, COM1B1);
+            }
             #endif
 
             #if defined(TCCR1A) && defined(COM1C1)
@@ -74,6 +94,10 @@ namespace yh {
                 // connect pwm to pin on timer 1, channel C
                 sbi(TCCR1A, COM1C1);
                 OCR1C = val; // set pwm duty
+            }
+            void off_COM1C1_PWM () __attribute__((__always_inline__));
+            void off_COM1C1_PWM () {
+                cbi(TCCR1A, COM1C1);
             }
             #endif
 
@@ -83,6 +107,10 @@ namespace yh {
                 sbi(TCCR2, COM21);
                 OCR2 = val; // set pwm duty
             }
+            void off_COM21_PWM () __attribute__((__always_inline__));
+            void off_COM21_PWM () {
+                cbi(TCCR2, COM21);
+            }
             #endif
 
             #if defined(TCCR2A) && defined(COM2A1)
@@ -90,6 +118,10 @@ namespace yh {
                 // connect pwm to pin on timer 2, channel A
                 sbi(TCCR2A, COM2A1);
                 OCR2A = val; // set pwm duty
+            }
+            void off_COM2A1_PWM () __attribute__((__always_inline__));
+            void off_COM2A1_PWM () {
+                cbi(TCCR2A, COM2A1);
             }
             #endif
 
@@ -99,6 +131,10 @@ namespace yh {
                 sbi(TCCR2A, COM2B1);
                 OCR2B = val; // set pwm duty
             }
+            void off_COM2B1_PWM () __attribute__((__always_inline__));
+            void off_COM2B1_PWM () {
+                cbi(TCCR2A, COM2B1);
+            }
             #endif
 
             #if defined(TCCR3A) && defined(COM3A1)
@@ -106,6 +142,10 @@ namespace yh {
                 // connect pwm to pin on timer 3, channel A
                 sbi(TCCR3A, COM3A1);
                 OCR3A = val; // set pwm duty
+            }
+            void off_COM3A1_PWM () __attribute__((__always_inline__));
+            void off_COM3A1_PWM () {
+                cbi(TCCR3A, COM3A1);
             }
             #endif
 
@@ -115,6 +155,10 @@ namespace yh {
                 sbi(TCCR3A, COM3B1);
                 OCR3B = val; // set pwm duty
             }
+            void off_COM3B1_PWM () __attribute__((__always_inline__));
+            void off_COM3B1_PWM () {
+                cbi(TCCR3A, COM3B1);
+            }
             #endif
 
             #if defined(TCCR3A) && defined(COM3C1)
@@ -122,6 +166,10 @@ namespace yh {
                 // connect pwm to pin on timer 3, channel C
                 sbi(TCCR3A, COM3C1);
                 OCR3C = val; // set pwm duty
+            }
+            void off_COM3C1_PWM () __attribute__((__always_inline__));
+            void off_COM3C1_PWM () {
+                cbi(TCCR3A, COM3C1);
             }
             #endif
 
@@ -134,6 +182,10 @@ namespace yh {
                 #endif
                 OCR4A = val;	// set pwm duty
             }
+            void off_COM4A1_PWM () __attribute__((__always_inline__));
+            void off_COM4A1_PWM () {
+                cbi(TCCR4A, COM4A1);
+            }
             #endif
             
             #if defined(TCCR4A) && defined(COM4B1)
@@ -142,6 +194,10 @@ namespace yh {
                 sbi(TCCR4A, COM4B1);
                 OCR4B = val; // set pwm duty
             }
+            void off_COM4B1_PWM () __attribute__((__always_inline__));
+            void off_COM4B1_PWM () {
+                cbi(TCCR4A, COM4B1);
+            }
             #endif
 
             #if defined(TCCR4A) && defined(COM4C1)
@@ -149,6 +205,10 @@ namespace yh {
                 // connect pwm to pin on timer 4, channel C
                 sbi(TCCR4A, COM4C1);
                 OCR4C = val; // set pwm duty
+            }
+            void off_COM4C1_PWM () __attribute__((__always_inline__));
+            void off_COM4C1_PWM () {
+                cbi(TCCR4A, COM4C1);
             }
             #endif
                 
@@ -161,6 +221,10 @@ namespace yh {
                 #endif
                 OCR4D = val;	// set pwm duty
             }
+            void off_COM4D1_PWM () __attribute__((__always_inline__));
+            void off_COM4D1_PWM () {
+                cbi(TCCR4C, COM4D1);
+            }
             #endif
 
                             
@@ -170,6 +234,10 @@ namespace yh {
                 sbi(TCCR5A, COM5A1);
                 OCR5A = val; // set pwm duty
             }
+            void off_COM5A1_PWM () __attribute__((__always_inline__));
+            void off_COM5A1_PWM () {
+                cbi(TCCR5A, COM5A1);
+            }
             #endif
 
             #if defined(TCCR5A) && defined(COM5B1)
@@ -178,6 +246,10 @@ namespace yh {
                 sbi(TCCR5A, COM5B1);
                 OCR5B = val; // set pwm duty
             }
+            void off_COM5B1_PWM () __attribute__((__always_inline__));
+            void off_COM5B1_PWM () {
+                cbi(TCCR5A, COM5B1);
+            }
             #endif
 
             #if defined(TCCR5A) && defined(COM5C1)
@@ -185,6 +257,10 @@ namespace yh {
                 // connect pwm to pin on timer 5, channel C
                 sbi(TCCR5A, COM5C1);
                 OCR5C = val; // set pwm duty
+            }
+            void off_COM5C1_PWM () __attribute__((__always_inline__));
+            void off_COM5C1_PWM () {
+                cbi(TCCR5A, COM5C1);
             }
             #endif
 
@@ -223,103 +299,118 @@ namespace yh {
                 #endif
                 void timer_identification () {
                     #if FUNCTION_PWM
-                    off_pwm = NULL;
                     switch(timer)
                     {
                         // XXX fix needed for atmega8
                         #if defined(TCCR0) && defined(COM00) && !defined(__AVR_ATmega8__)
                         case TIMER0A:
                             analog_write_ptr = Custom_pins::set_COM00_PWM;
+                            off_pwm          = Custom_pins::off_COM00_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR0A) && defined(COM0A1)
                         case TIMER0A:
                             analog_write_ptr = Custom_pins::set_COM0A1_PWM;
+                            off_pwm          = Custom_pins::off_COM0A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR0A) && defined(COM0B1)
                         case TIMER0B:
                             analog_write_ptr = Custom_pins::set_COM0B1_PWM;
+                            off_pwm          = Custom_pins::off_COM0B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR1A) && defined(COM1A1)
                         case TIMER1A:
                             analog_write_ptr = Custom_pins::set_COM1A1_PWM;
+                            off_pwm          = Custom_pins::off_COM1A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR1A) && defined(COM1B1)
                         case TIMER1B:
                             analog_write_ptr = Custom_pins::set_COM1B1_PWM;
+                            off_pwm          = Custom_pins::off_COM1B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR1A) && defined(COM1C1)
                         case TIMER1C:
                             analog_write_ptr = Custom_pins::set_COM1C1_PWM;
+                            off_pwm          = Custom_pins::off_COM1C1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR2) && defined(COM21)
                         case TIMER2:
                             analog_write_ptr = Custom_pins::set_COM21_PWM;
+                            off_pwm          = Custom_pins::off_COM21_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR2A) && defined(COM2A1)
                         case TIMER2A:
                             analog_write_ptr = Custom_pins::set_COM2A1_PWM;
+                            off_pwm          = Custom_pins::off_COM2A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR2A) && defined(COM2B1)
                         case TIMER2B:
                             analog_write_ptr = Custom_pins::set_COM2B1_PWM;
+                            off_pwm          = Custom_pins::off_COM2B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR3A) && defined(COM3A1)
                         case TIMER3A:
                             analog_write_ptr = Custom_pins::set_COM3A1_PWM;
+                            off_pwm          = Custom_pins::off_COM3A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR3A) && defined(COM3B1)
                         case TIMER3B:
                             analog_write_ptr = Custom_pins::set_COM3B1_PWM;
+                            off_pwm          = Custom_pins::off_COM3B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR3A) && defined(COM3C1)
                         case TIMER3C:
                             analog_write_ptr = Custom_pins::set_COM3C1_PWM;
+                            off_pwm          = Custom_pins::off_COM3C1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR4A)
                         case TIMER4A:
                             analog_write_ptr = Custom_pins::set_COM4A1_PWM;
+                            off_pwm          = Custom_pins::off_COM4A1_PWM;
                             break;
                         #endif
                         
                         #if defined(TCCR4A) && defined(COM4B1)
                         case TIMER4B:
                             analog_write_ptr = Custom_pins::set_COM4B1_PWM;
+                            off_pwm          = Custom_pins::off_COM4B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR4A) && defined(COM4C1)
                         case TIMER4C:
                             analog_write_ptr = Custom_pins::set_COM4C1_PWM;
+                            off_pwm          = Custom_pins::off_COM4C1_PWM;
                             break;
                         #endif
                             
                         #if defined(TCCR4C) && defined(COM4D1)
                         case TIMER4D:				
                             analog_write_ptr = Custom_pins::set_COM4D1_PWM;
+                            off_pwm          = Custom_pins::off_COM4D1_PWM;
                             break;
                         #endif
 
@@ -327,24 +418,28 @@ namespace yh {
                         #if defined(TCCR5A) && defined(COM5A1)
                         case TIMER5A:
                             analog_write_ptr = Custom_pins::set_COM5A1_PWM;
+                            off_pwm          = Custom_pins::off_COM5A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR5A) && defined(COM5B1)
                         case TIMER5B:
                             analog_write_ptr = Custom_pins::set_COM5B1_PWM;
+                            off_pwm          = Custom_pins::off_COM5B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR5A) && defined(COM5C1)
                         case TIMER5C:
                             analog_write_ptr = Custom_pins::set_COM5C1_PWM;
+                            off_pwm          = Custom_pins::off_COM5C1_PWM;
                             break;
                         #endif
 
                         case NOT_ON_TIMER:
                         default:
                             analog_write_ptr = NULL;
+                            off_pwm          = NULL;
                     }
                     #else
                     switch(timer)
