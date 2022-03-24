@@ -1,11 +1,10 @@
 yh		KEYWORD1
 rec		KEYWORD1
-Us_016_fast	KEYWORD1
 Us_016		KEYWORD1
 
 begin		KEYWORD2
 read_dist_mm	KEYWORD2
 read_dist_cm	KEYWORD2
 set_resolution	KEYWORD2
-get_previous_dist_mm	KEYWORD2
-get_previous_dist_cm	KEYWORD2
+
+NC_PINNO	LITERAL1
