@@ -1,8 +1,10 @@
-yh		KEYWORD1
-rec		KEYWORD1
-Btn7971b	KEYWORD1
+yh			KEYWORD1
+rec			KEYWORD1
+Btn7971b		KEYWORD1
 
-begin		KEYWORD2
-set_spd		KEYWORD2
-stop_motor	KEYWORD2
-get_spd		KEYWORD2
+begin			KEYWORD2
+set_spd			KEYWORD2
+stop_motor		KEYWORD2
+full_spd_forwards	KEYWORD2
+full_spd_backwards	KEYWORD2
+get_spd			KEYWORD2
