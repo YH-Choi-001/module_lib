@@ -238,7 +238,8 @@ void yh::rec::Btn7971b::timer_identification () {
         #if defined(TCCR4A)
         case TIMER4A:
             #if defined(COM4A0)		// only used on 32U4
-            cbi(TCCR4A, COM4A0);
+            // cbi(TCCR4A, COM4A0);
+            TCCR4A &= ~(1 << COM4A0);
             #endif
             timer_A_reg = &TCCR4A;
             timer_pwm_bit_mask = (1 << COM4A1);
@@ -265,7 +266,8 @@ void yh::rec::Btn7971b::timer_identification () {
         #if defined(TCCR4C) && defined(COM4D1)
         case TIMER4D:
             #if defined(COM4D0)		// only used on 32U4
-            cbi(TCCR4C, COM4D0);
+            // cbi(TCCR4C, COM4D0);
+            TCCR4C &= ~(1 << COM4D0);
             #endif
             timer_A_reg = &TCCR4C;
             timer_pwm_bit_mask = (1 << COM4D1);
