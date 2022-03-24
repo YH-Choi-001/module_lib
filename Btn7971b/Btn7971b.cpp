@@ -135,7 +135,7 @@ inline void yh::rec::Btn7971b::analog_write_pwm_pin (const uint8_t val) {
 }
 
 void yh::rec::Btn7971b::timer_identification () {
-    // copied from Custom_pins.h, also written by me
+    // copied from Custom_pins.h, which is also written by me
     switch(pwm_pin_timer)
     {
         // XXX fix needed for atmega8
