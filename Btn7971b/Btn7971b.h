@@ -1,3 +1,5 @@
+// This library is proved to be working on 24 Mar 2022 with bottleSumo robot
+
 // written by YH Choi
 // look for the latest version on https://github.com/YH-Choi-001/module_lib/blob/main/Btn7971b/Btn7971b.h
 
@@ -14,8 +16,7 @@
 namespace yh {
     namespace rec {
         // warning: BTN7971b uses H-bridge design,
-        // which does not support DAC input, but
-        // PWM input only.
+        // which does not support DAC input, but PWM input only.
         // Never use a DAC on any IN pins on BTN7971b
         //    IN1 : IN2   
         //    LOW : LOW    => stop
