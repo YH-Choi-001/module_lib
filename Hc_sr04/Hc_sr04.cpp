@@ -39,37 +39,33 @@ void yh::rec::Hc_sr04::set_max_range_in_cm (const double max_range_in_cm) {
     max_waiting_time_in_us = (max_range_in_cm > 400.0 ? 400.0 : max_range_in_cm) * 58.823; // it takes 58.823 us to detect a 1 cm obstable
 }
 
-#define TRIG_WAVE() { \
-    (*trig_pin_output_register) &= ~trig_pin_mask; \
-    delayMicroseconds(2); \
-    (*trig_pin_output_register) |= trig_pin_mask; \
-    delayMicroseconds(10); \
-    (*trig_pin_output_register) &= ~trig_pin_mask; \
-} \
-
-#define CUSTOM_PULSEIN() \
-    const unsigned long width = \
-        countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask, \
-            microsecondsToClockCycles(max_waiting_time_in_us) / 16);
-
 uint16_t yh::rec::Hc_sr04::read_dist_mm () {
-    TRIG_WAVE();
-    CUSTOM_PULSEIN();
+    (*trig_pin_output_register) &= ~trig_pin_mask;
+    delayMicroseconds(2);
+    (*trig_pin_output_register) |= trig_pin_mask;
+    delayMicroseconds(10);
+    (*trig_pin_output_register) &= ~trig_pin_mask;
+    const unsigned long width =
+        countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask,
+            microsecondsToClockCycles(max_waiting_time_in_us) / 16);
     return width ? (clockCyclesToMicroseconds(width * 16 + 16) * 0.17) : 8888;
     // const unsigned long duration = pulseIn(echo_pin, HIGH, (max_waiting_time_in_us > 23530 ? 23530 : max_waiting_time_in_us));
     // return duration ? duration * 0.17 : 8888;
 }
 
 uint16_t yh::rec::Hc_sr04::read_dist_cm () {
-    TRIG_WAVE();
-    CUSTOM_PULSEIN();
+    (*trig_pin_output_register) &= ~trig_pin_mask;
+    delayMicroseconds(2);
+    (*trig_pin_output_register) |= trig_pin_mask;
+    delayMicroseconds(10);
+    (*trig_pin_output_register) &= ~trig_pin_mask;
+    const unsigned long width =
+        countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask,
+            microsecondsToClockCycles(max_waiting_time_in_us) / 16);
     return width ? (clockCyclesToMicroseconds(width * 16 + 16) * 0.017) : 888;
     // const unsigned long duration = pulseIn(echo_pin, HIGH, (max_waiting_time_in_us > 23530 ? 23530 : max_waiting_time_in_us));
     // return duration ? duration * 0.017 : 888;
 }
-
-#undef CUSTOM_PULSEIN
-#undef TRIG_WAVE
 
 
 

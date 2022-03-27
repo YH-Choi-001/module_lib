@@ -21,7 +21,7 @@ Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
 
 void Custom_gy521::begin () {
     // init settings to the GY-521 module through I2C
-    if (!(TWCR & _BV(TWEN))) { // if (TwoWireENable bit is off) { begin I2C communication }
+    if (!(TWCR & (1 << TWEN))) { // if (TwoWireENable bit is off) { begin I2C communication }
         Wire.begin();
         Wire.setClock(400000); // set I2C to fast mode for faster communication
     }
@@ -144,7 +144,7 @@ void Custom_gy521::update_gyro () {
     Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U));
     // commands above take around 944 - 952 us in 100 KHz clock frequency
     if (wait_i2c_buf(6U)) return;
-    const unsigned long t_diff = micros() - previous_micros_reading;
+    const unsigned long t_diff = micros() - prev_micros_reading;
     #ifdef DMP_QUAT_EULER_CONVERSION
     // delta roll, delta pitch, delta yaw
 
@@ -246,7 +246,7 @@ void Custom_gy521::update_gyro () {
     pitch += d_pitch; // angle change per sec * time past in secs
     yaw += d_yaw; // angle change per sec * time past in secs
     #endif // #ifndef DMP_QUAT_EULER_CONVERSION
-    previous_micros_reading += t_diff;
+    prev_micros_reading += t_diff;
     // if (roll >= 360.0) roll -= 360.0;
     // if (roll < 0.0) roll += 360.0;
     // if (pitch >= 360.0) pitch -= 360.0;
