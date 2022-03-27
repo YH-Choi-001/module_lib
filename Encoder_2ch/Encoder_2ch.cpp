@@ -42,6 +42,8 @@ yh::rec::Encoder_2ch::~Encoder_2ch () {
 void yh::rec::Encoder_2ch::begin () {
     pinMode(signal_A_pin, INPUT);
     pinMode(signal_B_pin, INPUT);
+    prev_A_state = (*signal_A_input_reg) & signal_A_mask;
+    prev_B_state = (*signal_B_input_reg) & signal_B_mask;
 }
 
 #endif // #ifndef ENCODER_2CH_CPP

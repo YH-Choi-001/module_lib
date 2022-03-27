@@ -99,6 +99,8 @@ namespace yh {
                 const uint8_t signal_B_pin;
                 volatile uint8_t *signal_B_input_reg;
                 uint8_t signal_B_mask;
+                // stores the previous state of channel A and channel B
+                uint8_t prev_A_state, prev_B_state;
                 // stores the previous displacements for velocity calculations use
                 DISPLACEMENT_UNIT *logged_displacements;
                 // indicates the length of the logged_displacements array;
@@ -139,9 +141,7 @@ namespace yh {
                 }
                 // only call me in an ISR for each sensor
                 inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
-                    //
-                    static uint8_t prev_A_state = (*signal_A_input_reg & signal_A_mask);
-                    static uint8_t prev_B_state = (*signal_B_input_reg & signal_B_mask);
+                    // stores the current state of channel A and channel B
                     const uint8_t curr_A_state = (*signal_A_input_reg & signal_A_mask);
                     const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
                     // implementation
