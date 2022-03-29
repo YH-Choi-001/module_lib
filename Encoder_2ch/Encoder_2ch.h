@@ -114,7 +114,7 @@ namespace yh {
                 // stores the instantaneous acceleration of the encoder
                 int16_t instantaneous_acceleration;
             public:
-                Encoder_2ch (const Encoder_2ch &init_obj);
+                Encoder_2ch (Encoder_2ch &init_obj);
                 // inits the arguments to the signal A and B pins, and the length of displacement stored
                 Encoder_2ch (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len = 400);
                 // frees the memory allocated
