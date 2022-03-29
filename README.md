@@ -27,4 +27,3 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
   
 ![](./Ningor_ir/ball_pulse_graph.png)
 ![](./ATmega2560_pinout_1.jpeg)
-![](./arduino_mega_2560_r3_pinout.pdf)
