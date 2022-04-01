@@ -109,6 +109,20 @@ namespace yh {
                 uint16_t log_idx;
                 // stores the current displacement of the encoder
                 DISPLACEMENT_UNIT current_displacement;
+
+                // By the definition of velocity: v = ∆s / ∆t
+                // the instantaneous velocity may be found using 2 ways:
+                // v =  1 / ∆t
+                // v = ∆s / 1
+
+                // v =  1 / ∆t measures the difference of time between every unit of displacement moved
+                // it will become less responsive and buggy if the encoder is spinning at a low speed
+                // this method uses PCINT or hardware interrupts to calculate velocity
+
+                // v = ∆s / 1 measures the difference of displacement between every fixed time period
+                // it will not become less responsive and buggy, but it has a delay situation
+                // this method uses timer interrupts to calculate velocity
+
                 // stores the instantaneous velocity of the encoder
                 int16_t instantaneous_velocity;
                 // stores the instantaneous acceleration of the encoder

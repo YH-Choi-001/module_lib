@@ -2,7 +2,7 @@
   
 ### This repository is a collection of libraries of different modules  
   
-**Written exclusively for Arduino Mini, Nano, Uno, Mega, Mega2560, Mega2560 pro**  
+**Written exclusively for Arduino Nano, Uno, Mega, Mega2560, Mega2560 pro**  
   
 You may download the whole repository as a zip to your local drive, and then open your Arduino IDE.  
 Select from the IDE's toolbar: Sketch -> Include Library -> Add .ZIP library... -> and select the folder containing a desired module, maybe like Us_016  
