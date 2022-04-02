@@ -32,6 +32,9 @@
 // reminder:
 
 
+
+// Motions:
+
 // equations of motions:
 // s = (u + v)t / 2
 // v = u + at
@@ -40,7 +43,7 @@
 // where s is displacement, u is initial velocity, v is final velocity, a is acceleration, t is time
 // the 4 equations above only apply when acceleration of the whole process is constant (or linear approximations like what I did in gy521 library)
 
-// By the observation of William Ng,
+// By the observation of Mr. William Ng,
 // to find 1 unknown, at least 3 values must be known.
 // They might be hidden in the question. Be awared.
 
@@ -61,6 +64,47 @@
 
 
 
+// Moment:
+
+// equations of moment:
+// consider the diagram below:
+//
+//           \ 
+//            \ 
+//             \ 
+//              \ 
+//               \ 
+//                \ 
+//                _\|  applied force F
+//   O-----------------
+//   |--------------|
+//      distance d
+//
+//
+//                  |
+//                  |
+//                  |
+//                  |
+//                  |
+//                  |
+//                 \|/ perpendicular vector of applied force
+//
+//                 \ 
+//           ------- parallel vector of applied force
+//                 /
+//   O-----------------
+//   |--------------|
+//      distance d
+//
+// moment = perpendicular F * d = F * perpendicular d
+
+// Definition of an object at rest:
+// An object is defined as at rest when it's net velocity is 0, and its net moments is 0.
+
+// Net moment of an object = sum of clockwise moments + sum of anti-clockwise moments
+
+// Energy:
+
 // Conservation of energy:
 // The sum of energy in the universe is a constant. Energy can change from 1 form to another, but cannot be created nor destroyed.
 
@@ -73,6 +117,10 @@
 // power:
 // P = E / t = Fv
 // where P is power, E is energy transferred (or work done), t is time taken, F is force applied on object, v is constant velocity of object
+
+
+
+// Momentum (completely unrelated to moment):
 
 // Conservation of momentum:
 // The total momentum of a system is conserved, provided that no net external force is acting on it.
