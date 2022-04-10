@@ -1,0 +1,10 @@
+setup_timer_1A_interrupt	KEYWORD2
+setup_timer_2A_interrupt	KEYWORD2
+setup_timer_3A_interrupt	KEYWORD2
+setup_timer_4A_interrupt	KEYWORD2
+setup_timer_5A_interrupt	KEYWORD2
+off_timer_1A_interrupt		KEYWORD2
+off_timer_2A_interrupt		KEYWORD2
+off_timer_3A_interrupt		KEYWORD2
+off_timer_4A_interrupt		KEYWORD2
+off_timer_5A_interrupt		KEYWORD2

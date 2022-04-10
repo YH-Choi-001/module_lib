@@ -89,9 +89,7 @@ void Custom_ak8963::single_calibrate () {
     if (raw_x < min_x) min_x = raw_x;
     if (raw_y < min_y) min_y = raw_y;
     if (raw_z < min_z) min_z = raw_z;
-    // x_mean = (max_x + min_x) / 2;
-    // y_mean = (max_y + min_y) / 2;
-    // z_mean = (max_z + min_z) / 2;
+    // update range of values of each axis
     range_x = max_x - min_x;
     range_y = max_y - min_y;
     range_z = max_z - min_z;
@@ -101,21 +99,8 @@ void Custom_ak8963::reset_heading () {
     rz_heading = get_heading();
 }
 
-// double map_private (long x, long in_min, long in_max, long out_min, long out_max)
-// {
-//   return (x - in_min) * (out_max - out_min) / static_cast<double>(in_max - in_min) + out_min;
-// }
-
 double Custom_ak8963::get_heading () {
     update_raw();
-    // const double
-    //     cal_x = raw_x - (min_x + max_x) / 2,
-    //     cal_y = raw_y - (min_y + max_y) / 2,
-    //     cal_z = raw_z - (min_z + max_z) / 2;
-    // const double
-    //     cal_x = map_private(raw_x, min_x, max_x, -1023, 1023),
-    //     cal_y = map_private(raw_y, min_y, max_y, -1023, 1023),
-    //     cal_z = map_private(raw_z, min_z, max_z, -1023, 1023);
     const double
         cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
         cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,
@@ -127,14 +112,6 @@ double Custom_ak8963::get_heading () {
 
 double Custom_ak8963::get_heading (double (*atan2_function)(double, double)) {
     update_raw();
-    // const double
-    //     cal_x = raw_x - (min_x + max_x) / 2,
-    //     cal_y = raw_y - (min_y + max_y) / 2,
-    //     cal_z = raw_z - (min_z + max_z) / 2;
-    // const double
-    //     cal_x = map_private(raw_x, min_x, max_x, -1023, 1023),
-    //     cal_y = map_private(raw_y, min_y, max_y, -1023, 1023),
-    //     cal_z = map_private(raw_z, min_z, max_z, -1023, 1023);
     const double
         cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
         cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,

@@ -9,7 +9,7 @@
 
 namespace yh {
     namespace rec {
-        class Button_inverse_fast {
+        class Button_inverse {
             private:
                 //
             protected:
@@ -20,27 +20,12 @@ namespace yh {
                 volatile uint8_t *read_button_pin_input_register;
             public:
                 // inits the button pin to this object
-                Button_inverse_fast (const uint8_t init_read_button_pin);
+                Button_inverse (const uint8_t init_read_button_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 void begin ();
                 // checks if the button is pressed
                 virtual bool pressed_down ();
-        };
-        class Button_inverse : public Button_inverse_fast {
-            private:
-                //
-            protected:
-                // the bool that saves the previous button state
-                bool button_state;
-            public:
-                // inits the button pin to this object
-                Button_inverse (const uint8_t init_read_button_pin);
-                // checks if the button is pressed
-                // to override Button_inverse_fast::pressed_down()
-                bool pressed_down ();
-                // checks if the button is pressed
-                bool pressed_down (const bool refresh);
         };
     }
 }

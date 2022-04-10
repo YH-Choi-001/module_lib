@@ -37,51 +37,31 @@
 #define MPU9250 0x71
 
 class Quaternion {
-  public:
-    double w;
-    double x;
-    double y;
-    double z;
+    public:
+        double w;
+        double x;
+        double y;
+        double z;
 
-    Quaternion() : w(1.0), x(0.0), y(0.0), z(0.0) { }
+        Quaternion () : w(1.0), x(0.0), y(0.0), z(0.0) { }
 
-    Quaternion(double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
+        Quaternion (double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
 
-    Quaternion getProduct(Quaternion q) {
-        // Quaternion multiplication is defined by:
-        //     (Q1 * Q2).w = (w1w2 - x1x2 - y1y2 - z1z2)
-        //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
-        //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
-        //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
-        return Quaternion(
-                   w * q.w - x * q.x - y * q.y - z * q.z, // new w
-                   w * q.x + x * q.w + y * q.z - z * q.y, // new x
-                   w * q.y - x * q.z + y * q.w + z * q.x, // new y
-                   w * q.z + x * q.y - y * q.x + z * q.w); // new z
-    }
+        Quaternion &operator = (const Quaternion rhs);
 
-    Quaternion getConjugate() {
-        return Quaternion(w, -x, -y, -z);
-    }
+        Quaternion &operator *= (const Quaternion rhs);
 
-    double getMagnitude() {
-        return sqrt(w * w + x * x + y * y + z * z);
-    }
+        double vectors_squared (); // call me to check if bias from 1 is inacceptable
 
-    void normalize() {
-        double m = getMagnitude();
-        w /= m;
-        x /= m;
-        y /= m;
-        z /= m;
-    }
+        double getMagnitude ();
 
-    Quaternion getNormalized() {
-        Quaternion r(w, x, y, z);
-        r.normalize();
-        return r;
-    }
+        void normalize ();
 };
+
+Quaternion operator * (const Quaternion lhs, const Quaternion rhs);
+
+// un-comment the line below to use roll and pitch (disabled by default to save execute time)
+// #define ALL_AXES_ROTATION
 
 // this class has been customized for RCJ soccer robots use only
 class Custom_gy521 {
@@ -95,20 +75,14 @@ class Custom_gy521 {
         // the time of the previous reading in micros
         unsigned long prev_micros_reading;
     public:
-        // accel features: // not published
-        // using the equations of motions
-        // 1st equation: s = ut + (1/2) a t^2
-        // 2nd equation: v = u + at
-        // // the instantaneous displacement
-        // double sx, sy, sz;
-        // // the instantaneous velocity
-        // double vx, vy, vz;
-        // // the correction added to every reading from the chip
-        // double corr_ax, corr_ay, az;
 
         // gyro features:
         // the current value of the angles [0:359.99999999999999999999]
-        volatile double /*roll, pitch,*/ yaw;
+        volatile double
+        #ifdef ALL_AXES_ROTATION
+        roll, pitch,
+        #endif // #ifdef ALL_AXES_ROTATION
+        yaw;
         // the linear difference of roll, pitch, yaw between the latest and the further previous measurement
         volatile double d_roll, d_pitch, d_yaw;
         // the correction added to every reading from the chip
@@ -140,25 +114,6 @@ class Custom_gy521 {
         // gets 6 bytes from gyroscope (uses calibrated data to correct)
         // this function consumes 2000 - 2150 microseconds in FAST I2C MODE
         void update_gyro ();
-
-        // // calibrates roll, and give the corrections to corr_roll
-        // // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
-        // // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS EXITED
-        // double cal_roll (const uint16_t sampling_amount = 8192);
-        // // gets 2 bytes from roll (uses calibrated data to correct)
-        // double update_roll ();
-        // // calibrates pitch, and give the corrections to corr_pitch
-        // // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
-        // // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS EXITED
-        // double cal_pitch (const uint16_t sampling_amount = 8192);
-        // // gets 2 bytes from pitch (uses calibrated data to correct)
-        // double update_pitch ();
-        // // calibrates yaw, and give the corrections to corr_yaw
-        // // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
-        // // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS EXITED
-        // double cal_yaw (const uint16_t sampling_amount = 8192);
-        // // gets 2 bytes from yaw (uses calibrated data to correct)
-        // double update_yaw ();
 
         // specially made for the external AK8963 magnetometer attached to MPU-9250
         // but this is also applicable to MPU-6050 chip, so I put this method over here instead of inside Custom_gy9250

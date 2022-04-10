@@ -304,135 +304,135 @@ namespace yh {
                         // XXX fix needed for atmega8
                         #if defined(TCCR0) && defined(COM00) && !defined(__AVR_ATmega8__)
                         case TIMER0A:
-                            analog_write_ptr = Custom_pins::set_COM00_PWM;
-                            off_pwm          = Custom_pins::off_COM00_PWM;
+                            analog_write_ptr = custom_pins::set_COM00_PWM;
+                            off_pwm          = custom_pins::off_COM00_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR0A) && defined(COM0A1)
                         case TIMER0A:
-                            analog_write_ptr = Custom_pins::set_COM0A1_PWM;
-                            off_pwm          = Custom_pins::off_COM0A1_PWM;
+                            analog_write_ptr = custom_pins::set_COM0A1_PWM;
+                            off_pwm          = custom_pins::off_COM0A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR0A) && defined(COM0B1)
                         case TIMER0B:
-                            analog_write_ptr = Custom_pins::set_COM0B1_PWM;
-                            off_pwm          = Custom_pins::off_COM0B1_PWM;
+                            analog_write_ptr = custom_pins::set_COM0B1_PWM;
+                            off_pwm          = custom_pins::off_COM0B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR1A) && defined(COM1A1)
                         case TIMER1A:
-                            analog_write_ptr = Custom_pins::set_COM1A1_PWM;
-                            off_pwm          = Custom_pins::off_COM1A1_PWM;
+                            analog_write_ptr = custom_pins::set_COM1A1_PWM;
+                            off_pwm          = custom_pins::off_COM1A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR1A) && defined(COM1B1)
                         case TIMER1B:
-                            analog_write_ptr = Custom_pins::set_COM1B1_PWM;
-                            off_pwm          = Custom_pins::off_COM1B1_PWM;
+                            analog_write_ptr = custom_pins::set_COM1B1_PWM;
+                            off_pwm          = custom_pins::off_COM1B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR1A) && defined(COM1C1)
                         case TIMER1C:
-                            analog_write_ptr = Custom_pins::set_COM1C1_PWM;
-                            off_pwm          = Custom_pins::off_COM1C1_PWM;
+                            analog_write_ptr = custom_pins::set_COM1C1_PWM;
+                            off_pwm          = custom_pins::off_COM1C1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR2) && defined(COM21)
                         case TIMER2:
-                            analog_write_ptr = Custom_pins::set_COM21_PWM;
-                            off_pwm          = Custom_pins::off_COM21_PWM;
+                            analog_write_ptr = custom_pins::set_COM21_PWM;
+                            off_pwm          = custom_pins::off_COM21_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR2A) && defined(COM2A1)
                         case TIMER2A:
-                            analog_write_ptr = Custom_pins::set_COM2A1_PWM;
-                            off_pwm          = Custom_pins::off_COM2A1_PWM;
+                            analog_write_ptr = custom_pins::set_COM2A1_PWM;
+                            off_pwm          = custom_pins::off_COM2A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR2A) && defined(COM2B1)
                         case TIMER2B:
-                            analog_write_ptr = Custom_pins::set_COM2B1_PWM;
-                            off_pwm          = Custom_pins::off_COM2B1_PWM;
+                            analog_write_ptr = custom_pins::set_COM2B1_PWM;
+                            off_pwm          = custom_pins::off_COM2B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR3A) && defined(COM3A1)
                         case TIMER3A:
-                            analog_write_ptr = Custom_pins::set_COM3A1_PWM;
-                            off_pwm          = Custom_pins::off_COM3A1_PWM;
+                            analog_write_ptr = custom_pins::set_COM3A1_PWM;
+                            off_pwm          = custom_pins::off_COM3A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR3A) && defined(COM3B1)
                         case TIMER3B:
-                            analog_write_ptr = Custom_pins::set_COM3B1_PWM;
-                            off_pwm          = Custom_pins::off_COM3B1_PWM;
+                            analog_write_ptr = custom_pins::set_COM3B1_PWM;
+                            off_pwm          = custom_pins::off_COM3B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR3A) && defined(COM3C1)
                         case TIMER3C:
-                            analog_write_ptr = Custom_pins::set_COM3C1_PWM;
-                            off_pwm          = Custom_pins::off_COM3C1_PWM;
+                            analog_write_ptr = custom_pins::set_COM3C1_PWM;
+                            off_pwm          = custom_pins::off_COM3C1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR4A)
                         case TIMER4A:
-                            analog_write_ptr = Custom_pins::set_COM4A1_PWM;
-                            off_pwm          = Custom_pins::off_COM4A1_PWM;
+                            analog_write_ptr = custom_pins::set_COM4A1_PWM;
+                            off_pwm          = custom_pins::off_COM4A1_PWM;
                             break;
                         #endif
                         
                         #if defined(TCCR4A) && defined(COM4B1)
                         case TIMER4B:
-                            analog_write_ptr = Custom_pins::set_COM4B1_PWM;
-                            off_pwm          = Custom_pins::off_COM4B1_PWM;
+                            analog_write_ptr = custom_pins::set_COM4B1_PWM;
+                            off_pwm          = custom_pins::off_COM4B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR4A) && defined(COM4C1)
                         case TIMER4C:
-                            analog_write_ptr = Custom_pins::set_COM4C1_PWM;
-                            off_pwm          = Custom_pins::off_COM4C1_PWM;
+                            analog_write_ptr = custom_pins::set_COM4C1_PWM;
+                            off_pwm          = custom_pins::off_COM4C1_PWM;
                             break;
                         #endif
                             
                         #if defined(TCCR4C) && defined(COM4D1)
                         case TIMER4D:				
-                            analog_write_ptr = Custom_pins::set_COM4D1_PWM;
-                            off_pwm          = Custom_pins::off_COM4D1_PWM;
+                            analog_write_ptr = custom_pins::set_COM4D1_PWM;
+                            off_pwm          = custom_pins::off_COM4D1_PWM;
                             break;
                         #endif
 
                                         
                         #if defined(TCCR5A) && defined(COM5A1)
                         case TIMER5A:
-                            analog_write_ptr = Custom_pins::set_COM5A1_PWM;
-                            off_pwm          = Custom_pins::off_COM5A1_PWM;
+                            analog_write_ptr = custom_pins::set_COM5A1_PWM;
+                            off_pwm          = custom_pins::off_COM5A1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR5A) && defined(COM5B1)
                         case TIMER5B:
-                            analog_write_ptr = Custom_pins::set_COM5B1_PWM;
-                            off_pwm          = Custom_pins::off_COM5B1_PWM;
+                            analog_write_ptr = custom_pins::set_COM5B1_PWM;
+                            off_pwm          = custom_pins::off_COM5B1_PWM;
                             break;
                         #endif
 
                         #if defined(TCCR5A) && defined(COM5C1)
                         case TIMER5C:
-                            analog_write_ptr = Custom_pins::set_COM5C1_PWM;
-                            off_pwm          = Custom_pins::off_COM5C1_PWM;
+                            analog_write_ptr = custom_pins::set_COM5C1_PWM;
+                            off_pwm          = custom_pins::off_COM5C1_PWM;
                             break;
                         #endif
 

@@ -1,0 +1,9 @@
+yh				KEYWORD1
+rec				KEYWORD1
+Encoder_2ch			KEYWORD1
+
+begin				KEYWORD2
+get_displacement		KEYWORD2
+get_instantaneous_velocity	KEYWORD2
+reset_displacement		KEYWORD2
+isr_individual_sensor_routine	KEYWORD2

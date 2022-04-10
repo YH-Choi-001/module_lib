@@ -69,6 +69,9 @@ namespace yh {
                 volatile unsigned long current_tick;
                 // also acts as a flag to indicate whether the measurement has ended
                 volatile unsigned long ending_tick;
+                // the flag to indicate whether the LOW state of echo pin is before or after a measurement
+                // also the flag to indicate whether the ISR should save the current_tick to ending_tick as an end of a measurement
+                uint8_t waiting_for_echo_rise;
                 // saves the distance read from the previous measurement when the current measurement is still in progress
                 double prev_dist_read;
                 // the time interval between each ISR being run
@@ -114,13 +117,8 @@ namespace yh {
                     delayMicroseconds(10);
                     (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
                     //
-                    while ((*echo_pin_input_register) & echo_pin_mask) {} // while HIGH
-                    while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW
-                    uint8_t oldSREG = SREG;
-                    noInterrupts();
-                    current_tick = 0;
-                    ending_tick = 0;
-                    SREG = oldSREG;
+                    // while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW
+                    waiting_for_echo_rise = true; // leave it for the ISR to check the echo pin status
                 }
                 // call me by polling in void loop ()
                 inline double polling_update () {
@@ -131,24 +129,35 @@ namespace yh {
 
                 // only call me in an ISR for each sensor
                 inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
-                    // if (echo_pin == HIGH) && (ending_tick == 0)
-                        // measurement is in progress
-                        // increment to current_tick
-                    // elif (echo_pin == LOW) && (ending_tick == 0)
-                        // record the value of current_tick to ending_tick
-                    // elif (echo_pin == LOW) && (ending_tick != 0)
-                        // the echo_pin has lowered but the polling function in void loop hasn't called for a new measurement
-                        // nothing to do
-                    // elif (echo_pin == HIGH) && (ending_tick != 0)
-                        // isr is being ran in simple_update()
-                        // noting to do
-                    if (!ending_tick) {
-                        if ((*echo_pin_input_register) & echo_pin_mask) // {
-                            current_tick++;
-                        // } else {
-                        else
-                            ending_tick = current_tick;
-                        // }
+                    if (waiting_for_echo_rise) {
+                        if ((*echo_pin_input_register) & echo_pin_mask) {
+                            // echo pin has risen
+                            // clear the flag
+                            waiting_for_echo_rise = false;
+                            // kicks off a new measurement
+                            current_tick = 0;
+                            ending_tick = 0;
+                        }
+                    } else {
+                        // if (echo_pin == HIGH) && (ending_tick == 0)
+                            // measurement is in progress
+                            // increment to current_tick
+                        // elif (echo_pin == LOW) && (ending_tick == 0)
+                            // record the value of current_tick to ending_tick
+                        // elif (echo_pin == LOW) && (ending_tick != 0)
+                            // the echo_pin has lowered but the polling function in void loop hasn't called for a new measurement
+                            // nothing to do
+                        // elif (echo_pin == HIGH) && (ending_tick != 0)
+                            // isr is being ran in simple_update()
+                            // noting to do
+                        if (!ending_tick) {
+                            if ((*echo_pin_input_register) & echo_pin_mask) // {
+                                current_tick++;
+                            // } else {
+                            else
+                                ending_tick = current_tick;
+                            // }
+                        }
                     }
                 }
         };
@@ -225,7 +234,6 @@ namespace yh {
                     delayMicroseconds(10);
                     (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
                     //
-                    while ((*echo_pin_input_register) & echo_pin_mask) {} // while HIGH
                     while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW // this is the key to success
                     uint8_t oldSREG = SREG;
                     noInterrupts();

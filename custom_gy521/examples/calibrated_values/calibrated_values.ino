@@ -19,17 +19,13 @@ void setup () {
     //
     Serial.println("We are going to generate the calibrated values for your gyroscope.");
     Serial.println("Please be aware that every chip has different calibrated values.");
-    Serial.println("You should calibrate every chip before usage, otherwise you will get unusable values.");
-    Serial.print('\n');
+    Serial.println("You should calibrate every chip before usage, otherwise you will get unusable values.\n");
     delay(5000);
-    Serial.println("Now, please lay down and rest your gy521 / gy6500 / gy9250 chip.");
-    Serial.print('\n');
+    Serial.println("Now, please lay down and rest your gy521 / gy6500 / gy9250 chip.\n");
     delay(3000);
-    Serial.println("Please make sure no one nearby is going to touch the chip, or even just kick or knock the table.");
-    Serial.print('\n');
+    Serial.println("Please make sure no one nearby is going to touch the chip, or even just kick or knock the table.\n");
     delay(3000);
-    Serial.println("Please send something through the serial monitor after you have setup the environment for calibration mentioned above.");
-    Serial.print('\n');
+    Serial.println("Please send something through the serial monitor after you have setup the environment for calibration mentioned above.\n");
 
     while (Serial.available() < 1) {
         // wait
@@ -44,8 +40,7 @@ void setup () {
     gy521.cal_gyro(0xfffff);
 
     Serial.println("Calibration is completed. You may replace gy521.cal_gyro() with the code below.");
-    Serial.println("After pasting these code into your own program, you don't need to call gy521.cal_gyro() method in void setup() anymore.");
-    Serial.print('\n');
+    Serial.println("After pasting these code into your own program, you don't need to call gy521.cal_gyro() method in void setup() anymore.\n");
     Serial.print("gy521.corr_roll = ");
     Serial.print(gy521.corr_roll, 20);
     Serial.println(";");

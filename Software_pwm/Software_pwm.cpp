@@ -55,6 +55,9 @@ void yh::rec::Software_pwm::begin () {
         values[i] = 0;
         pinMode(pins[i], OUTPUT);
     }
+    // WGM set to 0b0001 for 8-bit fast PWM (not phase-correct PWM)
+    TCCR1A &= ~(1 << WGM11);
+    TCCR1A |=  (1 << WGM10);
     TCCR1B = (1 << CS10); // set TCCR1B register to prescaler: 1 // default prescaler is 64
     TIMSK1 |= (1 << TOIE1); // enable timer overflow interrupts
     begin_locking = true;
