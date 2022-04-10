@@ -26,19 +26,19 @@ void enable_pcint_num (const uint8_t pcint_num) {
     switch (pcint_num >> 3) {
         #ifdef PCMSK0
         case 0:
-            PCMSK0 |= (1 << pcint_num);
+            PCMSK0 |= (1 << (pcint_num & 0b111));
             PCICR |= (1 << 0);
             break;
         #endif
         #ifdef PCMSK1
         case 1:
-            PCMSK1 |= (1 << pcint_num);
+            PCMSK1 |= (1 << (pcint_num & 0b111));
             PCICR |= (1 << 1);
             break;
         #endif
         #ifdef PCMSK2
         case 2:
-            PCMSK2 |= (1 << pcint_num);
+            PCMSK2 |= (1 << (pcint_num & 0b111));
             PCICR |= (1 << 2);
             break;
         #endif
@@ -52,21 +52,21 @@ void disable_pcint_num (const uint8_t pcint_num) {
     switch (pcint_num >> 3) {
         #ifdef PCMSK0
         case 0:
-            PCMSK0 &= ~(1 << pcint_num);
+            PCMSK0 &= ~(1 << (pcint_num & 0b111));
             if (!PCMSK0)
                 PCICR &= ~(1 << 0);
             break;
         #endif
         #ifdef PCMSK1
         case 1:
-            PCMSK1 &= ~(1 << pcint_num);
+            PCMSK1 &= ~(1 << (pcint_num & 0b111));
             if (!PCMSK1)
                 PCICR &= ~(1 << 1);
             break;
         #endif
         #ifdef PCMSK2
         case 2:
-            PCMSK2 &= ~(1 << pcint_num);
+            PCMSK2 &= ~(1 << (pcint_num & 0b111));
             if (!PCMSK2)
                 PCICR &= ~(1 << 2);
             break;
