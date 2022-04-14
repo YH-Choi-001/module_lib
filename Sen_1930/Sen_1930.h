@@ -27,11 +27,11 @@ namespace yh {
                 // sets the value to decide whether the sensor is touching white
                 void set_threshold (const uint16_t input_bnw_threshold);
                 // functions that load raw data for other functions to further process
-                virtual uint16_t raw_read_gry_value ();
+                uint16_t raw_read_gry_value ();
                 // returns 1 if the sensor is determined touching black, else returns 0
-                virtual bool touch_black ();
+                bool touch_black ();
                 // returns 1 if the sensor is determined touching white, else returns 0
-                virtual bool touch_white ();
+                bool touch_white ();
         };
     }
 }

@@ -10,7 +10,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
   
 ## Remarks:  
 1. This library has configured some parameters to the module by default values which are based on RCJ soccer purpose.
-    (The range of the sensor is default to 3069 millimeters with a resolution of 3mm.)  
+    (The range of the sensor is set to 3069 millimeters with a resolution of 3mm by default.)  
 <!--2. This library provides a fast type and a normal type of the class for the module, which the fast type does not store the readings of the sensor to member variables, while the normal type stores the readings of the sensor to member variables, and allows the programmer to read them without updating the sensors again.  -->
 2. When 3 or more US-016 modules are used on the same Arduino board, only 2 of them can read useful readings, while the other modules can only read garbage readings. The reason for this is unknown, but it seems to be a problem related to Arduino's ADC.  
   

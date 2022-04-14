@@ -6,7 +6,7 @@
 #include "Sen_1930.h"
 
 yh::rec::Sen_1930::Sen_1930 (const uint8_t init_read_gryscl_pin) :
-read_gryscl_pin(init_read_gryscl_pin), bnw_threshold(512)
+read_gryscl_pin(init_read_gryscl_pin), bnw_threshold(511)
 {
     //
 }
