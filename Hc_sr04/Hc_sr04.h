@@ -167,6 +167,24 @@ namespace yh {
                 //
             protected:
             // public: // for debugging use only
+
+            // flags:
+                // starting_time == 0:
+                    // new measurement is waiting to start
+                // starting_time != 0:
+                    // measurement is in progress or finished
+                // ending_time == 0:
+                    // current measurement is waiting to be finished
+                // ending_time != 0:
+                    // latest measurement is finished
+            // situations:
+                // trig_pin triggered, waiting measurement to start     // waiting mode
+                // starting_time == 0, ending_time != 0
+                // new measurement starts, and is measuring now         // measuring mode
+                // starting_time != 0, ending_time == 0
+                // measurement finishes                                 // finished mode
+                // starting_time != 0, ending_time != 0
+
                 // pins that cannot be changed:
                 // the pin to trigger a sound wave
                 const uint8_t trig_pin;
@@ -194,14 +212,17 @@ namespace yh {
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 virtual void begin ();
+
                 // checks if new data is ready @return true when data is ready
-                inline bool is_data_ready () { return ending_time ? true : false; }
+                inline bool is_data_ready () { return (starting_time && ending_time) ? true : false; }
+
                 // checks if new data is not ready @return true when data is not ready
                 inline bool is_data_not_ready () { return !ending_time; }
+
                 // read the distance of the previous measurement
                 // you can also call me when the current measurement is still in progress
                 inline double read_previous_dist_mm () {
-                    if (ending_time) { // no need to disable interrupts before reading ending_tick, bc i just treat it as a flag in this line
+                    if (starting_time && ending_time) { // no need to disable interrupts before reading ending_tick, bc i just treat it as a flag in this line
                         uint8_t oldSREG = SREG;
                         noInterrupts();
                         prev_dist_read = (ending_time - starting_time) * 0.17; // prevent ending_time being updated while we are reading it
@@ -210,10 +231,11 @@ namespace yh {
                     }
                     return prev_dist_read;
                 }
+
                 // read the distance of the previous measurement
                 // you can also call me when the current measurement is still in progress
                 inline double read_previous_dist_cm () {
-                    if (ending_time) { // no need to disable interrupts before reading ending_tick, bc i just treat it as a flag in this line
+                    if (starting_time && ending_time) { // no need to disable interrupts before reading ending_tick, bc i just treat it as a flag in this line
                         uint8_t oldSREG = SREG;
                         noInterrupts();
                         prev_dist_read = (ending_time - starting_time) * 0.017; // prevent ending_time being updated while we are reading it
@@ -222,25 +244,24 @@ namespace yh {
                     }
                     return prev_dist_read;
                 }
+
                 // only call me by polling in the void loop () after you have get the previous measurement from read_previous_dist_cm()
                 // triggers a new sound pulse if the previous measurement has ended
                 inline void simple_update () {
-                    // if (echo_pin is HIGH) or (ending_tick == 0), just exit the function
-                    if (   ((*echo_pin_input_register) & echo_pin_mask) || (!ending_time)   ) return;
+                    // if (echo_pin is HIGH) or (measurement not finished), just exit the function
+                    if (   ((*echo_pin_input_register) & echo_pin_mask) || (!(starting_time && ending_time))   ) return;
 
                     (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
                     delayMicroseconds(2);
                     (*trig_pin_output_register) |= trig_pin_mask; // write trig_pin to HIGH
                     delayMicroseconds(10);
                     (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
-                    //
-                    while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW // this is the key to success
                     uint8_t oldSREG = SREG;
                     noInterrupts();
-                    starting_time = micros();
-                    ending_time = 0;
+                    starting_time = 0; // configures the flag into waiting mode
                     SREG = oldSREG;
                 }
+
                 // call me by polling in void loop ()
                 inline double polling_update () {
                     read_previous_dist_cm();
@@ -249,16 +270,28 @@ namespace yh {
                 }
 
                 // only call me in an ISR for each sensor
-                // this method also does not check the status of echo pin, which is suitable for faster hardware interrupts
+                // This method also checks the status of the echo pin,
+                // which should be used in CHANGE mode of the interrupt (or PCINTs).
+                // This method does not check if the echo pin has really changed,
+                // but treats the current state of echo pin as the state of echo pin after it is changed.
                 inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
-                    if (!ending_time) ending_time = micros();
+                    if ((*echo_pin_input_register) & echo_pin_mask) {
+                        // pin rises
+                        if (!starting_time) { // configures the flag into measuring mode
+                            starting_time = micros();
+                            ending_time = 0;
+                        }
+                    } else {
+                        // pin falls
+                        if (starting_time && (!ending_time)) ending_time = micros(); // logs the falling time, which also configures the flag into finished mode
+                    }
                 }
 
-                // only call me in an ISR for each sensor
-                // this method also checks the status of echo pin, which is suitable for PCINTs
-                inline void isr_individual_sensor_routine_with_checking_echo_status () __attribute__((__always_inline__)) {
-                    if (!ending_time && (!((*echo_pin_input_register) & echo_pin_mask)) ) ending_time = micros();
-                }
+                // // only call me in an ISR for each sensor
+                // // this method also checks the status of echo pin, which is suitable for PCINTs
+                // inline void isr_individual_sensor_routine_with_checking_echo_status () __attribute__((__always_inline__)) {
+                //     if (!ending_time && (!((*echo_pin_input_register) & echo_pin_mask)) ) ending_time = micros();
+                // }
         };
     }
 }

@@ -134,13 +134,9 @@ void yh::rec::Hc_sr04_ext_int::begin () {
     (*trig_pin_output_register) |= trig_pin_mask;
     delayMicroseconds(10);
     (*trig_pin_output_register) &= ~trig_pin_mask;
-    // wait
-    while ((*echo_pin_input_register) & echo_pin_mask) {} // while HIGH
-    while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW // this is the key to success
     uint8_t oldSREG = SREG;
     noInterrupts();
-    starting_time = micros();
-    ending_time = 0;
+    starting_time = 0;
     SREG = oldSREG;
 }
 

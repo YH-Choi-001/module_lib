@@ -9,7 +9,7 @@
 yh::rec::Hc_sr04_ext_int uts (2, 3);
 
 ISR(PCINT2_vect) {
-    uts.isr_individual_sensor_routine_with_checking_echo_status();
+    uts.isr_individual_sensor_routine();
 }
 
 void setup_pcint (const uint8_t pin) {
