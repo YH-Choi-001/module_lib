@@ -18,7 +18,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 1. **Constructor of an US-016 object ` yh::rec::Us_016::Us_016 ( range_pin, out_pin, resolution ) `**  
 Syntax: `yh::rec::Us_016 us_016 (13, A0);` or `yh::rec::Us_016 us_016 (13, A0, 3);`  
 The line above calls the constructor of an US-016 object.  
-You should declare an object of the Us_016 type outside any any functions.  
+You should declare an object of the Us_016 type outside of any functions.  
 In the `()`, first input the digital pin on the Arduino that is connected to the range pin on the US-016, then input the analog pin on the Arduino that is connected to the out pin on the US-016. Last, you can input the resolution of the US-016 module, either 1 for 1 millimeter or 3 for 3 millimeters. It is by default set to 3 millimeters, so it is optional. For more details, see `set_resolution(...)` method.  
   
 2. **`void yh::rec::Us_016::begin ()` method**  

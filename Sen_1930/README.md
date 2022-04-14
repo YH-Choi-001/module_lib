@@ -17,7 +17,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 1. **Constructor of an US-016 object ` yh::rec::Sen_1930::Sen_1930 ( signal_pin ) `**  
 Syntax: `yh::rec::Sen_1930 sen_1930 (A0);`  
 The line above calls the constructor of a SEN-1930 object.  
-You should declare an object of the Sen_1930 type outside any any functions.  
+You should declare an object of the Sen_1930 type outside of any functions.  
 In the `()`, input the analog pin on the Arduino that is connected to the signal pin on the SEN-1930.  
   
 2. **`void yh::rec::Sen_1930::begin ()` method**  

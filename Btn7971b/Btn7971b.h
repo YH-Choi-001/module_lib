@@ -60,7 +60,8 @@ namespace yh {
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 void begin ();
-                // set the speed of the motor [-slowest_spd:fastest_spd]
+                // set the speed of the motor
+                // @param input_spd ranges from [-slowest_spd:fastest_spd]
                 void set_spd (const int16_t input_spd);
                 // stops the motor
                 void stop_motor ();
