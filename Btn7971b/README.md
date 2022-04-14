@@ -17,7 +17,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 Syntax: `yh::rec::Btn7971b motor (6, 7);`
 The line above calls the constructor of a Btn7971b object.  
 You should declare an object of the Btn7971b type outside of any functions.  
-In the `()`, first input the pwm pin on the Arduino that is connected to 1 of the 2 IN pins on the Btn7971b, then input the digital pin on the Arduino that is connected to the another IN pin on the Btn7971b.  
+In the `()`, first input the pwm pin on the Arduino that is connected to 1 of the 2 INx pins on the Btn7971b, then input the digital pin on the Arduino that is connected to the another IN pin on the Btn7971b.  
   
 2. **`void yh::rec::Btn7971b::begin ()` method**  
 Syntax: `motor.begin();`  
