@@ -25,40 +25,40 @@ This `begin()` function configures the pin modes of the pins occupied by this in
 You must call this function in void setup () function to use this object properly.  
 No arguments should be inputed when calling this function.  
   
-3. **`void yh::rec::Us_016::set_spd ( input_speed )` method**  
-Syntax: `us_016.set_spd(127);`  
+3. **`void yh::rec::Btn7971b::set_spd ( input_speed )` method**  
+Syntax: `motor.set_spd(127);`  
 This `set_spd()` function sets the speed of the motor in both forwards and backwards. `input_speed` ranges from -255 to +255.  
   
-4. **`void yh::rec::Us_016::stop_motor ()` method**  
-Syntax: `us_016.stop_motor();`  
+4. **`void yh::rec::Btn7971b::stop_motor ()` method**  
+Syntax: `motor.stop_motor();`  
 This `stop_motor()` function stops the motor. It is a bit faster than using the `set_spd()` method.  
   
-5. **`void yh::rec::Us_016::full_spd_forwards ()` method**  
-Syntax: `us_016.stop_motor();`  
+5. **`void yh::rec::Btn7971b::full_spd_forwards ()` method**  
+Syntax: `motor.stop_motor();`  
 This `full_spd_forwards()` function sets the speed of the motor to full speed forwards. It is a bit faster than using the `set_spd()` method.  
   
-6. **`void yh::rec::Us_016::full_spd_backwards ()` method**  
-Syntax: `us_016.stop_motor();`  
+6. **`void yh::rec::Btn7971b::full_spd_backwards ()` method**  
+Syntax: `motor.stop_motor();`  
 This `full_spd_forwards()` function sets the speed of the motor to full speed backwards. It is a bit faster than using the `set_spd()` method.  
   
-7. **`int16_t yh::rec::Us_016::get_spd ()` method**  
-Syntax: `int16_t inputed_motor_speed = us_016.get_spd();`  
+7. **`int16_t yh::rec::Btn7971b::get_spd ()` method**  
+Syntax: `int16_t inputed_motor_speed = motor.get_spd();`  
 This `get_spd()` function returns the output speed to the motor. It may not be equal to the value you inputed in `set_spd(...)` function, because `set_spd(...)` is limited in +-255 only.  
   
-8. **`int16_t yh::rec::Us_016::operator += ( speed_increased )` method**  
-Syntax: `us_016 += 3;`  
+8. **`int16_t yh::rec::Btn7971b::operator += ( speed_increased )` method**  
+Syntax: `motor += 3;`  
 This `operator += ()` function increases the speed of the motor by `speed_increased`. It is really suitable for motor with encoders, that allows fine tuning the speed of the motor with reference to feedbacks.  
   
-9. **`int16_t yh::rec::Us_016::operator -= ( speed_decreased )` method**  
-Syntax: `us_016 -= 3;`  
+9. **`int16_t yh::rec::Btn7971b::operator -= ( speed_decreased )` method**  
+Syntax: `motor -= 3;`  
 This `operator -= ()` function decreases the speed of the motor by `speed_decreased`. It is really suitable for motor with encoders, that allows fine tuning the speed of the motor with reference to feedbacks.  
   
-10. **`int16_t yh::rec::Us_016::operator ++ ()` method**  
-Syntax: `us_016++;`  
+10. **`int16_t yh::rec::Btn7971b::operator ++ ()` method**  
+Syntax: `motor++;`  
 This `operator ++ ()` function increases the speed of the motor by 1. It is really suitable for motor with encoders, that allows fine tuning the speed of the motor with reference to feedbacks.  
   
-10. **`int16_t yh::rec::Us_016::operator -- ()` method**  
-Syntax: `us_016--;`  
+10. **`int16_t yh::rec::Btn7971b::operator -- ()` method**  
+Syntax: `motor--;`  
 This `operator -- ()` function decreases the speed of the motor by 1. It is really suitable for motor with encoders, that allows fine tuning the speed of the motor with reference to feedbacks.  
   
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
