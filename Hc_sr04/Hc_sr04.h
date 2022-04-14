@@ -270,8 +270,7 @@ namespace yh {
                 }
 
                 // only call me in an ISR for each sensor
-                // This method also checks the status of the echo pin,
-                // which should be used in CHANGE mode of the interrupt (or PCINTs).
+                // This method should be used in CHANGE mode of the interrupt (or PCINTs).
                 // This method does not check if the echo pin has really changed,
                 // but treats the current state of echo pin as the state of echo pin after it is changed.
                 inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
