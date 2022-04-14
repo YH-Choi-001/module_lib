@@ -13,7 +13,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
     (The resolution of the pwm is set to 8-bit by default.)  
   
 ## How to use:  
-1. **Constructor of an US-016 object ` yh::rec::Btn7971b::Btn7971b ( pwm_pin, direction_pin ) `**  
+1. **Constructor of a Btn7971b object ` yh::rec::Btn7971b::Btn7971b ( pwm_pin, direction_pin ) `**  
 Syntax: `yh::rec::Btn7971b motor (6, 7);`
 The line above calls the constructor of a BTN7971b object.  
 You should declare an object of the Btn7971b type outside of any functions.  

@@ -14,7 +14,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 <!--2. This library provides a fast type and a normal type of the class for the module, which the fast type does not store the readings of the sensor to member variables, while the normal type stores the readings of the sensor to member variables, and allows the programmer to read them without updating the sensors again.  -->
   
 ## How to use:  
-1. **Constructor of an US-016 object ` yh::rec::Sen_1930::Sen_1930 ( signal_pin ) `**  
+1. **Constructor of a Sen_1930 object ` yh::rec::Sen_1930::Sen_1930 ( signal_pin ) `**  
 Syntax: `yh::rec::Sen_1930 sen_1930 (A0);`  
 The line above calls the constructor of a SEN-1930 object.  
 You should declare an object of the Sen_1930 type outside of any functions.  
