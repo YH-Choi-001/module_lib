@@ -88,7 +88,7 @@ class Custom_gy521 {
         roll, pitch,
         #endif // #ifdef ALL_AXES_ROTATION
         yaw;
-        // the linear difference of roll, pitch, yaw between the latest and the further previous measurement
+        // the linear difference of roll, pitch, yaw between the latest and the previous measurement
         volatile double d_roll, d_pitch, d_yaw;
         // the correction added to every reading from the chip
         double corr_roll, corr_pitch, corr_yaw;
