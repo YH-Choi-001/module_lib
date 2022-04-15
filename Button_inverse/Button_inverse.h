@@ -23,9 +23,11 @@ namespace yh {
                 Button_inverse (const uint8_t init_read_button_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                void begin ();
+                inline void begin () __attribute__((__always_inline__)) { pinMode(read_button_pin, INPUT); }
                 // checks if the button is pressed
-                virtual bool pressed_down ();
+                inline bool pressed_down () __attribute__((__always_inline__)) {
+                    return !((*read_button_pin_input_register) & read_button_pin_mask);
+                }
         };
     }
 }
