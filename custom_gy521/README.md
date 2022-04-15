@@ -68,7 +68,10 @@ This `reset_gyro()` function resets all 3-axes of gyroscope of the chip to 0.
   
 10. **`void Custom_gy521::update_gyro ()` method**  
 Syntax: `gy521.update_gyro();`  
-This `update_gyro()` function updates the roll, pitch and yaw in the object.  
+This `update_gyro()` function updates the yaw member (and roll and pitch members) in the object.  
+You may call this method by polling or timer interrupts, but you should be reminded that global interrupts must be enabled when calling this method to let the I2C interrupt to work. The method takes around 2100 - 2150 microseconds in fast I2C mode.  
+This method will fail if the time interval between 2 consecutive calls of this method is less than 2150 microseconds.  
+Please leave some time for other codes to be executed when putting this method in a timer interrupt.  
   
 11. **`void Custom_gy521::enable_ext_i2c_slave_sensors ()` method**  
 Syntax: `gy521.enable_ext_i2c_slave_sensors();`  
