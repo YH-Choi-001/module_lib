@@ -3,7 +3,7 @@
 **Written exclusively for Arduino Nano, Uno, Mega, Mega2560, Mega2560 pro**  
   
 You may download this folder to ANYWHERE YOU LIKE in your local disk, and then open your Arduino IDE.  
-Select from the IDE's toolbar: Sketch -> Include Library -> Add .ZIP library... -> and select the folder named Us_016 that you have just downloaded.  
+Select from the IDE's toolbar: Sketch -> Include Library -> Add .ZIP library... -> and select the folder named Btn7971b that you have just downloaded.  
 Then you can use the library of this module.  
 You may like to see the examples of this library to get a better understanding on how to use this library.  
 To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bottom) and hover the library name of the module you have added to Arduino IDE just now, then you can take a look or even try uploading the examples to your Arduino board.
