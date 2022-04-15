@@ -26,7 +26,7 @@ This `begin()` function configures the pin modes of the pins occupied by this in
 You must call this function in void setup () function to use this object properly.  
 No arguments should be inputed when calling this function.  
   
-3. **`void yh::rec::Sen_1930::set_threshold (  black_and_white_threshold  )` method**  
+3. **`void yh::rec::Sen_1930::set_threshold ( black_and_white_threshold )` method**  
 Syntax: `grayscale.set_threshold(700);`  
 This `set_threshold()` function sets the threshold to determine whether the brightness detected is white or black. The brightness detected by the sensor is compared against the value of `black_and_white_threshold` inputed here to give boolean outputs in `touch_black()` and `touch_white()` methods. This threshold is set to 1023 / 2 = 511 by default.  
   
