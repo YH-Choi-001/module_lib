@@ -34,7 +34,7 @@ void Custom_ak8963::begin () {
     Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to select power-down mode
     Wire.write(0x00); // select power-down mode
     Wire.endTransmission();
-    delayMicroseconds(128); // delay at least 100us, required by datasheet to change power modes
+    delayMicroseconds(128); // delay at least 100us, required by datasheet when changing power modes
     // // select continuous measurement 2 that samples the magnetic field strength in 100 KHz (this is already the limit of the speed of the chip)
     Wire.beginTransmission(i2c_address); // talk to AK8963
     Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select continuous measurement 2 mode
@@ -96,27 +96,21 @@ void Custom_ak8963::single_calibrate () {
 }
 
 void Custom_ak8963::reset_heading () {
-    rz_heading = get_heading();
+    update_raw();
+    const double
+        cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
+        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023;
+        // cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
+    rz_heading = atan2(cal_x, cal_y) / M_PI * 180;
 }
 
 double Custom_ak8963::get_heading () {
     update_raw();
     const double
         cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
-        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,
-        cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
+        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023;
+        // cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
     double dir = atan2(cal_x, cal_y) / M_PI * 180 - rz_heading;
-    while (dir < 0.0) { dir += 360.0; }
-    return dir;
-}
-
-double Custom_ak8963::get_heading (double (*atan2_function)(double, double)) {
-    update_raw();
-    const double
-        cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
-        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023,
-        cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
-    double dir = ((atan2_function == NULL) ? (atan2(cal_x, cal_y) / M_PI * 180) : (atan2_function(cal_x, cal_y) / M_PI * 180)) - rz_heading;
     while (dir < 0.0) { dir += 360.0; }
     return dir;
 }

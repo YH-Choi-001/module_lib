@@ -57,8 +57,8 @@ class Custom_ak8963 {
         // inits the 7-bit I2C address of the chip to init_i2c_address
         Custom_ak8963 (const uint8_t init_i2c_address);
         // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
-        // calls pinMode function and config the pin modes
-        virtual void begin ();
+        // configures the settings of the I2C bus and the chip
+        void begin ();
 
         // gets the WIA value to clarify whether this chip is ak8963
         // if the chip is ak8963, the returned value should be 0x48
@@ -73,9 +73,6 @@ class Custom_ak8963 {
 
         // get heading of the chip
         double get_heading ();
-
-        // get heading of the chip
-        double get_heading (double (*atan2_function)(double, double));
 };
 
 // this class has been customized for RCJ soccer robots use only

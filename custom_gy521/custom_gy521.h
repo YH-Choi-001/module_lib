@@ -95,7 +95,7 @@ class Custom_gy521 {
         // inits the 7-bit I2C address of the chip to init_i2c_address
         Custom_gy521 (const uint8_t init_i2c_address);
         // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
-        // calls pinMode function and config the pin modes
+        // configures the settings of the I2C bus and the chip
         virtual void begin ();
 
         // gets the who_am_i value to clarify whether this chip is mpu6050, mpu6500, or mpu9250

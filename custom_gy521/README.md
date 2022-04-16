@@ -15,17 +15,17 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 4. This library sets the I2C clock to 400 KHz frequency (fast mode) to achieve faster communication.
   
 ## How to use:  
-1. **Constructor of a GY-521 object ` Custom_gy521::Custom_gy521 ( I2C_address ) `**  
-Syntax: ` Custom_gy521 gy521 (0x68); ` or `Custom_gy521 gy521 (0x69);`  
-The line above calls the constructor of a GY-521 object.  
-You should declare an object of the Custom_gy521 outside any any functions.  
+1. **Constructor of a Custom_gy521 object `Custom_gy521::Custom_gy521 ( I2C_address )`**  
+Syntax: `Custom_gy521 gy521 (0x68);` or `Custom_gy521 gy521 (0x69);`  
+The line above calls the constructor of a Custom_gy521 object.  
+You should declare an object of the Custom_gy521 outside of any functions.  
 In the `()`, input the I2C address of the chip (which is 0x68 by default).  
 If you connect the AD0 pin of the chip to a pin written HIGH, the I2C address of the chip will be changed to 0x69.  
 Therefore, you should input `0x68` to the `()` unless the AD0 pin of the chip is written HIGH, then you should input `0x69`.  
   
 2. **`void Custom_gy521::begin ()` method**  
 Syntax: `gy521.begin();`  
-This `begin()` function configures the I2C communication from Wire.h (which is a built-in library with Arduino IDE).  
+This `begin()` function configures the settings of the I2C bus and the chip.  
 You must call this function in void setup () function to use this object properly.  
 No arguments should be inputed when calling this function.  
   
