@@ -15,7 +15,7 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 2. When 3 or more US-016 modules are used on the same Arduino board, only 2 of them can read useful readings, while the other modules can only read garbage readings. The reason for this is unknown, but it seems to be a problem related to Arduino's ADC.  
   
 ## How to use:  
-1. **Constructor of an US-016 object ` yh::rec::Us_016::Us_016 ( range_pin, out_pin, resolution ) `**  
+1. **Constructor of an Us_016 object ` yh::rec::Us_016::Us_016 ( range_pin, out_pin, resolution ) `**  
 Syntax: `yh::rec::Us_016 us_016 (13, A0);` or `yh::rec::Us_016 us_016 (13, A0, 3);`  
 The line above calls the constructor of a Us_016 object.  
 You should declare an object of the Us_016 type outside of any functions.  
@@ -33,7 +33,7 @@ This `read_dist_mm()` function reads the distance between this ultrasound sensor
   
 4. **`uint16_t yh::rec::Us_016::read_dist_cm ()` method**  
 Syntax: `uint16_t distance_read = us_016.read_dist_cm();`  
-This `read_dist_mm()` function reads the distance between this ultrasound sensor and the obstacle in front of it in centimeters. It relies on the `analogRead()` function officially declared in `Arduino.h`.  
+This `read_dist_cm()` function reads the distance between this ultrasound sensor and the obstacle in front of it in centimeters. It relies on the `analogRead()` function officially declared in `Arduino.h`.  
 <!--
 5. `uint16_t yh::rec::Us_016::get_previous_dist_mm ()` **method**  
 Syntax: `uint16_t distance_read = us_016.get_previous_dist_mm();`  

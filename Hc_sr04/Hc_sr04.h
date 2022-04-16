@@ -34,7 +34,7 @@ namespace yh {
                 Hc_sr04 (const uint8_t init_trig_pin, const uint8_t init_echo_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                virtual void begin ();
+                void begin ();
                 // sets the maximum time the program will pause and wait for the sound pulse to return (unit is microseconds)
                 void set_max_waiting_time_in_us (const unsigned long assign_max_waiting_time_in_us);
                 // sets the maximum range of the sensor (unit is mm)
@@ -44,11 +44,11 @@ namespace yh {
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is mm)
                 // returns 8888 when the returning sound wave is undetectable
                 // has better performance under noInterrupts() environment
-                virtual uint16_t read_dist_mm ();
+                uint16_t read_dist_mm ();
                 // reads the distance between this ultrasound sensor and the obstacle in front of it (unit is cm)
                 // returns 888 when the returning sound wave is undetectable
                 // has better performance under noInterrupts() environment
-                virtual uint16_t read_dist_cm ();
+                uint16_t read_dist_cm ();
         };
         // you may use me when you choose to get distance measured with frequent scans on echo pin with timer interrupts
         class Hc_sr04_timer_int {
