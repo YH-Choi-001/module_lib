@@ -214,10 +214,10 @@ namespace yh {
                 virtual void begin ();
 
                 // checks if new data is ready @return true when data is ready
-                inline bool is_data_ready () { return (starting_time && ending_time) ? true : false; }
+                inline bool is_data_ready () { return (starting_time && ending_time); }
 
                 // checks if new data is not ready @return true when data is not ready
-                inline bool is_data_not_ready () { return !ending_time; }
+                inline bool is_data_not_ready () { return !(starting_time && ending_time); }
 
                 // read the distance of the previous measurement
                 // you can also call me when the current measurement is still in progress
