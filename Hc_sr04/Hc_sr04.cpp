@@ -70,13 +70,13 @@ uint16_t yh::rec::Hc_sr04::read_dist_cm () {
 
 
 yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const Hc_sr04_timer_int &init_obj) :
-    trig_pin(init_obj.trig_pin), echo_pin(init_obj.echo_pin), ending_tick(0), prev_dist_read(0)
+    trig_pin(init_obj.trig_pin), echo_pin(init_obj.echo_pin), waiting_for_echo_rise(0), measurement_ended(0), prev_dist_read(0)
 {
     //
 }
 
 yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const uint8_t init_trig_pin, const uint8_t init_echo_pin) :
-    trig_pin(init_trig_pin), echo_pin(init_echo_pin), ending_tick(0), prev_dist_read(0)
+    trig_pin(init_trig_pin), echo_pin(init_echo_pin), waiting_for_echo_rise(0), measurement_ended(0), prev_dist_read(0)
 {
     //
 }
@@ -96,13 +96,7 @@ void yh::rec::Hc_sr04_timer_int::begin () {
     delayMicroseconds(10);
     (*trig_pin_output_register) &= ~trig_pin_mask;
     // wait
-    while ((*echo_pin_input_register) & echo_pin_mask) {} // while HIGH
-    while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW // this is the key to success
-    uint8_t oldSREG = SREG;
-    noInterrupts();
-    current_tick = 0;
-    ending_tick = 0;
-    SREG = oldSREG;
+    waiting_for_echo_rise = true;
 }
 
 

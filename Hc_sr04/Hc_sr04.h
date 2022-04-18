@@ -66,12 +66,14 @@ namespace yh {
                 uint8_t echo_pin_mask;
                 volatile uint8_t *echo_pin_input_register;
                 // the counter to be incremented every time the ISR is run
-                volatile unsigned long current_tick;
-                // also acts as a flag to indicate whether the measurement has ended
-                volatile unsigned long ending_tick;
+                volatile unsigned long ticks;
+                // // also acts as a flag to indicate whether the measurement has ended
+                // volatile unsigned long ending_tick;
                 // the flag to indicate whether the LOW state of echo pin is before or after a measurement
-                // also the flag to indicate whether the ISR should save the current_tick to ending_tick as an end of a measurement
-                uint8_t waiting_for_echo_rise;
+                // also the flag to indicate whether the ISR should save the ticks to ending_tick as an end of a measurement
+                volatile uint8_t waiting_for_echo_rise : 1;
+                //
+                volatile uint8_t measurement_ended : 1;
                 // saves the distance read from the previous measurement when the current measurement is still in progress
                 double prev_dist_read;
                 // the time interval between each ISR being run
@@ -86,20 +88,20 @@ namespace yh {
                 Hc_sr04_timer_int (const uint8_t init_trig_pin, const uint8_t init_echo_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                virtual void begin ();
+                void begin ();
                 // tells the object the time distance between each isr_individual_sensor_routine() called
                 inline void set_time_interval_between_interrupts (const double time_interval_between_interrupts) { us_per_tick = time_interval_between_interrupts; }
                 // checks if new data is ready @return true when data is ready
-                inline bool is_data_ready () { return ending_tick ? true : false; }
+                inline bool is_data_ready () { return measurement_ended ? true : false; }
                 // checks if new data is not ready @return true when data is not ready
-                inline bool is_data_not_ready () { return !ending_tick; }
+                inline bool is_data_not_ready () { return !measurement_ended; }
                 // read the distance of the previous measurement
                 // you can also call me when the current measurement is still in progress
                 inline double read_previous_dist_cm () {
-                    if (ending_tick) { // no need to disable interrupts before reading ending_tick, bc i just treat it as a flag in this line
+                    if (measurement_ended) { // no need to disable interrupts before reading measurement_ended, bc i just treat it as a flag in this line
                         uint8_t oldSREG = SREG;
                         noInterrupts();
-                        prev_dist_read = ending_tick * us_per_tick / 58.823; // prevent ending_tick being updated while we are reading it
+                        prev_dist_read = ticks * us_per_tick / 58.823; // prevent ticks being updated while we are reading it
                         SREG = oldSREG;
                         if (prev_dist_read > 400) prev_dist_read = 888;
                     }
@@ -108,8 +110,8 @@ namespace yh {
                 // only call me by polling in the void loop () after you have get the previous measurement from read_previous_dist_cm()
                 // triggers a new sound pulse if the previous measurement has ended
                 inline void simple_update () {
-                    // if (echo_pin is HIGH) or (ending_tick == 0), just exit the function
-                    if (   ((*echo_pin_input_register) & echo_pin_mask) || (!ending_tick)   ) return;
+                    // if (echo_pin is HIGH) or (measurement_ended == 0), just exit the function
+                    if (   ((*echo_pin_input_register) & echo_pin_mask) || (!measurement_ended)   ) return;
 
                     (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
                     delayMicroseconds(2);
@@ -135,27 +137,27 @@ namespace yh {
                             // clear the flag
                             waiting_for_echo_rise = false;
                             // kicks off a new measurement
-                            current_tick = 0;
-                            ending_tick = 0;
+                            ticks = 0;
+                            measurement_ended = false;
                         }
                     } else {
-                        // if (echo_pin == HIGH) && (ending_tick == 0)
+                        // if (echo_pin == HIGH) && (measurement_ended == false)
                             // measurement is in progress
-                            // increment to current_tick
-                        // elif (echo_pin == LOW) && (ending_tick == 0)
-                            // record the value of current_tick to ending_tick
-                        // elif (echo_pin == LOW) && (ending_tick != 0)
+                            // increment to ticks
+                        // elif (echo_pin == LOW) && (measurement_ended == false)
+                            // set the measurement_ended flag on
+                        // elif (echo_pin == LOW) && (measurement_ended == true)
                             // the echo_pin has lowered but the polling function in void loop hasn't called for a new measurement
                             // nothing to do
-                        // elif (echo_pin == HIGH) && (ending_tick != 0)
+                        // elif (echo_pin == HIGH) && (measurement_ended == true)
                             // isr is being ran in simple_update()
                             // noting to do
-                        if (!ending_tick) {
+                        if (!measurement_ended) {
                             if ((*echo_pin_input_register) & echo_pin_mask) // {
-                                current_tick++;
+                                ticks++;
                             // } else {
                             else
-                                ending_tick = current_tick;
+                                measurement_ended = true;
                             // }
                         }
                     }
@@ -214,10 +216,10 @@ namespace yh {
                 virtual void begin ();
 
                 // checks if new data is ready @return true when data is ready
-                inline bool is_data_ready () { return (starting_time && ending_time); }
+                inline bool is_data_ready () { return ending_time ? true : false; }
 
                 // checks if new data is not ready @return true when data is not ready
-                inline bool is_data_not_ready () { return !(starting_time && ending_time); }
+                inline bool is_data_not_ready () { return !ending_time; }
 
                 // read the distance of the previous measurement
                 // you can also call me when the current measurement is still in progress
