@@ -152,7 +152,7 @@ It returns a distance-undefined value, which is 888, when the returning ultrason
 25. **`void yh::rec::Hc_sr04_ext_int::isr_individual_sensor_routine ()` method**  
 Syntax: `hc_sr04.isr_individual_sensor_routine();`  
 This `isr_individual_sensor_routine()` function performs checks on the state of the echo pins to measure the distance.  
-You must always and only call this method in an hardware interrupt in CHANGE mode, or a pin-change interrupt.  
+You must always and only call this method in an hardware interrupt in CHANGE mode, or a pin-change interrupt. Never call this method when the echo pin of this module has not changed its state.  
   
 If you find any problems, please raise an issue or contact me at yhei.choi@gmail.com.  
   
