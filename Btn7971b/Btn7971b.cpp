@@ -9,26 +9,22 @@
 yh::rec::Btn7971b::Btn7971b (const Btn7971b &init_obj) :
     pwm_pin(init_obj.pwm_pin), dir_pin(init_obj.dir_pin), speed(0), slowest_spd(-255), fastest_spd(255)
 {
-    pwm_pin_mask = digitalPinToBitMask(pwm_pin);
-    pwm_pin_output_register = portOutputRegister(digitalPinToPort(pwm_pin));
-    dir_pin_mask = digitalPinToBitMask(dir_pin);
-    dir_pin_output_register = portOutputRegister(digitalPinToPort(dir_pin));
-    pwm_pin_timer = digitalPinToTimer(pwm_pin);
-    timer_identification();
+    //
 }
 
 yh::rec::Btn7971b::Btn7971b (const uint8_t init_pwm_pin, const uint8_t init_dir_pin) :
     pwm_pin(init_pwm_pin), dir_pin(init_dir_pin), speed(0), slowest_spd(-255), fastest_spd(255)
 {
+    //
+}
+
+void yh::rec::Btn7971b::begin () {
     pwm_pin_mask = digitalPinToBitMask(pwm_pin);
     pwm_pin_output_register = portOutputRegister(digitalPinToPort(pwm_pin));
     dir_pin_mask = digitalPinToBitMask(dir_pin);
     dir_pin_output_register = portOutputRegister(digitalPinToPort(dir_pin));
     pwm_pin_timer = digitalPinToTimer(pwm_pin);
     timer_identification();
-}
-
-void yh::rec::Btn7971b::begin () {
     pinMode(pwm_pin, OUTPUT);
     pinMode(dir_pin, OUTPUT);
     (*pwm_pin_output_register) &= (~pwm_pin_mask); // this line replaces digitalWrite(pwm_pin, LOW);

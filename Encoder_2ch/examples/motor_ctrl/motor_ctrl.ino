@@ -45,8 +45,8 @@ void loop() {
     // put your main code here, to run repeatedly:
     // Serial.println(encoder_L.get_instantaneous_velocity());
     // Serial.println(encoder_R.get_instantaneous_velocity());
-    static unsigned long prev_time = micros();
-    const unsigned long time_diff = micros() - prev_time;
+    // static unsigned long prev_time = micros();
+    // const unsigned long time_diff = micros() - prev_time;
 
     // L_spd += pid_L.update_corr(100, encoder_L.get_instantaneous_velocity(), time_diff);
     // R_spd += pid_R.update_corr(100, encoder_R.get_instantaneous_velocity(), time_diff);

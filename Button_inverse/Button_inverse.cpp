@@ -5,11 +5,10 @@
 
 #include "button_inverse.h"
 
-yh::rec::Button_inverse::Button_inverse (const uint8_t init_read_button_pin) :
-    read_button_pin(init_read_button_pin)
+yh::rec::Button_inverse::Button_inverse (const uint8_t init_button_signal_pin) :
+    button_signal_pin(init_button_signal_pin)
 {
-    read_button_pin_mask = digitalPinToBitMask(read_button_pin);
-    read_button_pin_input_register = (portInputRegister(digitalPinToPort(read_button_pin)));
+    //
 }
 
 #endif // #ifndef BUTTON_INVERSE_CPP

@@ -15,18 +15,22 @@ namespace yh {
             protected:
                 // pins that cannot be changed:
                 // the pin to read the state of inverse button
-                const uint8_t read_button_pin;
-                uint8_t read_button_pin_mask;
-                volatile uint8_t *read_button_pin_input_register;
+                const uint8_t button_signal_pin;
+                uint8_t button_signal_mask;
+                volatile uint8_t *button_signal_reg;
             public:
                 // inits the button pin to this object
-                Button_inverse (const uint8_t init_read_button_pin);
+                Button_inverse (const uint8_t init_button_signal_pin);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
-                inline void begin () __attribute__((__always_inline__)) { pinMode(read_button_pin, INPUT); }
+                inline void begin () __attribute__((__always_inline__)) {
+                    button_signal_reg = (portInputRegister(digitalPinToPort(button_signal_pin)));
+                    button_signal_mask = digitalPinToBitMask(button_signal_pin);
+                    pinMode(button_signal_pin, INPUT);
+                }
                 // checks if the button is pressed
                 inline bool pressed_down () __attribute__((__always_inline__)) {
-                    return !((*read_button_pin_input_register) & read_button_pin_mask);
+                    return !((*button_signal_reg) & button_signal_mask);
                 }
         };
     }

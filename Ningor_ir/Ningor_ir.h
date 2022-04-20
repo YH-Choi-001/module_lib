@@ -5,6 +5,10 @@
 #include <Arduino.h>
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
 
+#ifndef NC_PINNO
+#define NC_PINNO 255
+#endif // #ifndef NC_PINNO
+
 namespace yh {
     namespace rec {
         class Ningor_ir_fast {
@@ -15,7 +19,8 @@ namespace yh {
                 // the pins connected to the corresponding eyes
                 const uint8_t eyes_pins [12];
                 // this function decides how to read an eye
-                uint16_t raw_read_one_eye (const uint8_t eye_idx);
+                // you may override me to use an external ADC
+                virtual inline uint16_t raw_read_one_eye (const uint8_t eye_idx) { return (uint16_t)analogRead(eyes_pins[eye_idx]); }
             public:
                 // inits the pins of 12 eyes into the object using an array argument
                 Ningor_ir_fast (const uint8_t *init_eyes_pin_array);
