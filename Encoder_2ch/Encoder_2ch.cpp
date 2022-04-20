@@ -11,10 +11,6 @@ yh::rec::Encoder_2ch::Encoder_2ch (Encoder_2ch &init_obj) :
     instantaneous_velocity(0),
     instantaneous_acceleration(0)
 {
-    signal_A_input_reg = portInputRegister(digitalPinToPort(signal_A_pin));
-    signal_A_mask = digitalPinToBitMask(signal_A_pin);
-    signal_B_input_reg = portInputRegister(digitalPinToPort(signal_B_pin));
-    signal_B_mask = digitalPinToBitMask(signal_B_pin);
     free(init_obj.logged_displacements);
     init_obj.logged_displacements = NULL;
     ( logged_displacements = (DISPLACEMENT_UNIT *)calloc(log_len, sizeof(DISPLACEMENT_UNIT)) );
@@ -27,10 +23,6 @@ yh::rec::Encoder_2ch::Encoder_2ch (const uint8_t init_signal_A_pin, const uint8_
     instantaneous_velocity(0),
     instantaneous_acceleration(0)
 {
-    signal_A_input_reg = portInputRegister(digitalPinToPort(signal_A_pin));
-    signal_A_mask = digitalPinToBitMask(signal_A_pin);
-    signal_B_input_reg = portInputRegister(digitalPinToPort(signal_B_pin));
-    signal_B_mask = digitalPinToBitMask(signal_B_pin);
     ( logged_displacements = (DISPLACEMENT_UNIT *)calloc(log_len, sizeof(DISPLACEMENT_UNIT)) );
 }
 
@@ -42,6 +34,10 @@ yh::rec::Encoder_2ch::~Encoder_2ch () {
 void yh::rec::Encoder_2ch::begin () {
     pinMode(signal_A_pin, INPUT);
     pinMode(signal_B_pin, INPUT);
+    signal_A_input_reg = portInputRegister(digitalPinToPort(signal_A_pin));
+    signal_A_mask = digitalPinToBitMask(signal_A_pin);
+    signal_B_input_reg = portInputRegister(digitalPinToPort(signal_B_pin));
+    signal_B_mask = digitalPinToBitMask(signal_B_pin);
     prev_A_state = (*signal_A_input_reg) & signal_A_mask;
     prev_B_state = (*signal_B_input_reg) & signal_B_mask;
 }

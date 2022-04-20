@@ -132,7 +132,7 @@
 
 namespace yh {
     namespace rec {
-        #define DISPLACEMENT_UNIT int32_t
+        #define DISPLACEMENT_UNIT int16_t
         // for 2-channel rotary encoder use
         class Encoder_2ch {
             private:
