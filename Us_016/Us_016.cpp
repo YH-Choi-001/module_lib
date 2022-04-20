@@ -10,18 +10,16 @@ yh::rec::Us_016::Us_016 (const Us_016 &init_obj) :
     out_pin(init_obj.out_pin),
     is_resolution_3mm(init_obj.is_resolution_3mm)
 {
-    if (range_pin == NC_PINNO) {
-        range_pin_mask = 0;
-        range_pin_output_port = (portOutputRegister(digitalPinToPort(0)));
-    } else {
-        range_pin_mask = (digitalPinToBitMask(range_pin));
-        range_pin_output_port = (portOutputRegister(digitalPinToPort(range_pin)));
-    }
+    //
 }
 
 yh::rec::Us_016::Us_016 (const uint8_t init_range_pin, const uint8_t init_out_pin, const uint8_t init_resolution) :
     range_pin(init_range_pin), out_pin(init_out_pin), is_resolution_3mm(init_resolution != 1)
 {
+    //
+}
+
+void yh::rec::Us_016::begin () {
     if (range_pin == NC_PINNO) {
         range_pin_mask = 0;
         range_pin_output_port = (portOutputRegister(digitalPinToPort(0)));
@@ -29,9 +27,6 @@ yh::rec::Us_016::Us_016 (const uint8_t init_range_pin, const uint8_t init_out_pi
         range_pin_mask = (digitalPinToBitMask(range_pin));
         range_pin_output_port = (portOutputRegister(digitalPinToPort(range_pin)));
     }
-}
-
-void yh::rec::Us_016::begin () {
     pinMode(range_pin, OUTPUT);
     pinMode(out_pin, INPUT);
     if (is_resolution_3mm)
