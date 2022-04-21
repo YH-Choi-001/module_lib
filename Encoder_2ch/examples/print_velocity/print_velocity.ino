@@ -1,8 +1,8 @@
 #include <Encoder_2ch.h>
 #include <Timer_int.h>
 
-yh::rec::Encoder_2ch encoder_L (2, 5, 600);
-yh::rec::Encoder_2ch encoder_R (3, 6, 600);
+yh::rec::Encoder_2ch_timer_int encoder_L (2, 5, 600);
+yh::rec::Encoder_2ch_timer_int encoder_R (3, 6, 600);
 
 const int L_spd_pin = 10;
 const int R_spd_pin = 11;

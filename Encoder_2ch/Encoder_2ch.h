@@ -134,7 +134,7 @@ namespace yh {
     namespace rec {
         #define DISPLACEMENT_UNIT int32_t
         // for 2-channel rotary encoder use
-        class Encoder_2ch {
+        class Encoder_2ch_timer_int {
             private:
                 //
             protected:
@@ -151,7 +151,7 @@ namespace yh {
                 uint8_t prev_A_state, prev_B_state;
                 // stores the previous displacements for velocity calculations use
                 DISPLACEMENT_UNIT *logged_displacements;
-                // indicates the length of the logged_displacements array;
+                // indicates the length of the logged_displacements array
                 const uint16_t log_len;
                 // the current index saving the displacements
                 uint16_t log_idx;
@@ -176,11 +176,11 @@ namespace yh {
                 // stores the instantaneous acceleration of the encoder
                 int16_t instantaneous_acceleration;
             public:
-                Encoder_2ch (Encoder_2ch &init_obj);
+                Encoder_2ch_timer_int (Encoder_2ch_timer_int &init_obj);
                 // inits the arguments to the signal A and B pins, and the length of displacement stored
-                Encoder_2ch (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len = 400);
+                Encoder_2ch_timer_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len = 400);
                 // frees the memory allocated
-                ~Encoder_2ch ();
+                ~Encoder_2ch_timer_int ();
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 void begin ();
@@ -265,6 +265,145 @@ namespace yh {
                     instantaneous_acceleration += instantaneous_velocity; // a = ∆v / ∆t (let ∆t = 1), a = ∆v = v - u
                     logged_displacements[log_idx++] = current_displacement;
                     if (log_idx == log_len) log_idx = 0;
+                    prev_A_state = curr_A_state;
+                    prev_B_state = curr_B_state;
+                }
+        };
+        // for 2-channel rotary encoder use (memory saving)
+        class Encoder_2ch_timer_int_light {
+            private:
+                //
+            protected:
+                // pins that cannot be changed:
+                // signal A pin
+                const uint8_t signal_A_pin;
+                volatile uint8_t *signal_A_input_reg;
+                uint8_t signal_A_mask;
+                // signal B pin
+                const uint8_t signal_B_pin;
+                volatile uint8_t *signal_B_input_reg;
+                uint8_t signal_B_mask;
+                // stores the previous state of channel A and channel B
+                uint8_t prev_A_state, prev_B_state;
+                // indicates the length of the logged_displacements array
+                const uint16_t log_len;
+                // the current index saving the displacements
+                uint16_t log_idx;
+                // stores the current displacement of the encoder
+                int16_t current_displacement;
+                // stores the instantaneous velocity of the encoder
+                int16_t instantaneous_velocity;
+            public:
+                Encoder_2ch_timer_int_light (Encoder_2ch_timer_int_light &init_obj);
+                // inits the arguments to the signal A and B pins, and the length of displacement stored
+                Encoder_2ch_timer_int_light (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len = 400);
+                // frees the memory allocated
+                ~Encoder_2ch_timer_int_light ();
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // calls pinMode function and config the pin modes
+                void begin ();
+                // gets the instantaneous velocity of the encoder
+                // the value of instantaneous_velocity increases as request_log_len in constructor increases
+                inline int16_t get_instantaneous_velocity () __attribute__((__always_inline__)) { return instantaneous_velocity; }
+                // only call me in an ISR for each sensor
+                inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
+                    // stores the current state of channel A and channel B
+                    const uint8_t curr_A_state = (*signal_A_input_reg & signal_A_mask);
+                    const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
+
+                    // if A_is_changed
+                    // if A_is_high_now && B_is_low
+                    // +1
+                    // if A_is_low_now && B_is_high
+                    // +1
+                    // if A_is_high_now && B_is_high
+                    // -1
+                    // if A_is_low_now && B_is_low
+                    // -1
+
+                    // if B_is_changed
+                    // if B_is_high_now && A_is_high
+                    // +1
+                    // if B_is_low_now && A_is_low
+                    // +1
+                    // if B_is_high_now && A_is_low
+                    // -1
+                    // if B_is_low_now && A_is_high
+                    // -1
+
+                    if ( (prev_A_state ^ curr_A_state) && (prev_B_state ^ curr_B_state) ) {
+                        // both A has B has changed
+                        // crashed (either +2 or -2)
+                        current_displacement += (instantaneous_velocity > 0) ? (+2) : (-2);
+                    } else if (prev_A_state ^ curr_A_state) {
+                        // A has changed
+                        current_displacement += (curr_A_state ^ curr_B_state) ? (+1) : (-1);
+                    } else if (prev_B_state ^ curr_B_state) {
+                        // B has changed
+                        current_displacement += (curr_A_state ^ curr_B_state) ? (-1) : (+1);
+                    }
+                    log_idx++;
+                    if (log_idx == log_len) {
+                        instantaneous_velocity = current_displacement;
+                        log_idx = 0;
+                    }
+                    prev_A_state = curr_A_state;
+                    prev_B_state = curr_B_state;
+                }
+        };
+        class Encoder_2ch_ext_int {
+            private:
+                //
+            protected:
+                // pins that cannot be changed:
+                // signal A pin
+                const uint8_t signal_A_pin;
+                volatile uint8_t *signal_A_input_reg;
+                uint8_t signal_A_mask;
+                // signal B pin
+                const uint8_t signal_B_pin;
+                volatile uint8_t *signal_B_input_reg;
+                uint8_t signal_B_mask;
+                // stores the previous state of channel A and channel B
+                uint8_t prev_A_state, prev_B_state;
+                //
+                double prev_time;
+
+                // stores the instantaneous velocity of the encoder
+                double instantaneous_velocity;
+                // stores the instantaneous acceleration of the encoder
+                double instantaneous_acceleration;
+            public:
+                Encoder_2ch_ext_int (Encoder_2ch_ext_int &init_obj);
+                // inits the arguments to the signal A and B pins, and the length of displacement stored
+                Encoder_2ch_ext_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin);
+                // frees the memory allocated
+                ~Encoder_2ch_ext_int ();
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // calls pinMode function and config the pin modes
+                void begin ();
+                // only call me in an ISR for each sensor
+                inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
+                    // stores the current state of channel A and channel B
+                    const uint8_t curr_A_state = (*signal_A_input_reg & signal_A_mask);
+                    const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
+                    int8_t delta_displacement;
+                    const double delta_time = micros() - prev_time;
+                    if ( (prev_A_state ^ curr_A_state) && (prev_B_state ^ curr_B_state) ) {
+                        // both A has B has changed
+                        // crashed (either +2 or -2)
+                        delta_displacement = (instantaneous_velocity > 0) ? (+2) : (-2);
+                    } else if (prev_A_state ^ curr_A_state) {
+                        // A has changed
+                        delta_displacement = (curr_A_state ^ curr_B_state) ? (+1) : (-1);
+                    } else if (prev_B_state ^ curr_B_state) {
+                        // B has changed
+                        delta_displacement = (curr_A_state ^ curr_B_state) ? (-1) : (+1);
+                    }
+                    const double new_instantaneous_velocity = delta_displacement / delta_time;
+                    instantaneous_acceleration = (new_instantaneous_velocity - instantaneous_velocity) / delta_time;
+                    instantaneous_velocity = new_instantaneous_velocity;
+                    prev_time += delta_time;
                     prev_A_state = curr_A_state;
                     prev_B_state = curr_B_state;
                 }

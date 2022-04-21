@@ -3,9 +3,10 @@
 
 #include "Encoder_2ch.h"
 
-yh::rec::Encoder_2ch::Encoder_2ch (Encoder_2ch &init_obj) :
+yh::rec::Encoder_2ch_timer_int::Encoder_2ch_timer_int (Encoder_2ch_timer_int &init_obj) :
     signal_A_pin(init_obj.signal_A_pin),
     signal_B_pin(init_obj.signal_B_pin),
+    log_idx(0),
     log_len(init_obj.log_len > 1000 ? 1000 : init_obj.log_len),
     current_displacement(0),
     instantaneous_velocity(0),
@@ -15,9 +16,10 @@ yh::rec::Encoder_2ch::Encoder_2ch (Encoder_2ch &init_obj) :
     init_obj.logged_displacements = NULL;
     ( logged_displacements = (DISPLACEMENT_UNIT *)calloc(log_len, sizeof(DISPLACEMENT_UNIT)) );
 }
-yh::rec::Encoder_2ch::Encoder_2ch (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len) :
+yh::rec::Encoder_2ch_timer_int::Encoder_2ch_timer_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len) :
     signal_A_pin(init_signal_A_pin),
     signal_B_pin(init_signal_B_pin),
+    log_idx(0),
     log_len(request_log_len > 1000 ? 1000 : request_log_len),
     current_displacement(0),
     instantaneous_velocity(0),
@@ -26,12 +28,45 @@ yh::rec::Encoder_2ch::Encoder_2ch (const uint8_t init_signal_A_pin, const uint8_
     ( logged_displacements = (DISPLACEMENT_UNIT *)calloc(log_len, sizeof(DISPLACEMENT_UNIT)) );
 }
 
-yh::rec::Encoder_2ch::~Encoder_2ch () {
+yh::rec::Encoder_2ch_timer_int::~Encoder_2ch_timer_int () {
     if (logged_displacements != NULL)
         free(logged_displacements);
 }
 
-void yh::rec::Encoder_2ch::begin () {
+void yh::rec::Encoder_2ch_timer_int::begin () {
+    pinMode(signal_A_pin, INPUT);
+    pinMode(signal_B_pin, INPUT);
+    signal_A_input_reg = portInputRegister(digitalPinToPort(signal_A_pin));
+    signal_A_mask = digitalPinToBitMask(signal_A_pin);
+    signal_B_input_reg = portInputRegister(digitalPinToPort(signal_B_pin));
+    signal_B_mask = digitalPinToBitMask(signal_B_pin);
+    prev_A_state = (*signal_A_input_reg) & signal_A_mask;
+    prev_B_state = (*signal_B_input_reg) & signal_B_mask;
+}
+
+yh::rec::Encoder_2ch_timer_int_light::Encoder_2ch_timer_int_light (Encoder_2ch_timer_int_light &init_obj) :
+    signal_A_pin(init_obj.signal_A_pin),
+    signal_B_pin(init_obj.signal_B_pin),
+    log_idx(0),
+    log_len(init_obj.log_len > 1000 ? 1000 : init_obj.log_len),
+    current_displacement(0),
+    instantaneous_velocity(0)
+{
+    //
+}
+
+yh::rec::Encoder_2ch_timer_int_light::Encoder_2ch_timer_int_light (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len) :
+    signal_A_pin(init_signal_A_pin),
+    signal_B_pin(init_signal_B_pin),
+    log_idx(0),
+    log_len(request_log_len > 1000 ? 1000 : request_log_len),
+    current_displacement(0),
+    instantaneous_velocity(0)
+{
+    //
+}
+
+void yh::rec::Encoder_2ch_timer_int_light::begin () {
     pinMode(signal_A_pin, INPUT);
     pinMode(signal_B_pin, INPUT);
     signal_A_input_reg = portInputRegister(digitalPinToPort(signal_A_pin));
