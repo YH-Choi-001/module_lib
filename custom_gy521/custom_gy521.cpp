@@ -235,7 +235,7 @@ void Custom_gy521::enable_ext_i2c_slave_sensors () {
     Wire.beginTransmission(i2c_address);
     Wire.write(0x37);
     Wire.endTransmission();
-    Wire.requestFrom(i2c_address, 1);
+    Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
     if (wait_i2c_buf(1U)) return;
     const uint8_t old_val = Wire.read();
     // write new value to MPU-9250 at register 0x37 with BYPASS_EN bit set HIGH
