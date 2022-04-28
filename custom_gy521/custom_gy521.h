@@ -38,24 +38,49 @@
 
 class Quaternion {
     public:
-        double w;
-        double x;
-        double y;
-        double z;
+        // vectors
+        double
+            w,
+            x,
+            y,
+            z;
 
+        // default constructor
         Quaternion () : w(1.0), x(0.0), y(0.0), z(0.0) { }
+
+        Quaternion (const Quaternion &init) : w(init.w), x(init.x), y(init.y), z(init.z) { }
 
         Quaternion (double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
 
-        Quaternion &operator = (const Quaternion rhs);
+        inline void operator = (const Quaternion rhs) {
+            this->w = rhs.w;
+            this->x = rhs.x;
+            this->y = rhs.y;
+            this->z = rhs.z;
+        }
 
-        Quaternion &operator *= (const Quaternion rhs);
+        inline void operator *= (const Quaternion rhs) {
+            const double
+                product_w = (w * rhs.w   -   x * rhs.x   -   y * rhs.y   -   z * rhs.z),
+                product_x = (w * rhs.x   +   x * rhs.w   +   y * rhs.z   -   z * rhs.y),
+                product_y = (w * rhs.y   -   x * rhs.z   +   y * rhs.w   +   z * rhs.x),
+                product_z = (w * rhs.z   +   x * rhs.y   -   y * rhs.x   +   z * rhs.w);
+            this->w = product_w;
+            this->x = product_x;
+            this->y = product_y;
+            this->z = product_z;
+        }
 
-        double vectors_squared (); // call me to check if bias from 1 is inacceptable
+        // call me to check if bias from 1 is inacceptable
+        inline double vectors_squared () { return (w * w + x * x + y * y + z * z); }
 
-        double getMagnitude ();
-
-        void normalize ();
+        inline void normalize () {
+            const double m = sqrt(this->vectors_squared());
+            w /= m;
+            x /= m;
+            y /= m;
+            z /= m;
+        }
 };
 
 Quaternion operator * (const Quaternion lhs, const Quaternion rhs);
@@ -80,14 +105,7 @@ class Custom_gy521 {
         // the time of the previous reading in micros
         unsigned long prev_micros_reading;
     public:
-
         // gyro features:
-        // the current value of the angles [0:359.99999999999999999999]
-        volatile double
-        #ifdef ALL_AXES_ROTATION
-        roll, pitch,
-        #endif // #ifdef ALL_AXES_ROTATION
-        yaw;
         // the linear difference of roll, pitch, yaw between the latest and the previous measurement
         volatile double d_roll, d_pitch, d_yaw;
         // the correction added to every reading from the chip
@@ -119,6 +137,13 @@ class Custom_gy521 {
         // gets 6 bytes from gyroscope (uses calibrated data to correct)
         // this function consumes 2000 - 2150 microseconds in FAST I2C MODE
         void update_gyro ();
+
+        // gets roll of Euler angles
+        double get_roll ();
+        // gets pitch of Euler angles
+        double get_pitch ();
+        // gets yaw of Euler angles
+        double get_yaw ();
 
         // specially made for the external AK8963 magnetometer attached to MPU-9250
         // but this is also applicable to MPU-6050 chip, so I put this method over here instead of inside Custom_gy9250

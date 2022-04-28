@@ -484,4 +484,72 @@ OFF_TIMER_16bit_INTERRUPT(5,A)
 
 #undef OFF_TIMER_16bit_INTERRUPT
 
+void set_timer_1_prescaler (const uint16_t request_prescaler) {
+  uint8_t oldSREG = SREG;
+  noInterrupts();
+  if (request_prescaler <= 1) {
+    TCCR1B = (TCCR1B & ~((1 << CS12) | (1 << CS11)))               | (1 << CS10);
+  } else if (request_prescaler <= 8) {
+    TCCR1B = (TCCR1B & ~((1 << CS12) | (1 << CS10)))               | (1 << CS11);
+  } else if (request_prescaler <= 64) {
+    TCCR1B = (TCCR1B & ~(1 << CS12))                               | (1 << CS11) | (1 << CS10);
+  } else if (request_prescaler <= 256) {
+    TCCR1B = (TCCR1B & ~((1 << CS11) | (1 << CS10)))               | (1 << CS12);
+  } else if (request_prescaler <= 1024) {
+    TCCR1B = (TCCR1B & ~(1 << CS11))                               | (1 << CS12) | (1 << CS10);
+  }
+  SREG = oldSREG;
+}
+
+#define SET_TIMER_16bit_PRESCALER(timer_no) \
+void set_timer_##timer_no##_prescaler (const uint16_t request_prescaler) { \
+  uint8_t oldSREG = SREG; \
+  noInterrupts(); \
+  if (request_prescaler <= 1) { \
+    TCCR##timer_no##B = (TCCR##timer_no##B & ~((1 << CS##timer_no##2) | (1 << CS##timer_no##1))) | (1 << CS##timer_no##0); \
+  } else if (request_prescaler <= 8) { \
+    TCCR##timer_no##B = (TCCR##timer_no##B & ~((1 << CS##timer_no##2) | (1 << CS##timer_no##0))) | (1 << CS##timer_no##1); \
+  } else if (request_prescaler <= 64) { \
+    TCCR##timer_no##B = (TCCR##timer_no##B & ~(1 << CS##timer_no##2))                            | (1 << CS##timer_no##1) | (1 << CS##timer_no##0); \
+  } else if (request_prescaler <= 256) { \
+    TCCR##timer_no##B = (TCCR##timer_no##B & ~((1 << CS##timer_no##1) | (1 << CS##timer_no##0))) | (1 << CS##timer_no##2); \
+  } else if (request_prescaler <= 1024) { \
+    TCCR##timer_no##B = (TCCR##timer_no##B & ~(1 << CS##timer_no##1))                            | (1 << CS##timer_no##2) | (1 << CS##timer_no##0); \
+  } \
+  SREG = oldSREG; \
+}
+
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+SET_TIMER_16bit_PRESCALER(3)
+SET_TIMER_16bit_PRESCALER(4)
+SET_TIMER_16bit_PRESCALER(5)
+#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+
+#undef SET_TIMER_16bit_PRESCALER
+
+void set_timer_1_wgm_mode (const uint8_t wgm_mode) {
+  uint8_t oldSREG = SREG;
+  noInterrupts();
+  TCCR1A = (TCCR1A & ~((1 << WGM11) | (1 << WGM10)))               | (wgm_mode & 0b0011);
+  TCCR1B = (TCCR1B & ~((1 << WGM13) | (1 << WGM12)))               | ((wgm_mode & 0b1100) << 1);
+  SREG = oldSREG;
+}
+
+#define SET_TIMER_16bit_WGM_MODE(timer_no) \
+void set_timer_##timer_no##_wgm_mode (const uint8_t wgm_mode) { \
+  uint8_t oldSREG = SREG; \
+  noInterrupts(); \
+  TCCR##timer_no##A = (TCCR##timer_no##A & ~((1 << WGM##timer_no##1) | (1 << WGM##timer_no##0))) | (wgm_mode & 0b0011); \
+  TCCR##timer_no##B = (TCCR##timer_no##B & ~((1 << WGM##timer_no##3) | (1 << WGM##timer_no##2))) | ((wgm_mode & 0b1100) << 1); \
+  SREG = oldSREG; \
+}
+
+#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+SET_TIMER_16bit_WGM_MODE(3)
+SET_TIMER_16bit_WGM_MODE(4)
+SET_TIMER_16bit_WGM_MODE(5)
+#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+
+#undef SET_TIMER_16bit_WGM_MODE
+
 #endif // #ifndef TIMER_INT_H
