@@ -24,17 +24,17 @@ void Custom_ak8963::begin () {
     Wire.beginTransmission(i2c_address); // talk to AK8963
     Wire.write(0x10); // accessing the register 0x10 to 0x12 - ASAX, ASAY, ASAZ registers for the magnetometer value adjustment in fuse ROM
     Wire.endTransmission();
-    Wire.requestFrom(i2c_address, 3);
-    while (Wire.available() < 3) {}
-    ASA_X = Wire.read();
-    ASA_Y = Wire.read();
-    ASA_Z = Wire.read();
+    if (Wire.requestFrom(i2c_address, static_cast<uint8_t>(3U)) == static_cast<uint8_t>(3U)) {
+        ASA_X = Wire.read();
+        ASA_Y = Wire.read();
+        ASA_Z = Wire.read();
+    }
     // set power mode to power-down mode first before other modes, required by datasheet to change power modes
     Wire.beginTransmission(i2c_address); // talk to AK8963
     Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to select power-down mode
     Wire.write(0x00); // select power-down mode
     Wire.endTransmission();
-    delayMicroseconds(128); // delay at least 100us, required by datasheet when changing power modes
+    delayMicroseconds(100); // delay at least 100us, required by datasheet when changing power modes
     // // select continuous measurement 2 that samples the magnetic field strength in 100 KHz (this is already the limit of the speed of the chip)
     Wire.beginTransmission(i2c_address); // talk to AK8963
     Wire.write(0x0A); // accessing the register 0x0A - CNTL1 register to turn off power-down mode, and to select continuous measurement 2 mode
@@ -47,24 +47,27 @@ inline void Custom_ak8963::update_raw () {
     Wire.beginTransmission(i2c_address); // talk to AK8963
     Wire.write(0x02); // accessing the register 0x02 - ST1 register
     Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)); // see if new data is ready
-    while (Wire.available() < 1) {}
-    if (Wire.read() & 0x01) {
-        // new data is ready
-        Wire.beginTransmission(i2c_address); // talk to AK8963
-        Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
-        Wire.endTransmission();
-        Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U));
-        while (Wire.available() < 7) {}
-        const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
-        const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
-        const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
-        if (!(Wire.read() & 0x10)) { // reading the ST2 register to check if magnetometer overflow has occured
-            // no overflow has occured
-            // update raw_x, raw_y, raw_z
-            raw_x = temp_raw_x;
-            raw_y = temp_raw_y;
-            raw_z = temp_raw_z;
+    if (Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)) == 1) {
+        if (Wire.read() & 0x01) {
+            // new data is ready
+            Wire.beginTransmission(i2c_address); // talk to AK8963
+            Wire.write(0x03); // accessing the registers of magnetometer x, y, z, where each axis has 2 bytes, from 0x03 to 0x08
+            Wire.endTransmission();
+            if (Wire.requestFrom(i2c_address, static_cast<uint8_t>(7U)) == static_cast<uint8_t>(7U)) {
+                // const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
+                // const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
+                // const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
+                const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * (ASA_X / 256.0 + 0.5);
+                const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * (ASA_Y / 256.0 + 0.5);
+                const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * (ASA_Z / 256.0 + 0.5);
+                if (!(Wire.read() & 0x10)) { // reading the ST2 register to check if magnetometer overflow has occured
+                    // no overflow has occured
+                    // update raw_x, raw_y, raw_z
+                    raw_x = temp_raw_x;
+                    raw_y = temp_raw_y;
+                    raw_z = temp_raw_z;
+                }
+            }
         }
     }
 }
@@ -74,9 +77,9 @@ uint8_t Custom_ak8963::who_i_am () {
     Wire.write(0x00); // accessing the register 0x00 - WIA register
     const uint8_t err = Wire.endTransmission();
     if (err) return 0; // an error occured while communicating with the chip
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
-    while (Wire.available() < 1) {}
-    return Wire.read();
+    if (Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U)) == static_cast<uint8_t>(1U))
+        return Wire.read();
+    return 0;
 }
 
 void Custom_ak8963::single_calibrate () {
