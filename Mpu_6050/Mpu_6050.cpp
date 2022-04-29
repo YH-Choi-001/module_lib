@@ -1,12 +1,12 @@
-#ifndef CUSTOM_GY521_CPP
-#define CUSTOM_GY521_CPP __DATE__ ", " __TIME__
+#ifndef MPU_6050_CPP
+#define MPU_6050_CPP __DATE__ ", " __TIME__
 
-#include "custom_gy521.h"
+#include "Mpu_6050.h"
 
 // #define GYRO_RANGE 1000
 #define GYRO_RANGE 2000
 
-Quaternion operator * (const Quaternion lhs, const Quaternion rhs) {
+yh::rec::Quaternion operator * (const yh::rec::Quaternion lhs, const yh::rec::Quaternion rhs) {
 
     // definitions:
     // i^2 = j^2 = k^2 = ijk = -1
@@ -26,7 +26,7 @@ Quaternion operator * (const Quaternion lhs, const Quaternion rhs) {
     //     (Q1 * Q2).x = (w1x2 + x1w2 + y1z2 - z1y2)
     //     (Q1 * Q2).y = (w1y2 - x1z2 + y1w2 + z1x2)
     //     (Q1 * Q2).z = (w1z2 + x1y2 - y1x2 + z1w2
-    return Quaternion(
+    return yh::rec::Quaternion(
         (lhs.w * rhs.w   -   lhs.x * rhs.x   -   lhs.y * rhs.y   -   lhs.z * rhs.z),
         (lhs.w * rhs.x   +   lhs.x * rhs.w   +   lhs.y * rhs.z   -   lhs.z * rhs.y),
         (lhs.w * rhs.y   -   lhs.x * rhs.z   +   lhs.y * rhs.w   +   lhs.z * rhs.x),
@@ -34,24 +34,13 @@ Quaternion operator * (const Quaternion lhs, const Quaternion rhs) {
     );
 }
 
-// waits for the buffer to be filled, return 1 if timeout
-bool wait_i2c_buf (const uint8_t buflen) __attribute__((__always_inline__));
-bool wait_i2c_buf (const uint8_t buflen) {
-    const unsigned long starting_time = micros();
-    const unsigned long max_waiting_time = (buflen * 500);
-    while (Wire.available() < buflen) {
-        if ((micros() - starting_time) > max_waiting_time) return 1;
-    }
-    return 0;
-}
-
-Custom_gy521::Custom_gy521 (const uint8_t init_i2c_address) :
+yh::rec::Mpu_6050::Mpu_6050 (const uint8_t init_i2c_address) :
     i2c_address(init_i2c_address), corr_roll(0), corr_pitch(0), corr_yaw(0), q(1, 0, 0, 0)
 {
     //
 }
 
-void Custom_gy521::begin () {
+void yh::rec::Mpu_6050::begin () {
     // init settings to the GY-521 module through I2C
     if (!(TWCR & (1 << TWEN))) { // if (TwoWireENable bit is off) { begin I2C communication }
         Wire.begin();
@@ -76,7 +65,7 @@ void Custom_gy521::begin () {
     prev_micros_reading = micros();
 }
 
-uint8_t Custom_gy521::who_am_i () {
+uint8_t yh::rec::Mpu_6050::who_am_i () {
     Wire.beginTransmission(i2c_address); // talk to GY-521
     Wire.write(static_cast<uint8_t>(0x75)); // accessing the who am I register
     if (Wire.endTransmission()) return 0; // an error occured while communicating with the chip
@@ -85,7 +74,7 @@ uint8_t Custom_gy521::who_am_i () {
     return 0;
 }
 
-double Custom_gy521::get_temp () {
+double yh::rec::Mpu_6050::get_temp () {
     Wire.beginTransmission(i2c_address); // talk to GY-521
     Wire.write(static_cast<uint8_t>(0x41)); // accessing the register of thermometer, which has 2 bytes, from 0x41 to 0x42
     Wire.endTransmission();
@@ -102,7 +91,7 @@ double Custom_gy521::get_temp () {
         return 0;
 }
 
-void Custom_gy521::cal_gyro (const uint32_t sampling_amount, void (*updating_function)(void)) {
+void yh::rec::Mpu_6050::cal_gyro (const uint32_t sampling_amount, void (*updating_function)(void)) {
     corr_roll  = 0;
     corr_pitch = 0;
     corr_yaw   = 0;
@@ -124,14 +113,14 @@ void Custom_gy521::cal_gyro (const uint32_t sampling_amount, void (*updating_fun
     corr_yaw   /= static_cast<double>(sampling_amount);
 }
 
-void Custom_gy521::reset_gyro () {
+void yh::rec::Mpu_6050::reset_gyro () {
     q.w = 1;
     q.x = 0;
     q.y = 0;
     q.z = 0;
 }
 
-void Custom_gy521::update_gyro () {
+void yh::rec::Mpu_6050::update_gyro () {
     Wire.beginTransmission(i2c_address); // talk to GY-521
     Wire.write(static_cast<uint8_t>(0x43)); // accessing the registers of gyroscope x, y, z, where each axis has 2 bytes, from 0x43 to 0x48
     Wire.endTransmission();
@@ -176,7 +165,7 @@ void Custom_gy521::update_gyro () {
     }
 }
 
-double Custom_gy521::get_roll () {
+double yh::rec::Mpu_6050::get_roll () {
     uint8_t oldSREG = SREG;
     noInterrupts();
     const double
@@ -192,7 +181,7 @@ double Custom_gy521::get_roll () {
     return atan(gravity_y / sqrt(gravity_x * gravity_x + gravity_z * gravity_z)) * RAD_TO_DEG; // gravity_y == x, gravity_x and gravity_z are y and z
 }
 
-double Custom_gy521::get_pitch () {
+double yh::rec::Mpu_6050::get_pitch () {
     uint8_t oldSREG = SREG;
     noInterrupts();
     const double
@@ -204,7 +193,7 @@ double Custom_gy521::get_pitch () {
     return atan(gravity_x / sqrt(gravity_y * gravity_y + gravity_z * gravity_z)) * RAD_TO_DEG; // gravity_x == z, gravity_y and gravity_z are x and y // gravity_x == z, gravity_y == x, gravity_z == y
 }
 
-double Custom_gy521::get_yaw () {
+double yh::rec::Mpu_6050::get_yaw () {
     uint8_t oldSREG = SREG;
     noInterrupts();
     // yaw = atan2(2 * q.x * q.y - 2 * q.w * q.z, 2 * q.w * q.w + 2 * q.x * q.x - 1) * RAD_TO_DEG;
@@ -213,7 +202,7 @@ double Custom_gy521::get_yaw () {
     return yaw < 0 ? yaw + 360.0 : yaw;
 }
 
-Euler_angle Custom_gy521::get_euler_angles () {
+yh::rec::Euler_angle yh::rec::Mpu_6050::get_euler_angles () {
     uint8_t oldSREG = SREG;
     noInterrupts();
     const double
@@ -232,7 +221,7 @@ Euler_angle Custom_gy521::get_euler_angles () {
     );
 }
 
-void Custom_gy521::enable_ext_i2c_slave_sensors () {
+void yh::rec::Mpu_6050::enable_ext_i2c_slave_sensors () {
     // load the old value of register 0x37
     Wire.beginTransmission(i2c_address);
     Wire.write(static_cast<uint8_t>(0x37));
@@ -247,4 +236,4 @@ void Custom_gy521::enable_ext_i2c_slave_sensors () {
     }
 }
 
-#endif // #ifndef CUSTOM_GY521_CPP
+#endif // #ifndef MPU_6050_CPP

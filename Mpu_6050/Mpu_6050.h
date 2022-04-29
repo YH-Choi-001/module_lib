@@ -22,8 +22,8 @@
 
 
 
-#ifndef CUSTOM_GY521_H
-#define CUSTOM_GY521_H __DATE__ ", " __TIME__
+#ifndef MPU_6050_H
+#define MPU_6050_H __DATE__ ", " __TIME__
 
 #if defined(ARDUINO) && !defined(Arduino_h)
 #include <Arduino.h>
@@ -36,143 +36,152 @@
 #define MPU6500 0x70
 #define MPU9250 0x71
 
-class Euler_angle;
-class Quaternion;
 
-class Euler_angle {
-    private:
-        //
-    protected:
-        //
-    public:
-        // angles
-        double
-            roll,
-            pitch,
-            yaw;
+namespace yh {
+    namespace rec {
 
-        // default constructor
-        Euler_angle () : roll(0.0), pitch(0.0), yaw(0.0) { }
+        class Euler_angle;
+        class Quaternion;
 
-        Euler_angle (const Euler_angle &init) : roll(init.roll), pitch(init.pitch), yaw(init.yaw) { }
+        class Euler_angle {
+            public:
+                // angles
+                double
+                    roll,
+                    pitch,
+                    yaw;
 
-        Euler_angle (const double r, const double p, const double y) : roll(r), pitch(p), yaw(y) { }
-};
+                // default constructor
+                Euler_angle () : roll(0.0), pitch(0.0), yaw(0.0) { }
 
-class Quaternion {
-    public:
-        // vectors
-        double
-            w,
-            x,
-            y,
-            z;
+                Euler_angle (const Euler_angle &init) : roll(init.roll), pitch(init.pitch), yaw(init.yaw) { }
 
-        // default constructor
-        Quaternion () : w(1.0), x(0.0), y(0.0), z(0.0) { }
+                Euler_angle (const double r, const double p, const double y) : roll(r), pitch(p), yaw(y) { }
 
-        Quaternion (const Quaternion &init) : w(init.w), x(init.x), y(init.y), z(init.z) { }
+                inline void operator = (const Euler_angle rhs) {
+                    this->roll  = rhs.roll;
+                    this->pitch = rhs.pitch;
+                    this->yaw   = rhs.yaw;
+                }
 
-        Quaternion (double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
+        };
 
-        inline void operator = (const Quaternion rhs) {
-            this->w = rhs.w;
-            this->x = rhs.x;
-            this->y = rhs.y;
-            this->z = rhs.z;
-        }
+        class Quaternion {
+            public:
+                // vectors
+                double
+                    w,
+                    x,
+                    y,
+                    z;
 
-        inline void operator *= (const Quaternion rhs) {
-            const double
-                product_w = (w * rhs.w   -   x * rhs.x   -   y * rhs.y   -   z * rhs.z),
-                product_x = (w * rhs.x   +   x * rhs.w   +   y * rhs.z   -   z * rhs.y),
-                product_y = (w * rhs.y   -   x * rhs.z   +   y * rhs.w   +   z * rhs.x),
-                product_z = (w * rhs.z   +   x * rhs.y   -   y * rhs.x   +   z * rhs.w);
-            this->w = product_w;
-            this->x = product_x;
-            this->y = product_y;
-            this->z = product_z;
-        }
+                // default constructor
+                Quaternion () : w(1.0), x(0.0), y(0.0), z(0.0) { }
 
-        // call me to check if bias from 1 is inacceptable
-        inline double vectors_squared () { return (w * w + x * x + y * y + z * z); }
+                Quaternion (const Quaternion &init) : w(init.w), x(init.x), y(init.y), z(init.z) { }
 
-        inline void normalize () {
-            const double m = sqrt(this->vectors_squared());
-            w /= m;
-            x /= m;
-            y /= m;
-            z /= m;
-        }
-};
+                Quaternion (double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
 
-Quaternion operator * (const Quaternion lhs, const Quaternion rhs);
+                inline void operator = (const Quaternion rhs) {
+                    this->w = rhs.w;
+                    this->x = rhs.x;
+                    this->y = rhs.y;
+                    this->z = rhs.z;
+                }
 
-// Un-comment line 69 below to use roll and pitch (disabled by default to save execute time).
-// Do not just define ALL_AXES_ROTATION in your *.ino sketch,
-// where the roll and pitch member variables are only declared,
-// but the values are not computed in the implementation file.
-// What I mean is, if you really want to use roll and pitch,
-// un-comment line 69 below, which is to edit the library's header file.
-// #define ALL_AXES_ROTATION
+                inline void operator *= (const Quaternion rhs) {
+                    const double
+                        product_w = (w * rhs.w   -   x * rhs.x   -   y * rhs.y   -   z * rhs.z),
+                        product_x = (w * rhs.x   +   x * rhs.w   +   y * rhs.z   -   z * rhs.y),
+                        product_y = (w * rhs.y   -   x * rhs.z   +   y * rhs.w   +   z * rhs.x),
+                        product_z = (w * rhs.z   +   x * rhs.y   -   y * rhs.x   +   z * rhs.w);
+                    this->w = product_w;
+                    this->x = product_x;
+                    this->y = product_y;
+                    this->z = product_z;
+                }
 
-// this class has been customized for RCJ soccer robots use only
-class Custom_gy521 {
-    private:
-        //
-    protected:
-        // the 7-bit I2C address of the chip [0x00:0x7f]
-        const uint8_t i2c_address;
-        // the quaternion of the current status
-        Quaternion q;
-        // the time of the previous reading in micros
-        unsigned long prev_micros_reading;
-    public:
-        // gyro features:
-        // the linear difference of roll, pitch, yaw between the latest and the previous measurement
-        volatile double d_roll, d_pitch, d_yaw;
-        // the correction added to every reading from the chip
-        double corr_roll, corr_pitch, corr_yaw;
-        // inits the 7-bit I2C address of the chip to init_i2c_address
-        Custom_gy521 (const uint8_t init_i2c_address);
-        // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
-        // configures the settings of the I2C bus and the chip
-        virtual void begin ();
+                // call me to check if bias from 1 is inacceptable
+                inline double vectors_squared () { return (w * w + x * x + y * y + z * z); }
 
-        // gets the who_am_i value to clarify whether this chip is mpu6050, mpu6500, or mpu9250
-        // if the chip is mpu6000 or mpu6050, the returned value should be 0x68
-        // if the chip is mpu6500, the returned value should be 0x70
-        // if the chip is mpu9250, the returned value should be 0x71
-        uint8_t who_am_i ();
+                inline void normalize () {
+                    const double m = sqrt(this->vectors_squared());
+                    w /= m;
+                    x /= m;
+                    y /= m;
+                    z /= m;
+                }
+        };
 
-        // gets 6 bytes from accelerometer
-        // void update_accel ();
+        Quaternion operator * (const Quaternion lhs, const Quaternion rhs);
 
-        // gets temperature in degree Celsius
-        double get_temp ();
+        // Un-comment line 69 below to use roll and pitch (disabled by default to save execute time).
+        // Do not just define ALL_AXES_ROTATION in your *.ino sketch,
+        // where the roll and pitch member variables are only declared,
+        // but the values are not computed in the implementation file.
+        // What I mean is, if you really want to use roll and pitch,
+        // un-comment line 69 below, which is to edit the library's header file.
+        // #define ALL_AXES_ROTATION
 
-        // calibrates the gyroscope, and give the corrections to corr_roll, corr_pitch, corr_yaw respectively
-        // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
-        // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
-        void cal_gyro (const uint32_t sampling_amount = 8192, void (*updating_function)(void) = NULL);
-        // resets the roll, pitch and yaw values
-        void reset_gyro ();
-        // gets 6 bytes from gyroscope (uses calibrated data to correct)
-        // this function consumes 2000 - 2150 microseconds in FAST I2C MODE
-        void update_gyro ();
+        // this class has been customized for RCJ soccer robots use only
+        class Mpu_6050 {
+            private:
+                //
+            protected:
+                // the 7-bit I2C address of the chip [0x00:0x7f]
+                const uint8_t i2c_address;
+                // the quaternion of the current status
+                Quaternion q;
+                // the time of the previous reading in micros
+                unsigned long prev_micros_reading;
+            public:
+                // gyro features:
+                // the linear difference of roll, pitch, yaw between the latest and the previous measurement
+                volatile double d_roll, d_pitch, d_yaw;
+                // the correction added to every reading from the chip
+                double corr_roll, corr_pitch, corr_yaw;
+                // inits the 7-bit I2C address of the chip to init_i2c_address
+                Mpu_6050 (const uint8_t init_i2c_address);
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // configures the settings of the I2C bus and the chip
+                virtual void begin ();
 
-        // gets roll of Euler angles
-        double get_roll ();
-        // gets pitch of Euler angles
-        double get_pitch ();
-        // gets yaw of Euler angles
-        double get_yaw ();
-        // gets all 3 axes of rotation of Euler angles
-        Euler_angle get_euler_angles ();
+                // gets the who_am_i value to clarify whether this chip is mpu6050, mpu6500, or mpu9250
+                // if the chip is mpu6000 or mpu6050, the returned value should be 0x68
+                // if the chip is mpu6500, the returned value should be 0x70
+                // if the chip is mpu9250, the returned value should be 0x71
+                uint8_t who_am_i ();
 
-        // specially made for the external AK8963 magnetometer attached to MPU-9250
-        // but this is also applicable to MPU-6050 chip, so I put this method over here instead of inside Custom_gy9250
-        void enable_ext_i2c_slave_sensors ();
-};
+                // gets 6 bytes from accelerometer
+                // void update_accel ();
 
-#endif // #ifndef CUSTOM_GY521_H
+                // gets temperature in degree Celsius
+                double get_temp ();
+
+                // calibrates the gyroscope, and give the corrections to corr_roll, corr_pitch, corr_yaw respectively
+                // ATTENTION: WHEN GYROSCOPE CALIBRATION IS IN PROGRESS, PUT THE CHIP ON A FLAT SURFACE,
+                // HOLD STILL, UNTIL CALIBRATION FUNCTION HAS RETURNED
+                void cal_gyro (const uint32_t sampling_amount = 8192, void (*updating_function)(void) = NULL);
+                // resets the roll, pitch and yaw values
+                void reset_gyro ();
+                // gets 6 bytes from gyroscope (uses calibrated data to correct)
+                // this function consumes 2000 - 2150 microseconds in FAST I2C MODE
+                void update_gyro ();
+
+                // gets roll of Euler angles
+                double get_roll ();
+                // gets pitch of Euler angles
+                double get_pitch ();
+                // gets yaw of Euler angles
+                double get_yaw ();
+                // gets all 3 axes of rotation of Euler angles
+                Euler_angle get_euler_angles ();
+
+                // specially made for the external AK8963 magnetometer attached to MPU-9250
+                // but this is also applicable to MPU-6050 chip, so I put this method over here instead of inside Custom_gy9250
+                void enable_ext_i2c_slave_sensors ();
+        };
+    }
+}
+
+#endif // #ifndef MPU_6050_H
