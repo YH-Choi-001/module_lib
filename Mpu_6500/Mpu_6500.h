@@ -115,14 +115,6 @@ namespace yh {
 
         Quaternion operator * (const Quaternion lhs, const Quaternion rhs);
 
-        // Un-comment line 69 below to use roll and pitch (disabled by default to save execute time).
-        // Do not just define ALL_AXES_ROTATION in your *.ino sketch,
-        // where the roll and pitch member variables are only declared,
-        // but the values are not computed in the implementation file.
-        // What I mean is, if you really want to use roll and pitch,
-        // un-comment line 69 below, which is to edit the library's header file.
-        // #define ALL_AXES_ROTATION
-
         // this class has been customized for RCJ soccer robots use only
         class Mpu_6500 {
             private:
