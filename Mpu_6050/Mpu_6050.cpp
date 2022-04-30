@@ -35,7 +35,7 @@ yh::rec::Quaternion operator * (const yh::rec::Quaternion lhs, const yh::rec::Qu
 }
 
 yh::rec::Mpu_6050::Mpu_6050 (const uint8_t init_i2c_address) :
-    i2c_address(init_i2c_address), corr_roll(0), corr_pitch(0), corr_yaw(0), q(1, 0, 0, 0)
+    i2c_address(init_i2c_address), d_roll(0), d_pitch(0), d_yaw(0), corr_roll(0), corr_pitch(0), corr_yaw(0), q(1, 0, 0, 0)
 {
     //
 }
@@ -49,9 +49,9 @@ void yh::rec::Mpu_6050::begin () {
     Wire.beginTransmission(i2c_address); // talk to GY-521
     Wire.write(static_cast<uint8_t>(0x6B)); // accessing the register 6B - Power Management 1
     Wire.write(static_cast<uint8_t>(0b00000000)); // setting SLEEP bit to 0
-    Wire.endTransmission();
-    Wire.beginTransmission(i2c_address); // talk to GY-521
-    Wire.write(static_cast<uint8_t>(0x6C)); // accessing the register 6C - Power Management 2
+    // Wire.endTransmission();
+    // Wire.beginTransmission(i2c_address); // talk to GY-521
+    // Wire.write(static_cast<uint8_t>(0x6C)); // accessing the register 6C - Power Management 2
     Wire.write(static_cast<uint8_t>(0b00000000)); // enabling accel x y z, enabling gyro x y z
     Wire.endTransmission();
     Wire.beginTransmission(i2c_address); // talk to GY-521
