@@ -45,12 +45,15 @@ yh::rec::Mpu_6500::Mpu_6500 (const uint8_t init_cs_pin) :
     corr_pitch(0),
     corr_yaw(0),
     q(1, 0, 0, 0)
-    #define MPU_6500_READ_BIT (0x80)
 {
     //
 }
 
 void yh::rec::Mpu_6500::begin () {
+    pinMode(cs_pin, OUTPUT); // prioritized line
+    pinMode(SCK, OUTPUT);
+    pinMode(MOSI, OUTPUT);
+    pinMode(MISO, INPUT);
     cs_pin_output_reg = portOutputRegister(digitalPinToPort(cs_pin));
     cs_pin_mask = digitalPinToBitMask(cs_pin);
     SPI.begin();
@@ -117,9 +120,9 @@ void yh::rec::Mpu_6500::cal_gyro (const uint32_t sampling_amount, void (*updatin
         (*cs_pin_output_reg) &= (~cs_pin_mask); // CS pin set to LOW
         SPI.beginTransaction(SPI_read_sensor_reg_settings); // talk to MPU-6500
         SPI.transfer(MPU_6500_READ_BIT | static_cast<uint8_t>(0x43)); // accessing the registers of gyroscope x, y, z, where each axis has 2 bytes, from 0x43 to 0x48
-        corr_roll  -= static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
-        corr_pitch -= static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
-        corr_yaw   -= static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
+        corr_roll  += static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
+        corr_pitch += static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
+        corr_yaw   += static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
         if (updating_function)
             updating_function();
         SPI.endTransaction();
@@ -138,40 +141,26 @@ void yh::rec::Mpu_6500::reset_gyro () {
     q.z = 0;
 }
 
-void yh::rec::Mpu_6500::update_gyro_isr (int16_t *const d_roll_raw, int16_t *const d_pitch_raw, int16_t *const d_yaw_raw) {
-    (*cs_pin_output_reg) &= (~cs_pin_mask); // CS pin set to LOW
-    SPI.beginTransaction(SPI_read_sensor_reg_settings); // talk to MPU-6500
-    SPI.transfer(MPU_6500_READ_BIT | static_cast<uint8_t>(0x43)); // accessing the registers of gyroscope x, y, z, where each axis has 2 bytes, from 0x43 to 0x48
-    (*d_roll_raw)  = ((static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00));
-    (*d_pitch_raw) = ((static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00));
-    (*d_yaw_raw)   = ((static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00));
-    SPI.endTransaction();
-    (*cs_pin_output_reg) |= cs_pin_mask; // CS pin set to HIGH
-}
-
 void yh::rec::Mpu_6500::update_gyro () {
-    int16_t d_roll_raw, d_pitch_raw, d_yaw_raw;
-    update_gyro_isr(&d_roll_raw, &d_pitch_raw, &d_yaw_raw);
-    // commands above take around 944 - 952 us at 100 KHz I2C clock rate
-    const unsigned long t_diff = micros() - prev_micros_reading;
+    const Gyro_packet d_gyro = update_gyro_isr();
 
     #if (GYRO_RANGE == 1000)
     // for sensitivity == +- 1000 degree per sec.
-    d_roll  = (d_roll_raw  + corr_roll ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-    d_pitch = (d_pitch_raw + corr_pitch) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-    d_yaw   = (d_yaw_raw   + corr_yaw  ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+    d_roll  = (d_gyro.d_roll_raw  - corr_roll ) / 32800000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_pitch = (d_gyro.d_pitch_raw - corr_pitch) / 32800000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_yaw   = (d_gyro.d_yaw_raw   - corr_yaw  ) / 32800000.0 * d_gyro.d_time; // angle change per sec * time past in secs
     #elif (GYRO_RANGE == 2000)
     // for sensitivity == +- 2000 degree per sec.
-    d_roll  = (d_roll_raw  + corr_roll ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
-    d_pitch = (d_pitch_raw + corr_pitch) / 16400000.0 * t_diff; // angle change per sec * time past in secs
-    d_yaw   = (d_yaw_raw   + corr_yaw  ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
+    d_roll  = (d_gyro.d_roll_raw  - corr_roll ) / 16400000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_pitch = (d_gyro.d_pitch_raw - corr_pitch) / 16400000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_yaw   = (d_gyro.d_yaw_raw   - corr_yaw  ) / 16400000.0 * d_gyro.d_time; // angle change per sec * time past in secs
     #endif
 
     const double d_roll_rad_div_2  = PI / 360.0 * d_roll;
     const double d_pitch_rad_div_2 = PI / 360.0 * d_pitch;
     const double d_yaw_rad_div_2   = PI / 360.0 * d_yaw;
     // delta Quaternion
-    // a little note that sin(pi - theta) == sin(theta), and cos(-theta) == cos(theta)
+    // Quaternion_of_that_angle == cos(d_angle / 2) + (i or j or k)sin(d_angle / 2)
     const double
         cy = cos(d_yaw_rad_div_2),
         sy = sin(d_yaw_rad_div_2),
@@ -179,16 +168,42 @@ void yh::rec::Mpu_6500::update_gyro () {
         sp = sin(d_pitch_rad_div_2),
         cr = cos(d_roll_rad_div_2),
         sr = sin(d_roll_rad_div_2);
+
+    // Given that: pow(e, ix) == cos(x) + i sin(x),
+    //  (cos(y) + k sin(y))(cos(p) + j sin(p))(cos(r) + i sin(r))
+    // == cos(y) * cos(p) * cos(r) + k sin(y) * j sin(p) * i sin(r)
+    //  + cos(y) * cos(p) * i sin(r) + k sin(y) * j sin(p) * cos(r)
+    //  + cos(y) * j sin(p) * cos(r) + k sin(y) * cos(p) * i sin(r)
+    //  + k sin(y) * cos(p) * cos(r) + cos(y) * j sin(p) * i sin(r)
+
+    // == cos(y) * cos(p) * cos(r) + kji sin(y) * sin(p) * sin(r)
+    //  + i cos(y) * cos(p) * sin(r) + kj sin(y) * sin(p) * cos(r)
+    //  + j cos(y) * sin(p) * cos(r) + ki sin(y) * cos(p) * sin(r)
+    //  + k sin(y) * cos(p) * cos(r) + ji cos(y) * sin(p) * sin(r)
+
+    // == cos(y) * cos(p) * cos(r) + (+1) sin(y) * sin(p) * sin(r)
+    //  + i cos(y) * cos(p) * sin(r) + (-i) sin(y) * sin(p) * cos(r)
+    //  + j cos(y) * sin(p) * cos(r) + (j) sin(y) * cos(p) * sin(r)
+    //  + k sin(y) * cos(p) * cos(r) + (-k) cos(y) * sin(p) * sin(r)
+
+    // == cos(y) * cos(p) * cos(r) + sin(y) * sin(p) * sin(r)
+    //  + i cos(y) * cos(p) * sin(r) - i sin(y) * sin(p) * cos(r)
+    //  + j cos(y) * sin(p) * cos(r) + j sin(y) * cos(p) * sin(r)
+    //  + k sin(y) * cos(p) * cos(r) - k cos(y) * sin(p) * sin(r)
+
+    // == cos(y) * cos(p) * cos(r) + sin(y) * sin(p) * sin(r)
+    //  + (cos(y) * cos(p) * sin(r) - sin(y) * sin(p) * cos(r))i
+    //  + (cos(y) * sin(p) * cos(r) + sin(y) * cos(p) * sin(r))j
+    //  + (sin(y) * cos(p) * cos(r) - cos(y) * sin(p) * sin(r))k
     q *= Quaternion
     (
-        cr * cp * cy + sr * sp * sy,
-        sr * cp * cy - cr * sp * sy,
-        cr * sp * cy + sr * cp * sy,
-        cr * cp * sy - sr * sp * cy  // this is the rotation expressed in quaternions
+        cy * cp * cr + sy * sp * sr,
+        cy * cp * sr - sy * sp * cr,
+        cy * sp * cr + sy * cp * sr,
+        sy * cp * cr - cy * sp * sr  // this is the rotation expressed in quaternions
     );
     q.normalize();
 
-    prev_micros_reading += t_diff;
 }
 
 double yh::rec::Mpu_6500::get_roll () {

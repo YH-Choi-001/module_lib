@@ -552,4 +552,71 @@ SET_TIMER_16bit_WGM_MODE(5)
 
 #undef SET_TIMER_16bit_WGM_MODE
 
+void delay_1_microsecond () __attribute__ ((__always_inline__));
+
+void delay_1_microsecond () {
+  #ifdef F_CPU
+    #if F_CPU >= 1000000UL
+      __asm__ __volatile__ (
+        #if F_CPU >= 16000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 15000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 14000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 13000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 12000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 11000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 10000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 9000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 8000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 7000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 6000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 5000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 4000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 3000000UL
+          "nop\n\t"
+        #endif
+        #if F_CPU >= 2000000UL
+          "nop\n\t"
+        #endif
+        // #if F_CPU >= 1000000UL
+          "nop\n\t"
+        // #endif
+        ::
+      );
+    #else // F_CPU < 1000000UL
+      return;
+    #endif
+  #else // !defined(F_CPU)
+    __asm__ __volatile__ (
+      "nop\n\t"
+      ::
+    );
+  #endif
+}
+
 #endif // #ifndef TIMER_INT_H

@@ -100,9 +100,9 @@ void yh::rec::Mpu_6050::cal_gyro (const uint32_t sampling_amount, void (*updatin
         Wire.write(static_cast<uint8_t>(0x43)); // accessing the registers of gyroscope x, y, z, where each axis has 2 bytes, from 0x43 to 0x48
         Wire.endTransmission();
         if (Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U)) == static_cast<uint8_t>(6U)) {
-            corr_roll  -= static_cast<double>( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() );
-            corr_pitch -= static_cast<double>( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() );
-            corr_yaw   -= static_cast<double>( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() );
+            corr_roll  += static_cast<double>( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() );
+            corr_pitch += static_cast<double>( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() );
+            corr_yaw   += static_cast<double>( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() );
             if (updating_function)
                 updating_function();
         }
@@ -130,14 +130,14 @@ void yh::rec::Mpu_6050::update_gyro () {
 
         #if (GYRO_RANGE == 1000)
         // for sensitivity == +- 1000 degree per sec.
-        d_roll  = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) + corr_roll    ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-        d_pitch = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) + corr_pitch   ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
-        d_yaw   = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) + corr_yaw     ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+        d_roll  = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_roll    ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+        d_pitch = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_pitch   ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
+        d_yaw   = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_yaw     ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
         #elif (GYRO_RANGE == 2000)
         // for sensitivity == +- 2000 degree per sec.
-        d_roll  = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) + corr_roll    ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
-        d_pitch = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) + corr_pitch   ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
-        d_yaw   = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) + corr_yaw     ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
+        d_roll  = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_roll    ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
+        d_pitch = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_pitch   ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
+        d_yaw   = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_yaw     ) / 16400000.0 * t_diff; // angle change per sec * time past in secs
         #endif
 
         const double d_roll_rad_div_2  = PI / 360.0 * d_roll;

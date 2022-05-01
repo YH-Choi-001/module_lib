@@ -44,7 +44,54 @@ namespace yh {
 
                 Quaternion (const Quaternion &init) : w(init.w), x(init.x), y(init.y), z(init.z) { }
 
-                Quaternion (double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
+                Quaternion (const double nw, const double nx, const double ny, const double nz) : w(nw), x(nx), y(ny), z(nz) { }
+
+                Quaternion (const Euler_angle &init) {
+                    const double d_roll_rad_div_2  = PI / 360.0 * init.roll;
+                    const double d_pitch_rad_div_2 = PI / 360.0 * init.pitch;
+                    const double d_yaw_rad_div_2   = PI / 360.0 * init.yaw;
+                    // delta Quaternion
+                    // a little note that sin(pi - theta) == sin(theta), and cos(-theta) == cos(theta)
+                    const double
+                        cy = cos(d_yaw_rad_div_2),
+                        sy = sin(d_yaw_rad_div_2),
+                        cp = cos(d_pitch_rad_div_2),
+                        sp = sin(d_pitch_rad_div_2),
+                        cr = cos(d_roll_rad_div_2),
+                        sr = sin(d_roll_rad_div_2);
+
+                    // Given that: pow(e, ix) == cos(x) + i sin(x),
+                    //  (cos(y) + k sin(y))(cos(p) + j sin(p))(cos(r) + i sin(r))
+                    // == cos(y) * cos(p) * cos(r) + k sin(y) * j sin(p) * i sin(r)
+                    //  + cos(y) * cos(p) * i sin(r) + k sin(y) * j sin(p) * cos(r)
+                    //  + cos(y) * j sin(p) * cos(r) + k sin(y) * cos(p) * i sin(r)
+                    //  + k sin(y) * cos(p) * cos(r) + cos(y) * j sin(p) * i sin(r)
+
+                    // == cos(y) * cos(p) * cos(r) + kji sin(y) * sin(p) * sin(r)
+                    //  + i cos(y) * cos(p) * sin(r) + kj sin(y) * sin(p) * cos(r)
+                    //  + j cos(y) * sin(p) * cos(r) + ki sin(y) * cos(p) * sin(r)
+                    //  + k sin(y) * cos(p) * cos(r) + ji cos(y) * sin(p) * sin(r)
+
+                    // == cos(y) * cos(p) * cos(r) + (+1) sin(y) * sin(p) * sin(r)
+                    //  + i cos(y) * cos(p) * sin(r) + (-i) sin(y) * sin(p) * cos(r)
+                    //  + j cos(y) * sin(p) * cos(r) + (j) sin(y) * cos(p) * sin(r)
+                    //  + k sin(y) * cos(p) * cos(r) + (-k) cos(y) * sin(p) * sin(r)
+
+                    // == cos(y) * cos(p) * cos(r) + sin(y) * sin(p) * sin(r)
+                    //  + i cos(y) * cos(p) * sin(r) - i sin(y) * sin(p) * cos(r)
+                    //  + j cos(y) * sin(p) * cos(r) + j sin(y) * cos(p) * sin(r)
+                    //  + k sin(y) * cos(p) * cos(r) - k cos(y) * sin(p) * sin(r)
+
+                    // == cos(y) * cos(p) * cos(r) + sin(y) * sin(p) * sin(r)
+                    //  + (cos(y) * cos(p) * sin(r) - sin(y) * sin(p) * cos(r))i
+                    //  + (cos(y) * sin(p) * cos(r) + sin(y) * cos(p) * sin(r))j
+                    //  + (sin(y) * cos(p) * cos(r) - cos(y) * sin(p) * sin(r))k
+
+                    w = cy * cp * cr + sy * sp * sr;
+                    x = cy * cp * sr - sy * sp * cr;
+                    y = cy * sp * cr + sy * cp * sr;
+                    z = sy * cp * cr - cy * sp * sr;
+                }
 
                 inline void operator = (const Quaternion rhs) {
                     this->w = rhs.w;
@@ -78,6 +125,16 @@ namespace yh {
         };
 
         Quaternion operator * (const Quaternion lhs, const Quaternion rhs);
+
+
+        typedef int16_t i_sin_type;
+        #define INT_MUL_CONST 32767
+
+        i_sin_type i_sin_raw (int16_t angle_in_degrees);
+
+        double sin (double angle_in_degrees);
+
+        double cos (double angle_in_degrees);
 
     }
 }

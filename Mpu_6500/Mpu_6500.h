@@ -80,7 +80,26 @@ namespace yh {
 
                 Quaternion (const Quaternion &init) : w(init.w), x(init.x), y(init.y), z(init.z) { }
 
-                Quaternion (double nw, double nx, double ny, double nz) : w(nw), x(nx), y(ny), z(nz) { }
+                Quaternion (const double nw, const double nx, const double ny, const double nz) : w(nw), x(nx), y(ny), z(nz) { }
+
+                Quaternion (const double roll, const double pitch, const double yaw) {
+                    const double d_roll_rad_div_2  = PI / 360.0 * roll;
+                    const double d_pitch_rad_div_2 = PI / 360.0 * pitch;
+                    const double d_yaw_rad_div_2   = PI / 360.0 * yaw;
+                    // delta Quaternion
+                    // a little note that sin(pi - theta) == sin(theta), and cos(-theta) == cos(theta)
+                    const double
+                        cy = cos(d_yaw_rad_div_2),
+                        sy = sin(d_yaw_rad_div_2),
+                        cp = cos(d_pitch_rad_div_2),
+                        sp = sin(d_pitch_rad_div_2),
+                        cr = cos(d_roll_rad_div_2),
+                        sr = sin(d_roll_rad_div_2);
+                    w = cr * cp * cy + sr * sp * sy;
+                    x = sr * cp * cy - cr * sp * sy;
+                    y = cr * sp * cy + sr * cp * sy;
+                    z = cr * cp * sy - sr * sp * cy;
+                }
 
                 inline void operator = (const Quaternion rhs) {
                     this->w = rhs.w;
@@ -115,6 +134,16 @@ namespace yh {
 
         Quaternion operator * (const Quaternion lhs, const Quaternion rhs);
 
+        struct Gyro_packet {
+            int16_t
+                d_roll_raw,
+                d_pitch_raw,
+                d_yaw_raw;
+            unsigned long
+                d_time;
+        };
+
+        #define MPU_6500_READ_BIT (0x80)
         // this class has been customized for RCJ soccer robots use only
         class Mpu_6500 {
             private:
@@ -164,7 +193,20 @@ namespace yh {
                 // resets the roll, pitch and yaw values
                 void reset_gyro ();
                 // the isr that is optimized to be very short
-                void update_gyro_isr (int16_t *const d_roll_raw, int16_t *const d_pitch_raw, int16_t *const d_yaw_raw);
+                const Gyro_packet update_gyro_isr () __attribute__((__always_inline__)) {
+                    Gyro_packet temp;
+                    temp.d_time = micros() - prev_micros_reading;
+                    (*cs_pin_output_reg) &= (~cs_pin_mask); // CS pin set to LOW
+                    SPI.beginTransaction(SPI_read_sensor_reg_settings); // talk to MPU-6500
+                    SPI.transfer(MPU_6500_READ_BIT | static_cast<uint8_t>(0x43)); // accessing the registers of gyroscope x, y, z, where each axis has 2 bytes, from 0x43 to 0x48
+                    temp.d_roll_raw  = ((static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00));
+                    temp.d_pitch_raw = ((static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00));
+                    temp.d_yaw_raw   = ((static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00));
+                    SPI.endTransaction();
+                    (*cs_pin_output_reg) |= cs_pin_mask; // CS pin set to HIGH
+                    prev_micros_reading += temp.d_time;
+                    return temp;
+                }
                 // gets 6 bytes from gyroscope (uses calibrated data to correct)
                 // this function consumes 2000 - 2150 microseconds in FAST I2C MODE
                 void update_gyro ();
