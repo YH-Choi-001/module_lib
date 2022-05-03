@@ -129,10 +129,10 @@ void yh::rec::Mpu_6500::cal_gyro (const uint32_t sampling_amount, void (*updatin
         corr_roll  += static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
         corr_pitch += static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
         corr_yaw   += static_cast<double>( (static_cast<int16_t>(SPI.transfer(0x00)) << 8) | SPI.transfer(0x00) );
-        if (updating_function)
-            updating_function();
         SPI.endTransaction();
         (*cs_pin_output_reg) |= cs_pin_mask; // CS pin set to HIGH
+        if (updating_function)
+            updating_function();
         delayMicroseconds(4);
     }
     corr_roll  /= static_cast<double>(sampling_amount);
