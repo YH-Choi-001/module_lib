@@ -3,8 +3,10 @@
 
 #include "Mpu_6500.h"
 
+// #define GYRO_RANGE 250
+// #define GYRO_RANGE 500
 // #define GYRO_RANGE 1000
-#define GYRO_RANGE 2000
+#define GYRO_RANGE 2000 // selects the largest range to minimize chance of error when the referee lifts up the robot during match
 
 yh::rec::Quaternion operator * (const yh::rec::Quaternion lhs, const yh::rec::Quaternion rhs) {
 
@@ -81,7 +83,11 @@ void yh::rec::Mpu_6500::begin () {
     (*cs_pin_output_reg) &= (~cs_pin_mask); // CS pin set to LOW
     SPI.beginTransaction(SPI_general_settings); // talk to MPU-6500
     SPI.transfer(static_cast<uint8_t>(0x1B)); // accessing the register 1B - Gyroscope Configuration
-    #if (GYRO_RANGE == 1000)
+    #if (GYRO_RANGE == 250)
+    SPI.transfer(static_cast<uint8_t>(0b00000000)); // setting the gyro to scale +/- 250deg./s (0 of [0:3])
+    #elif (GYRO_RANGE == 500)
+    SPI.transfer(static_cast<uint8_t>(0b00001000)); // setting the gyro to scale +/- 500deg./s (1 of [0:3])
+    #elif (GYRO_RANGE == 1000)
     SPI.transfer(static_cast<uint8_t>(0b00010000)); // setting the gyro to scale +/- 1000deg./s (2 of [0:3]) assume that the robot cannot rotate more than 2.5 circles per second
     #elif (GYRO_RANGE == 2000)
     SPI.transfer(static_cast<uint8_t>(0b00011000)); // setting the gyro to scale +/- 2000deg./s (3 of [0:3]) to minimize chance of error when the referee lifts up the robot during match
@@ -144,7 +150,17 @@ void yh::rec::Mpu_6500::reset_gyro () {
 void yh::rec::Mpu_6500::update_gyro () {
     const Gyro_packet d_gyro = update_gyro_isr();
 
-    #if (GYRO_RANGE == 1000)
+    #if (GYRO_RANGE == 250)
+    // for sensitivity == +- 250 degree per sec.
+    d_roll  = (d_gyro.d_roll_raw  - corr_roll ) / 131000000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_pitch = (d_gyro.d_pitch_raw - corr_pitch) / 131000000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_yaw   = (d_gyro.d_yaw_raw   - corr_yaw  ) / 131000000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    #elif (GYRO_RANGE == 500)
+    // for sensitivity == +- 500 degree per sec.
+    d_roll  = (d_gyro.d_roll_raw  - corr_roll ) / 65500000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_pitch = (d_gyro.d_pitch_raw - corr_pitch) / 65500000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    d_yaw   = (d_gyro.d_yaw_raw   - corr_yaw  ) / 65500000.0 * d_gyro.d_time; // angle change per sec * time past in secs
+    #elif (GYRO_RANGE == 1000)
     // for sensitivity == +- 1000 degree per sec.
     d_roll  = (d_gyro.d_roll_raw  - corr_roll ) / 32800000.0 * d_gyro.d_time; // angle change per sec * time past in secs
     d_pitch = (d_gyro.d_pitch_raw - corr_pitch) / 32800000.0 * d_gyro.d_time; // angle change per sec * time past in secs
