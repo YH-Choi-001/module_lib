@@ -58,8 +58,8 @@ void yh::rec::Mpu_6500::begin () {
     pinMode(MISO, INPUT);
     cs_pin_output_reg = portOutputRegister(digitalPinToPort(cs_pin));
     cs_pin_mask = digitalPinToBitMask(cs_pin);
-    SPI.begin();
     (*cs_pin_output_reg) |= cs_pin_mask; // CS pin set to HIGH
+    SPI.begin();
     delayMicroseconds(1); // 1 us == 1000 ns
 
     // burst write is supported, so we use burst write to configure register 6A - 6C.
