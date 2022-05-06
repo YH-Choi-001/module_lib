@@ -21,14 +21,4 @@ void yh::rec::Mcp_3008::begin () {
     SPI.begin();
 }
 
-uint16_t yh::rec::Mcp_3008::analog_read (const uint8_t channel) {
-    (*cs_pin_out_reg) &= (~cs_pin_mask);
-    SPI.beginTransaction(spi_settings);
-    SPI.transfer(0x01); // transfer START bit
-    const uint16_t result = ((SPI.transfer(0x80 | (channel << 4)) & 0x03) << 8) | SPI.transfer(0x00); // 0x80 selects single channel
-    SPI.endTransaction();
-    (*cs_pin_out_reg) |= cs_pin_mask;
-    return result;
-}
-
 #endif // #ifndef MCP_3008_CPP

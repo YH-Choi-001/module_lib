@@ -54,8 +54,7 @@ ISR (PCINT0_vect) {
     #define PINx_for_GROUP (PINB)
     static uint8_t prev_PINx_state = PINx_for_GROUP;
     const uint8_t changed_pins = PINx_for_GROUP ^ prev_PINx_state;
-    for (uint8_t i = 0; i < 8; i++) {
-        const uint8_t mask = (1 << i);
+    for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (changed_pins & PCMSK0 & mask) {
             switch
             (
@@ -98,12 +97,11 @@ ISR (PCINT1_vect) {
     #define PCINT_GROUP (1)
     // WARNING: PCINT1 takes PE0 pin as 0th pin of the PCINT GROUP, and takes PJ0 to PJ6 as 1th to 6th pin of the PCINT GROUP
     // They are not of the same port
-    // #define PINx_for_GROUP ((PINE & 0x80) | (PINJ >> 1)) // PE0 for 0, PJ0 to PJ6 for 1 to 7
-    const uint8_t PINx_for_GROUP = ((PINE & 0x80) | (PINJ >> 1)); // PE0 for 0, PJ0 to PJ6 for 1 to 7
-    static uint8_t prev_pcint_group_state = PINx_for_GROUP;
+    // #define PINx_for_GROUP ((PINE & 0x01) | (PINJ << 1)) // PE0 for 0, PJ0 to PJ6 for 1 to 7
+    const uint8_t PINx_for_GROUP = ((PINE & 0x01) | (PINJ << 1)); // PE0 for 0, PJ0 to PJ6 for 1 to 7
+    static uint8_t prev_PINx_state = PINx_for_GROUP;
     const uint8_t changed_pins = PINx_for_GROUP ^ prev_PINx_state;
-    for (uint8_t i = 0; i < 8; i++) {
-        const uint8_t mask = (1 << i);
+    for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (changed_pins & PCMSK1 & mask) {
             switch
             (
@@ -113,7 +111,7 @@ ISR (PCINT1_vect) {
             )
             {
                 case LOW:
-                    while (!( ((PINE & 0x80) | (PINJ >> 1)) & mask )) {
+                    while (!( ((PINE & 0x01) | (PINJ << 1)) & mask )) {
                         pcint_isr_ptr[PCINT_GROUP][i]();
                     }
                     break;
@@ -147,8 +145,7 @@ ISR (PCINT2_vect) {
     #define PINx_for_GROUP (PINK)
     static uint8_t prev_PINx_state = PINx_for_GROUP;
     const uint8_t changed_pins = PINx_for_GROUP ^ prev_PINx_state;
-    for (uint8_t i = 0; i < 8; i++) {
-        const uint8_t mask = (1 << i);
+    for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (changed_pins & PCMSK2 & mask) {
             switch
             (
@@ -196,8 +193,7 @@ ISR (PCINT0_vect) {
     #define PINx_for_GROUP (PINB)
     static uint8_t prev_PINx_state = PINx_for_GROUP;
     const uint8_t changed_pins = PINx_for_GROUP ^ prev_PINx_state;
-    for (uint8_t i = 0; i < 8; i++) {
-        const uint8_t mask = (1 << i);
+    for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (changed_pins & PCMSK0 & mask) {
             switch
             (
@@ -241,8 +237,7 @@ ISR (PCINT1_vect) {
     #define PINx_for_GROUP (PINC)
     static uint8_t prev_PINx_state = PINx_for_GROUP;
     const uint8_t changed_pins = PINx_for_GROUP ^ prev_PINx_state;
-    for (uint8_t i = 0; i < 8; i++) {
-        const uint8_t mask = (1 << i);
+    for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (changed_pins & PCMSK1 & mask) {
             switch
             (
@@ -286,8 +281,7 @@ ISR (PCINT2_vect) {
     #define PINx_for_GROUP (PIND)
     static uint8_t prev_PINx_state = PINx_for_GROUP;
     const uint8_t changed_pins = PINx_for_GROUP ^ prev_PINx_state;
-    for (uint8_t i = 0; i < 8; i++) {
-        const uint8_t mask = (1 << i);
+    for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (changed_pins & PCMSK2 & mask) {
             // this pin has changed
             switch
