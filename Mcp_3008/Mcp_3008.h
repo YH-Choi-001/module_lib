@@ -9,6 +9,16 @@
 
 namespace yh {
     namespace rec {
+        //                  +-\/-+
+        //            CH0  1|    |16  VDD
+        //            CH1  2|    |15  VREF
+        //            CH2  3|    |14  AGND
+        //            CH3  4|    |13  CLK
+        //            CH4  5|    |12  DOUT
+        //            CH5  6|    |11  DIN
+        //            CH6  7|    |10  CS/SHDN
+        //            CH7  8|    |9   DGND
+        //                  +----+
         class Mcp_3008 {
             private:
                 //

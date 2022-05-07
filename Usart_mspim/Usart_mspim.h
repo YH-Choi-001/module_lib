@@ -1,3 +1,6 @@
+// see datasheet of ATmega1280 | ATmega2560
+// https://ww1.microchip.com/downloads/en/devicedoc/atmel-2549-8-bit-avr-microcontroller-atmega640-1280-1281-2560-2561_datasheet.pdf#G14.1002704
+
 #ifndef USART_MSPIM_H
 #define USART_MSPIM_H __DATE__ ", " __TIME__
 
