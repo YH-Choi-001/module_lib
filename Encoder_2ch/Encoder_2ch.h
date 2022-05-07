@@ -407,6 +407,11 @@ namespace yh {
                     prev_A_state = curr_A_state;
                     prev_B_state = curr_B_state;
                 }
+                // gets the instantaneous velocity of the encoder
+                // the value of instantaneous_velocity increases as request_log_len in constructor increases
+                inline double get_instantaneous_velocity () __attribute__((__always_inline__)) {
+                    return ( ((micros() - prev_time) > (84 * 255 / 2)) ? 0 : instantaneous_velocity );
+                }
         };
     }
 }
