@@ -20,7 +20,7 @@ class USART_MSPIM_Settings {
     private:
         uint8_t ubrrn, ucsrnc;
         friend class yh::rec::Usart_mspim;
-    public: 
+    public:
         USART_MSPIM_Settings (uint32_t clock, uint8_t bitOrder, uint8_t dataMode) __attribute__((__always_inline__)) {
             ubrrn = F_CPU / 2 / clock - 1;
             switch (dataMode) {
