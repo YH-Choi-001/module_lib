@@ -367,43 +367,37 @@
 
 namespace yh {
     namespace rec {
-        class Usart_mspim;
-    }
-}
-
-class USART_MSPIM_Settings {
-    private:
-        uint16_t ubrrn;
-        uint8_t ucsrnc;
-        friend class yh::rec::Usart_mspim;
-    public:
-        USART_MSPIM_Settings (uint32_t clock, uint8_t bitOrder, uint8_t dataMode) __attribute__((__always_inline__)) {
-            ubrrn = F_CPU / 2 / clock - 1;
-            switch (dataMode) {
-                case SPI_MODE0: // CPOL == 0, CPHA == 0
-                    ucsrnc = 0;
-                    break;
-                case SPI_MODE1: // CPOL == 0, CPHA == 1
-                    ucsrnc = (1 << UCPHA0);
-                    break;
-                case SPI_MODE2: // CPOL == 1, CPHA == 0
-                    ucsrnc = (1 << UCPOL0);
-                    break;
-                case SPI_MODE3: // CPOL == 1, CPHA == 1
-                    ucsrnc = (1 << UCPOL0) | (1 << UCPHA0);
-                    break;
-                default:
-                    ucsrnc = 0;
-                    break;
-            }
-            if (bitOrder == LSBFIRST)
-                ucsrnc |= (1 << UDORD0);
-        }
-};
-
-namespace yh {
-    namespace rec {
-        class Usart_mspim {
+        class USART_MSPIM_Class;
+        class USART_MSPIM_Settings {
+            private:
+                uint16_t ubrrn;
+                uint8_t ucsrnc;
+                friend class USART_MSPIM_Class;
+            public:
+                USART_MSPIM_Settings (uint32_t clock, uint8_t bitOrder, uint8_t dataMode) __attribute__((__always_inline__)) {
+                    ubrrn = F_CPU / 2 / clock - 1;
+                    switch (dataMode) {
+                        case SPI_MODE0: // CPOL == 0, CPHA == 0
+                            ucsrnc = 0;
+                            break;
+                        case SPI_MODE1: // CPOL == 0, CPHA == 1
+                            ucsrnc = (1 << UCPHA0);
+                            break;
+                        case SPI_MODE2: // CPOL == 1, CPHA == 0
+                            ucsrnc = (1 << UCPOL0);
+                            break;
+                        case SPI_MODE3: // CPOL == 1, CPHA == 1
+                            ucsrnc = (1 << UCPOL0) | (1 << UCPHA0);
+                            break;
+                        default:
+                            ucsrnc = 0;
+                            break;
+                    }
+                    if (bitOrder == LSBFIRST)
+                        ucsrnc |= (1 << UDORD0);
+                }
+        };
+        class USART_MSPIM_Class {
             private:
                 //
             protected:
@@ -423,7 +417,7 @@ namespace yh {
                 const uint8_t xckn_port_bit_mask;
             public:
                 // default constructor
-                Usart_mspim (
+                USART_MSPIM_Class (
                     volatile uint8_t *const init_ubrrn,
                     volatile uint8_t *const init_ucsrna,
                     volatile uint8_t *const init_ucsrnb,
@@ -471,7 +465,7 @@ namespace yh {
                     while (!((*ucsrna) & (1 << UDRE0))) {}
                     // send byte
                     (*udrn) = data;
-                    asm volatile ("nop");
+                    asm volatile("nop");
                     // wait for data-receiving complete
                     while (!((*ucsrna) & (1 << RXC0))) {}
                     const uint8_t received_data = (*udrn);
@@ -480,13 +474,45 @@ namespace yh {
                     (*ucsrna) |= (1 << TXC0); // clear the bit manually
                     return received_data;
                 }
+                // transfer 16 bits of data through the USART_MPSIM bus
+                inline uint16_t transfer16 (uint16_t data) {
+                    union { uint16_t val; struct { uint8_t lsb; uint8_t msb; }; } in, out;
+                    in.val = data;
+                    if (!((*ucsrnc) & (1 << UDORD0))) {
+                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                        (*udrn) = in.msb;                      // write msb data to tx buf
+                        asm volatile("nop");                   // nop
+                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        out.msb = (*udrn);                     // read msb data from rx buf
+                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                        (*udrn) = in.lsb;                      // write lsb data to tx buf
+                        asm volatile("nop");                   // nop
+                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        out.lsb = (*udrn);                     // read lsb data from rx buf
+                    } else {
+                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                        (*udrn) = in.lsb;                      // write lsb data to tx buf
+                        asm volatile("nop");                   // nop
+                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        out.lsb = (*udrn);                     // read lsb data from rx buf
+                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                        (*udrn) = in.msb;                      // write msb data to tx buf
+                        asm volatile("nop");                   // nop
+                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        out.msb = (*udrn);                     // read msb data from rx buf
+                    }
+                    while (!((*ucsrna) & (1 << TXC0))) {}     // wait for data-transmitting complete
+                    (*ucsrna) |= (1 << TXC0); // clear the bit manually
+                    return out.val;
+                }
+                // transfer an array of data through the USART_MPSIM bus
                 inline void transfer (uint8_t *const buf, const uint8_t len) {
                     for (uint8_t i = 0; i < len; i++) {
                         // wait for transmitter buffer empty
                         while (!((*ucsrna) & (1 << UDRE0))) {}
                         // send byte
                         (*udrn) = buf[i];
-                        asm volatile ("nop");
+                        asm volatile("nop");
                         // wait for data-receiving complete
                         while (!((*ucsrna) & (1 << RXC0))) {}
                         buf[i] = (*udrn);
@@ -497,13 +523,13 @@ namespace yh {
                 }
                 // This function is deprecated.  New applications should use
                 // beginTransaction() to configure USART_MSPIM settings.
-                inline void setBitOrder(uint8_t bitOrder) {
+                inline void setBitOrder (uint8_t bitOrder) {
                     if (bitOrder == LSBFIRST) (*ucsrnc) |= (1 << UDORD0);
                     else (*ucsrnc) &= ~(1 << UDORD0);
                 }
                 // This function is deprecated.  New applications should use
                 // beginTransaction() to configure USART_MSPIM settings.
-                inline void setDataMode(uint8_t dataMode) {
+                inline void setDataMode (uint8_t dataMode) {
                     switch (dataMode) {
                         case SPI_MODE0: // CPOL == 0, CPHA == 0
                             (*ucsrnc) &= ~(1 << UCPOL0);
@@ -569,14 +595,14 @@ namespace yh {
 #endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
-extern yh::rec::Usart_mspim USPI;
+extern yh::rec::USART_MSPIM_Class USPI;
 #endif
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-extern yh::rec::Usart_mspim USPI;
-extern yh::rec::Usart_mspim USPI1;
-extern yh::rec::Usart_mspim USPI2;
-extern yh::rec::Usart_mspim USPI3;
+extern yh::rec::USART_MSPIM_Class USPI;
+extern yh::rec::USART_MSPIM_Class USPI1;
+extern yh::rec::USART_MSPIM_Class USPI2;
+extern yh::rec::USART_MSPIM_Class USPI3;
 #endif
 
 #endif // #ifndef USART_MSPIM_H
