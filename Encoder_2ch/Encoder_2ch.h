@@ -419,14 +419,12 @@ namespace yh {
                 // the value of instantaneous_velocity increases as request_log_len in constructor increases
                 inline int16_t get_instantaneous_velocity () __attribute__((__always_inline__)) {
                     const unsigned long time_since_last_isr_ran = micros() - prev_time;
+                    if (time_since_last_isr_ran > max_waiting_time) // check if timeout
+                        return 0; // timeout, then return 0
                     uint8_t oldSREG = SREG;
                     noInterrupts();
-                    const int16_t to_return = (
-                        (time_since_last_isr_ran > max_waiting_time) ? // check if timeout
-                        0 // timeout, then return 0
-                        :
-                        instantaneous_velocity + instantaneous_acceleration * time_since_last_isr_ran // return v = u + at
-                    );
+                    const int16_t to_return = 
+                        instantaneous_velocity + instantaneous_acceleration * time_since_last_isr_ran; // return v = u + at
                     SREG = oldSREG;
                     return to_return;
                 }
