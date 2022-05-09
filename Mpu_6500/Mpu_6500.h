@@ -181,9 +181,9 @@ namespace yh {
                 double corr_roll, corr_pitch, corr_yaw;
                 // inits the digital pin connected to the nCS pin of the MPU-6500
                 Mpu_6500 (const uint8_t init_cs_pin) :
-                    sck_pin(SCK),
-                    mosi_pin(MOSI),
-                    miso_pin(MISO),
+                    sck_pin(typeid(SPI_class) == typeid(SPIClass) ? SCK : 0),
+                    mosi_pin(typeid(SPI_class) == typeid(SPIClass) ? MOSI : 0),
+                    miso_pin(typeid(SPI_class) == typeid(SPIClass) ? MISO : 0),
                     cs_pin(init_cs_pin),
                     SPI_general_settings((((F_CPU / 2) > 1000000U) ? 1000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, accessing all registers have a maximum of 1MHz clock rate
                     SPI_read_sensor_reg_settings((((F_CPU / 2) > 20000000U) ? 20000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, reading sensor and interrupt registers have a maximum of 20MHz clock rate
@@ -201,9 +201,9 @@ namespace yh {
 
                 // inits the digital pin connected to the nCS pin of the MPU-6500
                 Mpu_6500 (SPI_class *init_spi_ptr, const uint8_t init_sck_pin, const uint8_t init_mosi_pin, const uint8_t init_miso_pin, const uint8_t init_cs_pin) :
-                    sck_pin(init_sck_pin),
-                    mosi_pin(init_mosi_pin),
-                    miso_pin(init_miso_pin),
+                    sck_pin(typeid(SPI_class) == typeid(SPIClass) ? SCK : init_sck_pin),
+                    mosi_pin(typeid(SPI_class) == typeid(SPIClass) ? MOSI : init_mosi_pin),
+                    miso_pin(typeid(SPI_class) == typeid(SPIClass) ? MISO : init_miso_pin),
                     cs_pin(init_cs_pin),
                     SPI_general_settings((((F_CPU / 2) > 1000000U) ? 1000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, accessing all registers have a maximum of 1MHz clock rate
                     SPI_read_sensor_reg_settings((((F_CPU / 2) > 20000000U) ? 20000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, reading sensor and interrupt registers have a maximum of 20MHz clock rate
@@ -221,7 +221,7 @@ namespace yh {
 
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // configures the settings of the SPI bus and the chip
-                virtual void begin () {
+                void begin () {
                     pinMode(cs_pin, OUTPUT); // prioritized line
                     pinMode(sck_pin, OUTPUT);
                     pinMode(mosi_pin, OUTPUT);
@@ -481,6 +481,7 @@ namespace yh {
                 // so there is no need for us to bypass the MPU-6500 chip to access the other slaves through I2C.
                 // void enable_ext_i2c_slave_sensors ();
         };
+        typedef Mpu_6500<SPIClass, SPISettings> Mpu_6500_default_SPI;
     }
 }
 

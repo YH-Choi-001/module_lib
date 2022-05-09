@@ -571,7 +571,6 @@ namespace yh {
                 // This function is deprecated.  New applications should use
                 // beginTransaction() to configure USART_MSPIM settings.
                 inline void setClockDivider (const uint8_t clockDiv) {
-                    uint8_t freq = 0;
                     // UBRR0 = F_CPU / 2 / freq - 1;
                     switch (clockDiv) {
                         case SPI_CLOCK_DIV2:
@@ -603,6 +602,12 @@ namespace yh {
         };
     }
 }
+
+
+#if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
+#warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
+#warning If you insist to use USART_MSPIM, use Arduino Uno instead.
+#endif // #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
 #warning None of the XCKn pins on the Arduino Mega board are broken out.
