@@ -22,8 +22,8 @@
 
 
 
-#ifndef CUSTOM_GY9250_H
-#define CUSTOM_GY9250_H __DATE__ ", " __TIME__
+#ifndef MPU_9250_H
+#define MPU_9250_H __DATE__ ", " __TIME__
 
 #include "../Mpu_6050/Mpu_6050.h"
 
@@ -91,4 +91,4 @@ namespace yh {
     }
 }
 
-#endif // #ifndef CUSTOM_GY9250_H
+#endif // #ifndef MPU_9250_H

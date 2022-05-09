@@ -1,8 +1,8 @@
-#ifndef CUSTOM_GY9250_CPP
-#define CUSTOM_GY9250_CPP __DATE__ ", " __TIME__
+#ifndef MPU_9250_CPP
+#define MPU_9250_CPP __DATE__ ", " __TIME__
 
-#include "custom_gy9250.h"
-#include "../Mpu_6050/Mpu_6050.h"
+#include "Mpu_9250.h"
+#include "../Mpu_6050/Mpu_6050.cpp"
 
 yh::rec::Ak_8963::Ak_8963 (const uint8_t init_i2c_address) :
     i2c_address(init_i2c_address), ASA_X(0), ASA_Y(0), ASA_Z(0), max_x(0), max_y(0), max_z(0), min_x(0), min_y(0), min_z(0),
@@ -124,4 +124,4 @@ yh::rec::Mpu_9250::Mpu_9250 (const uint8_t init_i2c_address) :
     //
 }
 
-#endif // #ifndef CUSTOM_GY9250_CPP
+#endif // #ifndef MPU_9250_CPP
