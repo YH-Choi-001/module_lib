@@ -14,22 +14,4 @@ yh::rec::USART_MSPIM_Class USPI2 (&UBRR2, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2, &DDR
 yh::rec::USART_MSPIM_Class USPI3 (&UBRR3, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3, &DDRJ, (1 << 2));
 #endif
 
-void yh::rec::USART_MSPIM_Class::begin () {
-    // must be zero before enabling the transmitter
-    (*ubrrn) = 0;
-    (*ucsrna) = (1 << TXC0);  // any old transmit now complete (clear the bit by writing 1 to the bit location)
-    (*xckn_port_ddr) |= xckn_port_bit_mask;  // set XCK pin as output to enable master mode
-    (*ucsrnc) = (1 << UMSEL00) | (1 << UMSEL01);  // Master SPI mode, default SPI mode 0 and MSBFIRST
-    (*ucsrnb) = (1 << TXEN0) | (1 << RXEN0);  // transmit enable and receive enable, RX and TX and DR buf empty interrupts are disabled
-    // must be done last, see page 206
-    (*ubrrn) = F_CPU / 2 / 4000000 - 1; // clock frequency = default 4MHz
-}
-
-void yh::rec::USART_MSPIM_Class::end () {
-    (*ucsrna) = 0;
-    (*ucsrnb) = 0;
-    (*ucsrnc) = 0;
-    (*ubrrn) = 0;
-}
-
 #endif // #ifndef USART_MSPIM_CPP

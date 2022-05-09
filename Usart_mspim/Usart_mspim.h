@@ -375,7 +375,8 @@ namespace yh {
                 friend class USART_MSPIM_Class;
             public:
                 USART_MSPIM_Settings (uint32_t clock, uint8_t bitOrder, uint8_t dataMode) __attribute__((__always_inline__)) {
-                    ubrrn = F_CPU / 2 / clock - 1;
+                    const double ubrrn_double = F_CPU / 2 / static_cast<double>(clock) - 1;
+                    ubrrn = (ubrrn_double < 0) ? 0 : ceil(ubrrn_double);
                     switch (dataMode) {
                         case SPI_MODE0: // CPOL == 0, CPHA == 0
                             ucsrnc = 0;
@@ -440,9 +441,23 @@ namespace yh {
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 // You should call pinMode(4, OUTPUT); by yourself, to maintain compatibility
-                void begin ();
+                void begin () {
+                    // must be zero before enabling the transmitter
+                    (*ubrrn) = 0;
+                    (*ucsrna) = (1 << TXC0);  // any old transmit now complete (clear the bit by writing 1 to the bit location)
+                    (*xckn_port_ddr) |= xckn_port_bit_mask;  // set XCK pin as output to enable master mode
+                    (*ucsrnc) = (1 << UMSEL00) | (1 << UMSEL01);  // Master SPI mode, default SPI mode 0 and MSBFIRST
+                    (*ucsrnb) = (1 << TXEN0) | (1 << RXEN0);  // transmit enable and receive enable, RX and TX and DR buf empty interrupts are disabled
+                    // must be done last, see page 206
+                    (*ubrrn) = F_CPU / 2 / 4000000 - 1; // clock frequency = default 4MHz
+                }
                 // disables the USART_MSPIM bus
-                void end ();
+                void end () {
+                    (*ucsrna) = 0;
+                    (*ucsrnb) = 0;
+                    (*ucsrnc) = 0;
+                    (*ubrrn) = 0;
+                }
                 // This function is used to configure correct settings.
                 inline void beginTransaction (USART_MSPIM_Settings settings) {
                     // wait for transmitter buffer empty

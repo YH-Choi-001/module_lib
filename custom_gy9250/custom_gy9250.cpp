@@ -4,14 +4,14 @@
 #include "custom_gy9250.h"
 #include "../Mpu_6050/Mpu_6050.h"
 
-Custom_ak8963::Custom_ak8963 (const uint8_t init_i2c_address) :
+yh::rec::Ak_8963::Ak_8963 (const uint8_t init_i2c_address) :
     i2c_address(init_i2c_address), ASA_X(0), ASA_Y(0), ASA_Z(0), max_x(0), max_y(0), max_z(0), min_x(0), min_y(0), min_z(0),
     range_x(0), range_y(0), range_z(0), raw_x(0), raw_y(0), raw_z(0), rz_heading(0)
 {
     //
 }
 
-void Custom_ak8963::begin () {
+void yh::rec::Ak_8963::begin () {
     // init settings to the AK8963 module through I2C
     if (!(TWCR & _BV(TWEN))) { // if (TwoWireENable bit is off) { begin I2C communication }
         Wire.begin();
@@ -42,7 +42,7 @@ void Custom_ak8963::begin () {
     Wire.endTransmission();
 }
 
-inline void Custom_ak8963::update_raw () {
+inline void yh::rec::Ak_8963::update_raw () {
     // // refresh magnetometer
     Wire.beginTransmission(i2c_address); // talk to AK8963
     Wire.write(0x02); // accessing the register 0x02 - ST1 register
@@ -57,9 +57,9 @@ inline void Custom_ak8963::update_raw () {
                 // const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
                 // const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
                 // const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
-                const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * (ASA_X / 256.0 + 0.5);
-                const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * (ASA_Y / 256.0 + 0.5);
-                const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * (ASA_Z / 256.0 + 0.5);
+                const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ((ASA_X + 128) / 256.0);
+                const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ((ASA_Y + 128) / 256.0);
+                const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ((ASA_Z + 128) / 256.0);
                 if (!(Wire.read() & 0x10)) { // reading the ST2 register to check if magnetometer overflow has occured
                     // no overflow has occured
                     // update raw_x, raw_y, raw_z
@@ -72,7 +72,7 @@ inline void Custom_ak8963::update_raw () {
     }
 }
 
-uint8_t Custom_ak8963::who_i_am () {
+uint8_t yh::rec::Ak_8963::who_i_am () {
     Wire.beginTransmission(i2c_address); // talk to AK8963
     Wire.write(0x00); // accessing the register 0x00 - WIA register
     const uint8_t err = Wire.endTransmission();
@@ -82,7 +82,7 @@ uint8_t Custom_ak8963::who_i_am () {
     return 0;
 }
 
-void Custom_ak8963::single_calibrate () {
+void yh::rec::Ak_8963::single_calibrate () {
     update_raw();
     // update max values
     if (raw_x > max_x) max_x = raw_x;
@@ -98,28 +98,28 @@ void Custom_ak8963::single_calibrate () {
     range_z = max_z - min_z;
 }
 
-void Custom_ak8963::reset_heading () {
+void yh::rec::Ak_8963::reset_heading () {
     update_raw();
     const double
-        cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
-        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023;
-        // cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
-    rz_heading = atan2(cal_x, cal_y) / M_PI * 180;
+        cal_x = (raw_x - min_x) * 2046 / range_x - 1023,
+        cal_y = (raw_y - min_y) * 2046 / range_y - 1023;
+        // cal_z = (raw_z - min_z) * 2046 / range_z - 1023;
+    rz_heading = atan2(cal_x, cal_y) * RAD_TO_DEG;
 }
 
-double Custom_ak8963::get_heading () {
+double yh::rec::Ak_8963::get_heading () {
     update_raw();
     const double
-        cal_x = (raw_x - min_x) * 2046 / static_cast<double>(range_x) - 1023,
-        cal_y = (raw_y - min_y) * 2046 / static_cast<double>(range_y) - 1023;
-        // cal_z = (raw_z - min_z) * 2046 / static_cast<double>(range_z) - 1023;
-    double dir = atan2(cal_x, cal_y) / M_PI * 180 - rz_heading;
+        cal_x = (raw_x - min_x) * 2046 / range_x - 1023,
+        cal_y = (raw_y - min_y) * 2046 / range_y - 1023;
+        // cal_z = (raw_z - min_z) * 2046 / range_z - 1023;
+    double dir = atan2(cal_x, cal_y) * RAD_TO_DEG - rz_heading;
     while (dir < 0.0) { dir += 360.0; }
     return dir;
 }
 
-Custom_gy9250::Custom_gy9250 (const uint8_t init_i2c_address) :
-    Custom_gy521(init_i2c_address), mag(0x0C)
+yh::rec::Mpu_9250::Mpu_9250 (const uint8_t init_i2c_address) :
+    Mpu_6050(init_i2c_address), mag(0x0C)
 {
     //
 }

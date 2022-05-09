@@ -3,11 +3,6 @@
 
 #include "Mpu_6500.h"
 
-// #define GYRO_RANGE 250
-// #define GYRO_RANGE 500
-// #define GYRO_RANGE 1000
-#define GYRO_RANGE 2000 // selects the largest range to minimize chance of error when the referee lifts up the robot during match
-
 yh::rec::Quaternion operator * (const yh::rec::Quaternion lhs, const yh::rec::Quaternion rhs) {
 
     // definitions:
@@ -36,20 +31,7 @@ yh::rec::Quaternion operator * (const yh::rec::Quaternion lhs, const yh::rec::Qu
     );
 }
 
-yh::rec::Mpu_6500::Mpu_6500 (const uint8_t init_cs_pin) :
-    cs_pin(init_cs_pin),
-    SPI_general_settings(1000000U, MSBFIRST, SPI_MODE3), // according to datasheet, accessing all registers have a maximum of 1MHz clock rate
-    SPI_read_sensor_reg_settings(20000000U, MSBFIRST, SPI_MODE3), // according to datasheet, reading sensor and interrupt registers have a maximum of 20MHz clock rate
-    d_roll(0),
-    d_pitch(0),
-    d_yaw(0),
-    corr_roll(0),
-    corr_pitch(0),
-    corr_yaw(0),
-    q(1, 0, 0, 0)
-{
-    //
-}
+#if 0 // the following are moved to the header file, to maintain compatibility with the Usart_mspim library
 
 void yh::rec::Mpu_6500::begin () {
     pinMode(cs_pin, OUTPUT); // prioritized line
@@ -277,5 +259,7 @@ yh::rec::Euler_angle yh::rec::Mpu_6500::get_euler_angles () {
         atan2(2 * yaw_y_read, 2 * yaw_x_read - 1) * RAD_TO_DEG
     );
 }
+
+#endif
 
 #endif // #ifndef MPU_6500_CPP

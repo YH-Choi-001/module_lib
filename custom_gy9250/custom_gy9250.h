@@ -25,67 +25,70 @@
 #ifndef CUSTOM_GY9250_H
 #define CUSTOM_GY9250_H __DATE__ ", " __TIME__
 
-#include "../custom_gy521/custom_gy521.h"
+#include "../Mpu_6050/Mpu_6050.h"
 
-// this class has been customized for RCJ soccer robots use only
-class Custom_ak8963 {
-    private:
-        //
-    protected:
-        // the 7-bit I2C address of the chip [0x00:0x7f]
-        const uint8_t i2c_address;
-        // sensitivity adjustment value of the axes
-        // the correction ratio multiplied to every reading from the chip
-        uint8_t ASA_X, ASA_Y, ASA_Z;
-        // the mean of the max and min values read by each axis respectively
-        // used for compass purpose only
-        // you don't need this if you want to measure the strength of electromagnetic field only
-        //
-        int32_t max_x, max_y, max_z;
-        int32_t min_x, min_y, min_z;
-        int32_t range_x, range_y, range_z;
-        // the current value of the raw magnetic field strength
-        // note: must be a signed 16-bit integer
-        volatile int16_t raw_x, raw_y, raw_z;
-        // update raw x, y, z
-        inline void update_raw ();
-        // use this to do polling
-        // inline void polling_update_raw ();
-    public:
-        // the return-to-zero heading
-        double rz_heading;
-        // inits the 7-bit I2C address of the chip to init_i2c_address
-        Custom_ak8963 (const uint8_t init_i2c_address);
-        // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
-        // configures the settings of the I2C bus and the chip
-        void begin ();
+namespace yh {
+    namespace rec {
+        // this class has been customized for RCJ soccer robots use only
+        class Ak_8963 {
+            private:
+                //
+            protected:
+                // the 7-bit I2C address of the chip [0x00:0x7f]
+                const uint8_t i2c_address;
+                // sensitivity adjustment value of the axes
+                // the correction ratio multiplied to every reading from the chip
+                uint8_t ASA_X, ASA_Y, ASA_Z;
+                // maximum strength of electromagnetic field recorded at this place
+                int16_t max_x, max_y, max_z;
+                // the current value of the raw magnetic field strength
+                // note: must be a signed 16-bit integer
+                volatile int16_t raw_x, raw_y, raw_z;
+                // update raw x, y, z
+                inline void update_raw ();
+                // use this to do polling
+                // inline void polling_update_raw ();
+            public:
+                // minimum strength of electromagnetic field recorded at this place
+                int16_t min_x, min_y, min_z;
+                // range of strength of electromagnetic field recorded at this place
+                double range_x, range_y, range_z;
+                // the return-to-zero heading
+                double rz_heading;
+                // inits the 7-bit I2C address of the chip to init_i2c_address
+                Ak_8963 (const uint8_t init_i2c_address);
+                // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
+                // configures the settings of the I2C bus and the chip
+                void begin ();
 
-        // gets the WIA value to clarify whether this chip is ak8963
-        // if the chip is ak8963, the returned value should be 0x48
-        uint8_t who_i_am ();
+                // gets the WIA value to clarify whether this chip is ak8963
+                // if the chip is ak8963, the returned value should be 0x48
+                uint8_t who_i_am ();
 
-        // calibrates the magnetometer, and give the mean values to x_mean, y_mean, z_mean for compass usage
-        // ATTENTION: WHEN MAGNETOMETER CALIBRATION IS IN PROGRESS, SWING THE CHIP IN ALL DIRECTIONS OF X, Y AND Z.
-        void single_calibrate ();
+                // calibrates the magnetometer, and give the mean values to x_mean, y_mean, z_mean for compass usage
+                // ATTENTION: WHEN MAGNETOMETER CALIBRATION IS IN PROGRESS, SWING THE CHIP IN ALL DIRECTIONS OF X, Y AND Z.
+                void single_calibrate ();
 
-        // sets the current heading to 0
-        void reset_heading ();
+                // sets the current heading to 0
+                void reset_heading ();
 
-        // get heading of the chip
-        double get_heading ();
-};
+                // get heading of the chip
+                double get_heading ();
+        };
+        // this class has been customized for RCJ soccer robots use only
+        class Mpu_9250 : public Mpu_6050 {
+            private:
+                //
+            protected:
+                //
+            public:
+                // the AK-8963 magnetometer object inside the MPU-9250 chip
+                Ak_8963 mag;
+                //
+                Mpu_9250 (const uint8_t init_i2c_address);
+        };
 
-// this class has been customized for RCJ soccer robots use only
-class Custom_gy9250 : public Custom_gy521 {
-    private:
-        //
-    protected:
-        //
-    public:
-        //
-        Custom_ak8963 mag;
-        //
-        Custom_gy9250 (const uint8_t init_i2c_address);
-};
+    }
+}
 
 #endif // #ifndef CUSTOM_GY9250_H

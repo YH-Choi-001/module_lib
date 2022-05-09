@@ -44,12 +44,12 @@ namespace yh {
                     mosi_pin(MOSI),
                     miso_pin(MISO),
                     cs_pin(init_cs_pin),
-                    spi_ptr(&SPI),
-                    spi_settings(3600000UL, MSBFIRST, SPI_MODE0)
+                    spi_settings(3600000UL, MSBFIRST, SPI_MODE0),
+                    spi_ptr(typeid(SPI_class) == typeid(SPIClass) ? (&SPI) : ((SPI_class *)NULL))
                 {
                     //
                 }
-                // passes the CS pin into the constructor
+                // passes the SPI object, sck, mosi, miso, ss pins into the constructor
                 Mcp_3008 (SPI_class *init_spi_ptr, const uint8_t init_sck_pin, const uint8_t init_mosi_pin, const uint8_t init_miso_pin, const uint8_t init_cs_pin)
                 :
                     sck_pin(init_sck_pin),
