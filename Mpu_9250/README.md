@@ -1,8 +1,4 @@
-<!--# This library is still under development, thus is not available. Please do not use any code from this custom_gy9250 folder.  
-  
-## The code of this library are tested and proved to be successful, but this documentation is still being written. Please do not use any part of this library until this documentation is finished.  
-
--->
+<!-- Who told you to read this source code directly... Read it through GitHub. -->
 # You should use code only when you understand them  
 
 You may download this folder to ANYWHERE YOU LIKE in your local disk, and then open your Arduino IDE.  
