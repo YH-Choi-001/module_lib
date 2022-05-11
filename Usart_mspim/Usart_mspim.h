@@ -370,6 +370,7 @@ namespace yh {
         class USART_MSPIM_Class;
         class USART_MSPIM_Settings {
             private:
+            public:
                 uint16_t ubrrn;
                 uint8_t ucsrnc;
                 friend class USART_MSPIM_Class;
@@ -377,21 +378,20 @@ namespace yh {
                 USART_MSPIM_Settings (uint32_t clock, uint8_t bitOrder, uint8_t dataMode) __attribute__((__always_inline__)) {
                     const double ubrrn_double = F_CPU / 2 / static_cast<double>(clock) - 1;
                     ubrrn = (ubrrn_double < 0) ? 0 : ceil(ubrrn_double);
+                    ucsrnc = (1 << UMSEL00) | (1 << UMSEL01);
                     switch (dataMode) {
                         case SPI_MODE0: // CPOL == 0, CPHA == 0
-                            ucsrnc = 0;
                             break;
                         case SPI_MODE1: // CPOL == 0, CPHA == 1
-                            ucsrnc = (1 << UCPHA0);
+                            ucsrnc |= (1 << UCPHA0);
                             break;
                         case SPI_MODE2: // CPOL == 1, CPHA == 0
-                            ucsrnc = (1 << UCPOL0);
+                            ucsrnc |= (1 << UCPOL0);
                             break;
                         case SPI_MODE3: // CPOL == 1, CPHA == 1
-                            ucsrnc = (1 << UCPOL0) | (1 << UCPHA0);
+                            ucsrnc |= (1 << UCPOL0) | (1 << UCPHA0);
                             break;
                         default:
-                            ucsrnc = 0;
                             break;
                     }
                     if (bitOrder == LSBFIRST)
@@ -403,7 +403,7 @@ namespace yh {
                 //
             protected:
                 // USART MSPIM n baud rate register
-                volatile uint8_t *const ubrrn;
+                volatile uint16_t *const ubrrn;
                 // USART MSPIM n control and signal register A
                 volatile uint8_t *const ucsrna;
                 // USART MSPIM n control and signal register B
@@ -419,7 +419,7 @@ namespace yh {
             public:
                 // default constructor
                 USART_MSPIM_Class (
-                    volatile uint8_t *const init_ubrrn,
+                    volatile uint16_t *const init_ubrrn,
                     volatile uint8_t *const init_ucsrna,
                     volatile uint8_t *const init_ucsrnb,
                     volatile uint8_t *const init_ucsrnc,
@@ -461,9 +461,9 @@ namespace yh {
                 // This function is used to configure correct settings.
                 inline void beginTransaction (USART_MSPIM_Settings settings) {
                     // wait for transmitter buffer empty
-                    while (!((*ucsrna) & (1 << UDRE0))) {}
+                    // while (!((*ucsrna) & (1 << UDRE0))) {}
                     // wait for data-transmitting complete
-                    while (!((*ucsrna) & (1 << TXC0))) {}
+                    // while (!((*ucsrna) & (1 << TXC0))) {}
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     (*ucsrnc) = settings.ucsrnc;

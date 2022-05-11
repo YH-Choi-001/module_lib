@@ -181,9 +181,9 @@ namespace yh {
                 double corr_roll, corr_pitch, corr_yaw;
                 // inits the digital pin connected to the nCS pin of the MPU-6500
                 Mpu_6500 (const uint8_t init_cs_pin) :
-                    sck_pin(typeid(SPI_class) == typeid(SPIClass) ? SCK : 0),
-                    mosi_pin(typeid(SPI_class) == typeid(SPIClass) ? MOSI : 0),
-                    miso_pin(typeid(SPI_class) == typeid(SPIClass) ? MISO : 0),
+                    sck_pin(SCK),
+                    mosi_pin(MOSI),
+                    miso_pin(MISO),
                     cs_pin(init_cs_pin),
                     SPI_general_settings((((F_CPU / 2) > 1000000U) ? 1000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, accessing all registers have a maximum of 1MHz clock rate
                     SPI_read_sensor_reg_settings((((F_CPU / 2) > 20000000U) ? 20000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, reading sensor and interrupt registers have a maximum of 20MHz clock rate
@@ -194,16 +194,16 @@ namespace yh {
                     corr_pitch(0),
                     corr_yaw(0),
                     q(1, 0, 0, 0),
-                    spi_ptr(typeid(SPI_class) == typeid(SPIClass) ? (&SPI) : ((SPI_class *)NULL))
+                    spi_ptr((SPI_class *)(&SPI))
                 {
                     //
                 }
 
                 // inits the digital pin connected to the nCS pin of the MPU-6500
                 Mpu_6500 (SPI_class *init_spi_ptr, const uint8_t init_sck_pin, const uint8_t init_mosi_pin, const uint8_t init_miso_pin, const uint8_t init_cs_pin) :
-                    sck_pin(typeid(SPI_class) == typeid(SPIClass) ? SCK : init_sck_pin),
-                    mosi_pin(typeid(SPI_class) == typeid(SPIClass) ? MOSI : init_mosi_pin),
-                    miso_pin(typeid(SPI_class) == typeid(SPIClass) ? MISO : init_miso_pin),
+                    sck_pin(init_sck_pin),
+                    mosi_pin(init_mosi_pin),
+                    miso_pin(init_miso_pin),
                     cs_pin(init_cs_pin),
                     SPI_general_settings((((F_CPU / 2) > 1000000U) ? 1000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, accessing all registers have a maximum of 1MHz clock rate
                     SPI_read_sensor_reg_settings((((F_CPU / 2) > 20000000U) ? 20000000U : (F_CPU / 2)), MSBFIRST, SPI_MODE3), // according to datasheet, reading sensor and interrupt registers have a maximum of 20MHz clock rate
@@ -279,6 +279,7 @@ namespace yh {
                     const uint8_t who_am_i_value = spi_ptr->transfer(0x00);
                     spi_ptr->endTransaction();
                     (*cs_pin_output_reg) |= cs_pin_mask; // CS pin set to HIGH
+                    return who_am_i_value;
                 }
 
                 // gets 6 bytes from accelerometer
@@ -470,7 +471,7 @@ namespace yh {
                     return Euler_angle(
                         atan(gravity_y / sqrt(gravity_x * gravity_x + gravity_z * gravity_z)) * RAD_TO_DEG,
                         atan(gravity_x / sqrt(gravity_y * gravity_y + gravity_z * gravity_z)) * RAD_TO_DEG,
-                        yaw < 0 ? yaw + 360.0 : yaw;
+                        yaw < 0 ? yaw + 360.0 : yaw
                     );
                 }
 

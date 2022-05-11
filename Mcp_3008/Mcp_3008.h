@@ -40,11 +40,11 @@ namespace yh {
                 // passes the CS pin into the constructor
                 Mcp_3008 (const uint8_t init_cs_pin)
                 :
-                    sck_pin(typeid(SPI_class) == typeid(SPIClass) ? SCK : 0),
-                    mosi_pin(typeid(SPI_class) == typeid(SPIClass) ? MOSI : 0),
-                    miso_pin(typeid(SPI_class) == typeid(SPIClass) ? MISO : 0),
+                    sck_pin(SCK),
+                    mosi_pin(MOSI),
+                    miso_pin(MISO),
                     cs_pin(init_cs_pin),
-                    spi_ptr(typeid(SPI_class) == typeid(SPIClass) ? (&SPI) : ((SPI_class *)NULL)),
+                    spi_ptr((SPI_class *)(&SPI)),
                     spi_settings((((F_CPU / 2) > 3600000UL) ? 3600000UL : (F_CPU / 2)), MSBFIRST, SPI_MODE0)
                 {
                     //
@@ -52,9 +52,9 @@ namespace yh {
                 // passes the SPI object, sck, mosi, miso, ss pins into the constructor
                 Mcp_3008 (SPI_class *init_spi_ptr, const uint8_t init_sck_pin, const uint8_t init_mosi_pin, const uint8_t init_miso_pin, const uint8_t init_cs_pin)
                 :
-                    sck_pin(typeid(SPI_class) == typeid(SPIClass) ? SCK : init_sck_pin),
-                    mosi_pin(typeid(SPI_class) == typeid(SPIClass) ? MOSI : init_mosi_pin),
-                    miso_pin(typeid(SPI_class) == typeid(SPIClass) ? MISO : init_miso_pin),
+                    sck_pin(init_sck_pin),
+                    mosi_pin(init_mosi_pin),
+                    miso_pin(init_miso_pin),
                     cs_pin(init_cs_pin),
                     spi_ptr(init_spi_ptr),
                     spi_settings((((F_CPU / 2) > 3600000UL) ? 3600000UL : (F_CPU / 2)), MSBFIRST, SPI_MODE0)

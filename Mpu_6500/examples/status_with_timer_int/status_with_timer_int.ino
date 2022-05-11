@@ -1,12 +1,16 @@
 // Please do the following:
-// connect Vcc on GY-521 to 3.3V on arduino
-// connect Gnd on GY-521 to GND on arduino
-// connect SDA on GY-521 to SDA on arduino
-// connect SCL on GY-521 to SCL on arduino
+// connect Vcc     on GY-6500 to 3.3V on arduino
+// connect Gnd     on GY-6500 to GND  on arduino
+// connect SDA/SDI on GY-6500 to MOSI on arduino
+// connect SCL/SCK on GY-6500 to SCK  on arduino
+// connect AD0/SDO on GY-6500 to MISO on arduino
+// connect nCS     on GY-6500 to pin 10 on arduino
 
-#include <Mpu_6050.h>
+#include <Mpu_6500.h>
 
-yh::rec::Mpu_6050 mpu (0x68); // change argument to 0x69 if AD0 is HIGH
+yh::rec::Mpu_6500_default_SPI mpu (10); // input the CS pin
+
+yh::rec::Gyro_packet temp_gyro_packet;
 
 // copied from Timer_int.h
 inline int8_t setup_timer_1A_interrupt (const unsigned long us_per_interrupt, const uint16_t request_prescaler = 0);
@@ -27,34 +31,17 @@ void setup () {
     // calibrate the gyroscope
     mpu.cal_gyro(400, update_progress);
 
-    // note: it is suggested not to input a time interval that is less than 600 microseconds
-    // as update_gyro() takes 500 - 550 microseconds when you have set the I2C clock frequency to 400KHz
-    // note: it is suggested not to input a time interval that is less than 1300 microseconds
-    // as update_gyro() takes 1100 - 1200 microseconds when you have set the I2C clock frequency to 100KHz
-    // note: 400KHz frequency is selected by yh::rec::Mpu_6050::begin() method.
-    // configure the registers to set the timer interrupt in timer 1
-    // the 1000 here stands for calling the interrupt every 1000 microseconds
+    // note: it is suggested not to input a time interval that is less than 80 microseconds
+    // as update_gyro() takes 24 - 28 microseconds
+    // mpu.update_gyro_isr() takes 24 - 28 µs
+    // mpu.update_gyro(mpu.update_gyro_isr()) takes 1400 - 1600 µs
     setup_timer_1A_interrupt(1000);
 }
 
 void loop () {
 
-    // prints out the current heading of the chip
-    // calls yh::rec::Mpu_6050::update_gyro() method without arguments
-    // in order to use calibrated values for readings from yh::rec::Mpu_6050.cal_gyro()
-    #ifdef FIND_TIME_INTERVAL
-    const unsigned long prev = micros();
-    mpu.update_gyro();
-    const unsigned long dt = micros() - prev;
-    static unsigned long maxt = 0;
-    if (dt > maxt) maxt = dt;
-    Serial.print(dt);
-    Serial.print('\t');
-    Serial.println(maxt);
-    // from the data logged above,
-    // every update_gyro() call takes 1100 - 1200 us
-    // every timer interrupt should have at least 1300 us distance
-    #else // !defined(FIND_TIME_INTERVAL)
+    // update the gyroscope
+    mpu.update_gyro(temp_gyro_packet);
     Serial.print(mpu.d_roll);
     Serial.print('\t');
     Serial.print(mpu.d_pitch);
@@ -65,6 +52,7 @@ void loop () {
     Serial.print('\t');
     Serial.print(mpu.get_pitch());
     Serial.print('\t');
+    // prints out the current heading of the chip
     Serial.print(mpu.get_yaw());
     Serial.print('\n');
     #endif // !defined(FIND_TIME_INTERVAL)
@@ -72,7 +60,7 @@ void loop () {
 
 ISR(TIMER1_COMPA_vect) {
     interrupts(); // allow interrupts as I2C relies on interrupts to send and receive data
-    gy521.update_gyro();
+    temp_gyro_packet = mpu.update_gyro_isr();
     noInterrupts(); // disable interrupts as this is an ISR (interrupt service routine)
 }
 
