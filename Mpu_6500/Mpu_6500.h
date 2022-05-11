@@ -459,18 +459,18 @@ namespace yh {
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     const double
-                        gravity_x = 2 * (q.x * q.z - q.w * q.y),
-                        gravity_y = 2 * (q.w * q.x + q.y * q.z),
+                        gravity_x = 2 * (q.x * q.z - q.w * q.y), // 2 * (xi * zk - w * yj) == 2 * (-(xz)j - (wy)j) == -2 * (xz + wy)j
+                        gravity_y = 2 * (q.w * q.x + q.y * q.z), // 2 * (w * xi + yj * zk) == 2 * ((wx)i + (yz)i) == 2 * (wx + yz)i
                         // gravity_z = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
-                        gravity_z = 2 * (q.w * q.w + q.z * q.z) - 1;
-                    const double
-                        yaw_y_read = (q.x * q.y - q.w * q.z),
-                        yaw_x_read = (q.w * q.w + q.x * q.x);
+                        gravity_z = 2 * (q.w * q.w + q.z * q.z) - 1; // 2 * (ww + zkzk) - 1 == 2 * (ww - zz) - 1
+                    const double yaw = atan2(2 * (q.x * q.y - q.w * q.z), 2 * (q.w * q.w + q.x * q.x) - 1) * RAD_TO_DEG;
+                        // yaw_y_read = 2 * (q.x * q.y - q.w * q.z), // 2 * (xi * yj - w * zk) == 2 * ((xy)k - (wz)k) == 2 * (xy - wz)k
+                        // yaw_x_read = 2 * (q.w * q.w + q.x * q.x) - 1;
                     SREG = oldSREG;
                     return Euler_angle(
                         atan(gravity_y / sqrt(gravity_x * gravity_x + gravity_z * gravity_z)) * RAD_TO_DEG,
                         atan(gravity_x / sqrt(gravity_y * gravity_y + gravity_z * gravity_z)) * RAD_TO_DEG,
-                        atan2(2 * yaw_y_read, 2 * yaw_x_read - 1) * RAD_TO_DEG
+                        yaw < 0 ? yaw + 360.0 : yaw;
                     );
                 }
 
