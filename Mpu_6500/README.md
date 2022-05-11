@@ -1,4 +1,4 @@
-<!--
+<!-- Who told you to read this source code directly... Read it through GitHub. -->
 # You should use code only when you understand them  
 
 You may download this folder to ANYWHERE YOU LIKE in your local disk, and then open your Arduino IDE.  
@@ -8,113 +8,107 @@ You may like to see the examples of this library to get a better understanding o
 To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bottom) and hover the library name of the module you have added to Arduino IDE just now, then you can take a look or even try uploading the examples to your Arduino board.
   
 ## Remarks:  
-1. This library is applicable to GY-521 (MPU6000 or MPU6050), GY-6500 (MPU6500), GY-9250 (MPU9250),
-    just treat the word gy-521 as the module you are holding right now.  
+1. This library is applicable to GY-6500 (MPU6500), GY-9250 (MPU9250),
+    just treat the word gy-6500 as the module you are holding right now.  
 2. This library has configured some parameters to the module by default values which are based on RCJ soccer purpose.
-    (The resolution of gyroscope is default to 2000 degrees per second; roll pitch yaw of Euler angles are supported, but only yaw is calculated by default.)  
-3. You are advised to check the who_am_i value of the chip before usage, since there are many reports that an MPU6500 chip was installed on an MPU9250 board. The appearance of the module may fake you. The check is to let you understand what is the model of the chip that is really inside the module you are holding.  
-4. This library sets the I2C clock to 400 KHz frequency (fast mode) to achieve faster communication.
+    (The resolution of gyroscope is default to 2000 degrees per second.)  
+3. You are advised to check the who_am_i value of the chip before usage, since there are many reports that an MPU6500 chip was installed on a GY9250 board. The appearance of the module may fake you. The check is to let you understand what is the model of the chip that is really inside the module you are holding.  
+4. Do not confuse this library with Mpu_6050 library. Mpu_6050 library uses I2C communication, which is available on MPU-6000, MPU-6050, MPU6500 and MPU9250. Mpu_6500 library uses SPI communication, which is only available on MPU6500 and MPU9250.  
   
 ## How to use:  
-1. **Constructor of a Custom_gy521 object `Custom_gy521::Custom_gy521 ( I2C_address )`**  
-Syntax: `Custom_gy521 gy521 (0x68);` or `Custom_gy521 gy521 (0x69);`  
-The line above calls the constructor of a Custom_gy521 object.  
-You should declare an object of the Custom_gy521 outside of any functions.  
-In the `()`, input the I2C address of the chip (which is 0x68 by default).  
-If you connect the AD0 pin of the chip to a pin written HIGH, the I2C address of the chip will be changed to 0x69.  
-Therefore, you should input `0x68` to the `()` unless the AD0 pin of the chip is written HIGH, then you should input `0x69`.  
+1. **Constructor of a `yh::rec::Mpu_6500` object `yh::rec::Mpu_6500::Mpu_6500 ( chip_select_pin )`**  
+Syntax: `yh::rec::Mpu_6500<SPIClass, SPISettings> mpu (10);`  
+The line above calls the constructor of a `yh::rec::Mpu_6500` object.  
+You should declare an object of the `yh::rec::Mpu_6500` outside of any functions.  
+In the `()`, input the Arduino digital pin connected to the nCS pin on the module.  
   
-2. **`void Custom_gy521::begin ()` method**  
-Syntax: `gy521.begin();`  
-This `begin()` function configures the settings of the I2C bus and the chip.  
+2. **`void yh::rec::Mpu_6500::begin ()` method**  
+Syntax: `mpu.begin();`  
+This `begin()` function configures the settings of the SPI bus and the chip.  
 You must call this function in void setup () function to use this object properly.  
 No arguments should be inputed when calling this function.  
   
-3. **`uint8_t Custom_gy521::who_am_i ()` method**  
-Syntax: `uint8_t who_am_i = gy521.who_am_i();`  
+3. **`uint8_t yh::rec::Mpu_6500::who_am_i ()` method**  
+Syntax: `uint8_t who_am_i = mpu.who_am_i();`  
 This `who_am_i()` function asks the chip to give a value to identify itself.  
-The value returned by this method can tell you whether this chip is MPU6000, MPU6050, MPU6500 or MPU9250.  
-If the value returned by this function is 0x68 (or 104 in decimal), then this chip is MPU6000 or MPU6050 (or maybe it is MPU9150, but you can tell it by the appearance of the module).  
+The value returned by this method can tell you whether this chip is MPU6500 or MPU9250.  
 If the value returned by this function is 0x70 (or 106 in decimal), then this chip is MPU6500.  
 If the value returned by this function is 0x71 (or 107 in decimal), then this chip is MPU9250.  
   
-4. **`volatile double Custom_gy521::d_roll, Custom_gy521::d_pitch, Custom_gy521::d_yaw` members**  
+4. **`volatile double yh::rec::Mpu_6500::d_roll, yh::rec::Mpu_6500::d_pitch, yh::rec::Mpu_6500::d_yaw` members**  
 These 3 members with the data type of `double` stores the instantaneous difference in roll, pitch and yaw axes of the chip.  
-Be aware that these values are based on the x, y, z axes of the chip, not in the real world, so they cannot be used to calculate Euler angles in the real world directly. The library uses quaternion to do that, and it has been done for you in `Custom_gy521::update_gyro()` method.  
+Be aware that these values are based on the x, y, z axes of the chip, not in the real world, so they cannot be used to calculate Euler angles in the real world directly. The library uses quaternion to do that, and it has been done for you in `yh::rec::Mpu_6500::update_gyro()` method.  
   
-5. **`double Custom_gy521::corr_roll, Custom_gy521::corr_pitch, Custom_gy521::corr_yaw` members**  
-These 3 members with the data type of `double` stores the correction of roll, pitch and yaw values to be added to the gyroscope data collected every time the `update_gyro()` method is called.  
+5. **`double yh::rec::Mpu_6500::corr_roll, yh::rec::Mpu_6500::corr_pitch, yh::rec::Mpu_6500::corr_yaw` members**  
+These 3 members with the data type of `double` stores the correction of roll, pitch and yaw values to be subtracted from the 16-bit raw gyroscope data collected every time the `update_gyro()` method is called.  
 They stores the calibration values generated by the `cal_gyro()` method.  
 You may assign them to 0 or a value that you have achieved by previous calibrations on the same chip.  
   
-6. **`double Custom_gy521::update_temp ()` method**  
-Syntax: `double temperature = gy521.update_temp();`  
-This `update_temp()` function updates the reading of the thermometer in the chip in degree Celsius.  
+6. **`double yh::rec::Mpu_6500::get_temp ()` method**  
+Syntax: `double temperature = mpu.get_temp();`  
+This `get_temp()` function updates the reading of the thermometer in the chip in degree Celsius.  
   
-7. **`void Custom_gy521::cal_gyro ( sampling_amount, updating_function )` method**  
-Syntax: `gy521.cal_gyro();` or `gy521.cal_gyro(100);` or `gy521.cal_gyro(100, print_new_line);`  
+7. **`void yh::rec::Mpu_6500::cal_gyro ( sampling_amount, updating_function )` method**  
+Syntax: `mpu.cal_gyro();` or `mpu.cal_gyro(100);` or `mpu.cal_gyro(100, print_new_line);`  
 **ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
 This `cal_gyro()` function calibrates all 3-axes of gyroscope of the chip.  
 This function repeats reading the gyroscope values of the 3 axes and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
 The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the function will get 8192 data samples, so this argument is optional.  
 The argument `updating_function` tells the function to execute the updating_function() after the gyroscope has sampled 1 time. This function should be as short and precise as possible. By default, this method will not do anything after the gyroscope has sampled 1 time, so this argument is optional.  
   
-8. **`void Custom_gy521::reset_gyro ()` method**  
-Syntax: `gy521.reset_gyro();`  
+8. **`void yh::rec::Mpu_6500::reset_gyro ()` method**  
+Syntax: `mpu.reset_gyro();`  
 This `reset_gyro()` function resets all 3-axes of gyroscope of the chip to 0.  
   
-9. **`void Custom_gy521::update_gyro ()` method**  
-Syntax: `gy521.update_gyro();`  
-This `update_gyro()` function updates the yaw member (and roll and pitch members) in the object.  
-You may call this method by polling or timer interrupts, but you should be reminded that global interrupts must be enabled when calling this method to let the I2C interrupt to work. The method takes around 2100 - 2150 microseconds in fast I2C mode.  
-This method will fail if the time interval between 2 consecutive calls of this method is less than 2150 microseconds.  
+9. **update gyro**  
+Since SPI provides a much faster communication than I2C, this library divides the original `update_gyro()` function inherited from Mpu_6050 library into 2 separate functions.  
+`update_gyro_isr()` gets the raw data using very short time, while `update_gyro( gyro_packet )` processes the raw data that consumes thousands of microseconds.  
+You are advised not to call the `update_gyro( gyro_packet )` function in a timer interrupt. Instead, call `update_gyro_isr()` in a timer interrupt and store the `yh::rec::Gyro_packet` object in a global space, and let the main loop call the `update_gyro( gyro_packet )` to do the heavy trigonometry stuff.  
+If you are using the `yh::rec::Mpu_6500` object by polling, you can write a line like `mpu.update_gyro(mpu.update_gyro_isr())` to update the quaternion in the object directly, which behaves just as `yh::rec::Mpu_6050::update_gyro()` method in Mpu_6050 library.  
+  
+- **`const yh::rec::Gyro_packet yh::rec::Mpu_6500::update_gyro_isr ()` method**  
+Syntax: `const yh::rec::Gyro_packet gyro_packet = mpu.update_gyro_isr();`  
+This `update_gyro_isr()` function gets raw data from the chip only.  
+You may call this method by polling or timer interrupts. The method takes less than 100 microseconds.  
+This method will fail if the time interval between 2 consecutive calls of this method is less than 100 microseconds.  
 Please leave some time for other codes to be executed when putting this method in a timer interrupt.  
   
-10. **`void Custom_gy521::enable_ext_i2c_slave_sensors ()` method**  
+- **`void yh::rec::Mpu_6500::update_gyro ( gyro_packet )` method**  
+Syntax: `mpu.update_gyro(gyro_packet);`  
+This `update_gyro()` function updates the quaternion in the object.  
+If you are calling the `yh::rec::Mpu_6500::update_gyro_isr()` method inside a timer interrupt, you should pass every `yh::rec::Gyro_packet` object saved by the interrupt to this function as the only argument, in the order of first data, first process.  
+You are advised not to call this function in a timer interrupt, but in the main loop, since this method does heavy trigonometry stuff, and does a lot of floating-point arithmetics.  
+  
+10. **`double yh::rec::Mpu_6500::get_roll ()` method**  
+Syntax: `mpu.get_roll();`  
+This `get_roll()` function returns the current roll angle of the sensor.  
+It uses trigonometric functions to convert quaternions into Euler angles, so it takes a long time.  
+  
+11. **`double yh::rec::Mpu_6500::get_pitch ()` method**  
+Syntax: `mpu.get_pitch();`  
+This `get_pitch()` function returns the current pitch angle of the sensor.  
+It uses trigonometric functions to convert quaternions into Euler angles, so it takes a long time.  
+  
+12. **`double yh::rec::Mpu_6500::get_yaw ()` method**  
+Syntax: `mpu.get_yaw();`  
+This `get_yaw()` function returns the current yaw angle of the sensor.  
+It uses trigonometric functions to convert quaternions into Euler angles, so it takes a long time.  
+  
+13. **`yh::rec::Euler_angle yh::rec::Mpu_6500::get_euler_angles ()` method**  
+Syntax: `yh::rec::Euler_angle angles = mpu.get_euler_angles();`  
+This `get_euler_angles()` function returns an object of the `yh::rec::Euler_angle`, which contains roll, pitch, yaw values as members of the class.  
+This function is introduced to save calculation time, since some values are the same when calculating roll and pitch values, so the same values can be reused without another calculation.  
+It uses trigonometric functions to convert quaternions into Euler angles, so it takes a long time.  
+  
+<!--
+14. **`void yh::rec::Mpu_6050::enable_ext_i2c_slave_sensors ()` method**  
 Syntax: `gy521.enable_ext_i2c_slave_sensors();`  
 This `enable_ext_i2c_slave_sensors()` function allows other (external) sensors on board to be directly accessed by the I2C bus connected to the SDA and SCL pins of the module itself.  
 Another way to communicate with the other (external) sensors on board is by configuring the I2C slaves 0 - 4 of the chip, and let the MPU-chip acts as a media to communicate with the other (external) sensors.  
 However, that way is too complicated for the use of AK8963 magnetometer if we would like to simplify everything to strike for speed and refresh rate, so that way is not implemented in this library. (AK8963 is a magnetometer on board of the GY9250 module)  
 You may see in the example of custom_gy9250 library that the `gy9250` object is calling this function. It is called to allow the Arduino board to directly access the AK8963 magnetometer on board, without any data being passed to the MPU-chip then resent back to the Arduino board.  
-  -->
-<!--
-**The following methods are the 1-axis version of `cal_gyro(...)` and `update_gyro()` methods.**  
-**They have the same functionality as `cal_gyro(...)` and `update_gyro()` but are a bit faster since they only need to get data of 1-axis.**  
-  
-8. `void Custom_gy521::cal_roll ( sampling_amount )` method  
-Syntax: `gy521.cal_roll();` or `gy521.cal_roll(100);`  
-**ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
-This `cal_roll()` function **only calibrates the x-axis of gyroscope** of the chip.  
-This function repeats reading the gyroscope values of the **x-axis** and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
-The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  
-  
-9. `void Custom_gy521::update_roll ()` method  
-Syntax: `gy521.update_roll();`  
-This `update_roll()` function **only updates the member `roll`** in the object.  
-  
-10. `void Custom_gy521::cal_pitch ( sampling_amount )` method  
-Syntax: `gy521.cal_pitch();` or `gy521.cal_pitch(100);`  
-**ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
-This `cal_pitch()` function **only calibrates the y-axis of gyroscope** of the chip.  
-This function repeats reading the gyroscope values of the **y-axis** and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
-The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  
-  
-11. `void Custom_gy521::update_pitch ()` method  
-Syntax: `gy521.update_pitch();`  
-This `update_pitch()` function **only updates the member `pitch`** in the object.  
-  
-12. `void Custom_gy521::cal_yaw ( sampling_amount )` method  
-Syntax: `gy521.cal_yaw();` or `gy521.cal_yaw(100);`  
-**ATTENTION: When gyroscope calibration is in progress, put the chip on a flat surface, hold still, until this function has exited.**  
-This `cal_yaw()` function **only calibrates the z-axis of gyroscope** of the chip.  
-This function repeats reading the gyroscope values of the **z-axis** and gets a mean value to be subtracted from every time the programmer gets new gyroscope data.  
-The argument `sampling_amount` tells the function how many times it should get data samples. The larger the value, the calibration is more accurate, but also more time-consuming. By default, the funciton will get 8192 data samples, so this argument is optional.  
-  
-13. `void Custom_gy521::update_yaw ()` method  
-Syntax: `gy521.update_yaw();`  
-This `update_yaw()` function **only updates the member `yaw`** in the object.  
 -->
-  <!--
+  
 ## Datasheets and Register Maps:  
 The links below are the datasheets and register maps of the 3 types of chips mentioned above.  
 This library is written based on the datasheets and register maps below.  
@@ -146,4 +140,3 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
 **This repository is written and maintained by YH Choi,**  
 **tested with hardware modules provided by CSWCSS REC**  
 **and technically supported by CSWCSS REC hardware team.**
--->

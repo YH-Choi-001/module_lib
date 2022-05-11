@@ -11,12 +11,13 @@ To do so, select from the IDE's toolbar: File -> Examples -> (Scroll to the bott
 1. This library is applicable to GY-521 (MPU6000 or MPU6050), GY-6500 (MPU6500), GY-9250 (MPU9250),
     just treat the word gy-521 as the module you are holding right now.  
 2. This library has configured some parameters to the module by default values which are based on RCJ soccer purpose.
-    (The resolution of gyroscope is default to 2000 degrees per second; roll pitch yaw of Euler angles are supported, but only yaw is calculated by default.)  
+    (The resolution of gyroscope is default to 2000 degrees per second.)  
 3. You are advised to check the who_am_i value of the chip before usage, since there are many reports that an MPU6500 chip was installed on a GY9250 board. The appearance of the module may fake you. The check is to let you understand what is the model of the chip that is really inside the module you are holding.  
-4. This library sets the I2C clock to 400 KHz frequency (fast mode) to achieve faster communication.
+4. This library sets the I2C clock to 400 KHz frequency (fast mode) to achieve faster communication.  
+5. Do not confuse this library with Mpu_6500 library. Mpu_6050 library uses I2C communication, which is available on MPU-6000, MPU-6050, MPU6500 and MPU9250. Mpu_6500 library uses SPI communication, which is only available on MPU6500 and MPU9250.  
   
 ## How to use:  
-1. **Constructor of a `yh::rec::Mpu_6050` object `yh::rec::Mpu_6050::yh::rec::Mpu_6050 ( I2C_address )`**  
+1. **Constructor of a `yh::rec::Mpu_6050` object `yh::rec::Mpu_6050::Mpu_6050 ( I2C_address )`**  
 Syntax: `yh::rec::Mpu_6050 gy521 (0x68);` or `yh::rec::Mpu_6050 gy521 (0x69);`  
 The line above calls the constructor of a `yh::rec::Mpu_6050` object.  
 You should declare an object of the `yh::rec::Mpu_6050` outside of any functions.  
@@ -65,7 +66,7 @@ This `reset_gyro()` function resets all 3-axes of gyroscope of the chip to 0.
   
 9. **`void yh::rec::Mpu_6050::update_gyro ()` method**  
 Syntax: `gy521.update_gyro();`  
-This `update_gyro()` function updates the yaw member (and roll and pitch members) in the object.  
+This `update_gyro()` function updates the quaternion in the object.  
 You may call this method by polling or timer interrupts, but you should be reminded that global interrupts must be enabled when calling this method to let the I2C interrupt to work. The method takes around 1300 - 1400 microseconds in fast I2C mode.  
 This method will fail if the time interval between 2 consecutive calls of this method is less than 1400 microseconds.  
 Please leave some time for other codes to be executed when putting this method in a timer interrupt.  
