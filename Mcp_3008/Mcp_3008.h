@@ -56,7 +56,7 @@ namespace yh {
                     mosi_pin(typeid(SPI_class) == typeid(SPIClass) ? MOSI : init_mosi_pin),
                     miso_pin(typeid(SPI_class) == typeid(SPIClass) ? MISO : init_miso_pin),
                     cs_pin(init_cs_pin),
-                    spi_ptr(&init_spi_ptr),
+                    spi_ptr(init_spi_ptr),
                     spi_settings((((F_CPU / 2) > 3600000UL) ? 3600000UL : (F_CPU / 2)), MSBFIRST, SPI_MODE0)
                 {
                     //
