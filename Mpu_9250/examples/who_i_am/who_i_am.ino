@@ -4,9 +4,9 @@
 // connect SDA on GY-9250 to SDA on arduino
 // connect SCL on GY-9250 to SCL on arduino
 
-#include <custom_gy9250.h>
+#include <Mpu_9250.h>
 
-Custom_gy9250 gy9250 (0x68); // change argument to 0x69 if AD0 is HIGH
+yh::rec::Mpu_9250 gy9250 (0x68); // change argument to 0x69 if AD0 is HIGH
 
 void setup () {
 
