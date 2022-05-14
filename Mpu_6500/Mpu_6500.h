@@ -420,15 +420,20 @@ namespace yh {
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     const double
-                        gravity_x = 2 * (q.x * q.z - q.w * q.y),
-                        gravity_y = 2 * (q.w * q.x + q.y * q.z),
-                        // gravity_z = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
-                        gravity_z = 2 * (q.w * q.w + q.z * q.z) - 1;
+                        w = q.w,
+                        x = q.x,
+                        y = q.y,
+                        z = q.z;
+                    SREG = oldSREG;
+                    const double
+                        gravity_x = 2 * (x * z - w * y),
+                        gravity_y = 2 * (w * x + y * z),
+                        // gravity_z = w * w - x * x - y * y + z * z;
+                        gravity_z = 2 * (w * w + z * z) - 1;
                     // since w^2 + x^2 + y^2 + z^2 = 1
                     //                   w^2 + z^2 = 1 - x^2 - y^2
                     //               w^2 + z^2 - 1 = - x^2 - y^2
-                    // 2 * (q.w * q.w + q.z * q.z) - 1
-                    SREG = oldSREG;
+                    // 2 * (w * w + z * z) - 1
                     return atan(gravity_y / sqrt(gravity_x * gravity_x + gravity_z * gravity_z)) * RAD_TO_DEG;
                 }
 
@@ -437,11 +442,16 @@ namespace yh {
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     const double
-                        gravity_x = 2 * (q.x * q.z - q.w * q.y),
-                        gravity_y = 2 * (q.w * q.x + q.y * q.z),
-                        // gravity_z = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
-                        gravity_z = 2 * (q.w * q.w + q.z * q.z) - 1;
+                        w = q.w,
+                        x = q.x,
+                        y = q.y,
+                        z = q.z;
                     SREG = oldSREG;
+                    const double
+                        gravity_x = 2 * (x * z - w * y),
+                        gravity_y = 2 * (w * x + y * z),
+                        // gravity_z = w * w - x * x - y * y + z * z;
+                        gravity_z = 2 * (w * w + z * z) - 1;
                     return atan(gravity_x / sqrt(gravity_y * gravity_y + gravity_z * gravity_z)) * RAD_TO_DEG;
                 }
 
@@ -449,9 +459,14 @@ namespace yh {
                 double get_yaw () {
                     uint8_t oldSREG = SREG;
                     noInterrupts();
-                    // yaw = atan2(2 * q.x * q.y - 2 * q.w * q.z, 2 * q.w * q.w + 2 * q.x * q.x - 1) * RAD_TO_DEG;
-                    const double yaw = atan2(2 * (q.x * q.y - q.w * q.z), 2 * (q.w * q.w + q.x * q.x) - 1) * RAD_TO_DEG;
+                    const double
+                        w = q.w,
+                        x = q.x,
+                        y = q.y,
+                        z = q.z;
                     SREG = oldSREG;
+                    // yaw = atan2(2 * x * y - 2 * w * z, 2 * w * w + 2 * x * x - 1) * RAD_TO_DEG;
+                    const double yaw = atan2(2 * (x * y - w * z), 2 * (w * w + x * x) - 1) * RAD_TO_DEG;
                     return yaw < 0 ? yaw + 360.0 : yaw;
                 }
 
@@ -460,14 +475,17 @@ namespace yh {
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     const double
-                        gravity_x = 2 * (q.x * q.z - q.w * q.y), // 2 * (xi * zk - w * yj) == 2 * (-(xz)j - (wy)j) == -2 * (xz + wy)j
-                        gravity_y = 2 * (q.w * q.x + q.y * q.z), // 2 * (w * xi + yj * zk) == 2 * ((wx)i + (yz)i) == 2 * (wx + yz)i
-                        // gravity_z = q.w * q.w - q.x * q.x - q.y * q.y + q.z * q.z;
-                        gravity_z = 2 * (q.w * q.w + q.z * q.z) - 1; // 2 * (ww + zkzk) - 1 == 2 * (ww - zz) - 1
-                    const double yaw = atan2(2 * (q.x * q.y - q.w * q.z), 2 * (q.w * q.w + q.x * q.x) - 1) * RAD_TO_DEG;
-                        // yaw_y_read = 2 * (q.x * q.y - q.w * q.z), // 2 * (xi * yj - w * zk) == 2 * ((xy)k - (wz)k) == 2 * (xy - wz)k
-                        // yaw_x_read = 2 * (q.w * q.w + q.x * q.x) - 1;
+                        w = q.w,
+                        x = q.x,
+                        y = q.y,
+                        z = q.z;
                     SREG = oldSREG;
+                    const double
+                        gravity_x = 2 * (x * z - w * y), // 2 * (xi * zk - w * yj) == 2 * (-(xz)j - (wy)j) == -2 * (xz + wy)j
+                        gravity_y = 2 * (w * x + y * z), // 2 * (w * xi + yj * zk) == 2 * ((wx)i + (yz)i) == 2 * (wx + yz)i
+                        // gravity_z = w * w - x * x - y * y + z * z;
+                        gravity_z = 2 * (w * w + z * z) - 1; // 2 * (ww + zkzk) - 1 == 2 * (ww - zz) - 1
+                    const double yaw = atan2(2 * (x * y - w * z), 2 * (w * w + x * x) - 1) * RAD_TO_DEG;
                     return Euler_angle(
                         atan(gravity_y / sqrt(gravity_x * gravity_x + gravity_z * gravity_z)) * RAD_TO_DEG,
                         atan(gravity_x / sqrt(gravity_y * gravity_y + gravity_z * gravity_z)) * RAD_TO_DEG,

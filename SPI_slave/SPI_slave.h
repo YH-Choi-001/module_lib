@@ -46,11 +46,14 @@ namespace yh {
                 // @brief waits until the transaction is completed
                 inline static void wait_for_trans_complete () { while (!(SPSR & (1 << SPIF))) {} }
                 // @return the status of SS pin
-                inline static uint8_t ss_status () { return ( ((*ss_in_reg) & ss_mask) ? 1 : 0 ); }
+                inline static uint8_t ss_status () { return (*ss_in_reg) & ss_mask; }
         };
     }
 }
 
 yh::rec::SPI_slave spi_slave;
+
+volatile uint8_t *yh::rec::SPI_slave::ss_in_reg = (volatile uint8_t *)NULL;
+uint8_t yh::rec::SPI_slave::ss_mask = 0;
 
 #endif // #ifndef SPI_SLAVE_H
