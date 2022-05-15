@@ -605,24 +605,22 @@ namespace yh {
 
 
 #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
-#warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
-#warning If you insist to use USART_MSPIM, use Arduino Uno instead.
+// #warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
+// #warning If you insist to use USART_MSPIM, use Arduino Uno instead.
+// extern yh::rec::USART_MSPIM_Class USPI;
 #endif // #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
+
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
+extern yh::rec::USART_MSPIM_Class USPI;
+#endif // #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
 #warning None of the XCKn pins on the Arduino Mega board are broken out.
 #warning If you insist to use USART_MSPIM, use Arduino Uno instead.
-#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
-
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
-extern yh::rec::USART_MSPIM_Class USPI;
-#endif
-
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 extern yh::rec::USART_MSPIM_Class USPI;
 extern yh::rec::USART_MSPIM_Class USPI1;
 extern yh::rec::USART_MSPIM_Class USPI2;
 extern yh::rec::USART_MSPIM_Class USPI3;
-#endif
+#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
 
 #endif // #ifndef USART_MSPIM_H

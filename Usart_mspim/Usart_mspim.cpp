@@ -3,9 +3,13 @@
 
 #include "Usart_mspim.h"
 
+#if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
+// yh::rec::USART_MSPIM_Class USPI (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRD, (1 << 4));
+#endif // #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
+
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
 yh::rec::USART_MSPIM_Class USPI (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRD, (1 << 4));
-#endif
+#endif // #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
 yh::rec::USART_MSPIM_Class USPI (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRE, (1 << 2));
