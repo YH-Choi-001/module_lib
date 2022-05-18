@@ -43,7 +43,7 @@ namespace yh {
                 int16_t max_x, max_y, max_z;
                 // the current value of the raw magnetic field strength
                 // note: must be a signed 16-bit integer
-                volatile int16_t raw_x, raw_y, raw_z;
+                int16_t raw_x, raw_y, raw_z;
                 // update raw x, y, z
                 inline void update_raw ();
                 // use this to do polling

@@ -53,6 +53,54 @@
         ) \
 )
 
+#define PIN_TO_P_NUM(prefix,pin,unknown) ( \
+    (pin >= 22 && pin <= 29) ? \
+        (prefix##0) : \
+        ( \
+            (pin >= 30 && pin <= 37) ? \
+                (prefix##2) : \
+                ( \
+                    (pin >= 42 && pin <= 49) ? \
+                        (prefix##10) : \
+                        ( \
+                            (pin >= 54 && pin <= 61) ? \
+                                (prefix##5) : \
+                                ( \
+                                    (pin >= 62 && pin <= 69) ? \
+                                        (prefix##9) : \
+                                        ( \
+                                            ((pin >= 10 && pin <= 13) || (pin >= 50 && pin <= 53)) ? \
+                                                (prefix##1) : \
+                                                ( \
+                                                    ((pin >= 6 && pin <= 9) || (pin == 16 || pin == 17)) ? \
+                                                        (prefix##7) : \
+                                                        ( \
+                                                            ((pin >= 0 && pin <= 3) || pin == 5) ? \
+                                                                (prefix##4) : \
+                                                                ( \
+                                                                    ((pin >= 18 && pin <= 21) || pin == 38) ? \
+                                                                        (prefix##3) : \
+                                                                        ( \
+                                                                            ((pin >= 39 && pin <= 41) || pin == 4) ? \
+                                                                                (prefix##6) : \
+                                                                                ( \
+                                                                                    (pin == 14 || pin == 15) ? \
+                                                                                        (prefix##8) : \
+                                                                                        ( \
+                                                                                            unknown \
+                                                                                        ) \
+                                                                                ) \
+                                                                        ) \
+                                                                ) \
+                                                        ) \
+                                                ) \
+                                        ) \
+                                ) \
+                        ) \
+                ) \
+        ) \
+)
+
 #define PIN_TO_BIT(pin,unknown) ( \
     ((pin >= 2 && pin <= 3) || (pin >= 10 && pin <= 13) || (pin >= 22 && pin <= 29) || (pin >= 54 && pin <= 69)) ? \
         ((pin + 2) & 0b111) : \
@@ -190,7 +238,7 @@
                                 ) \
                         ) \
                 ) \
-        )
+        ) \
 )
 
 #if 0
@@ -255,7 +303,84 @@
 
 namespace yh {
     namespace rec {
-        void pin_mode (const uint8_t pin, const uint8_t direction) __attribute__((__always_inline__)) {
+        #define PIN_TO_PORT_N_BIT_TEMP_ONLY(pin) \
+            ((PIN_TO_P_NUM( , pin, 8) & 0b1111) << 4) | (PIN_TO_BIT(pin, 8) & 0b111)
+        static const PROGMEM uint8_t pin_to_port_n_bit [] = {
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(0),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(1),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(2),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(3),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(4),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(5),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(6),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(7),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(8),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(9),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(10),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(11),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(12),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(13),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(14),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(15),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(16),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(17),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(18),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(19),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(20),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(21),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(22),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(23),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(24),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(25),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(26),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(27),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(28),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(29),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(30),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(31),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(32),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(33),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(34),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(35),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(36),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(37),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(38),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(39),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(40),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(41),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(42),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(43),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(44),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(45),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(46),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(47),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(48),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(49),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(50),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(51),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(52),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(53),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(54),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(55),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(56),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(57),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(58),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(59),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(60),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(61),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(62),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(63),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(64),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(65),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(66),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(67),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(68),
+            PIN_TO_PORT_N_BIT_TEMP_ONLY(69)
+        };
+        #undef PIN_TO_PORT_N_BIT_TEMP_ONLY
+        #define pin_to_port_n_bit(x) pgm_read_byte_near(pin_to_port_n_bit + x)
+        void pin_mode (const uint8_t pin, const uint8_t direction) __attribute__((__always_inline__));
+        void pin_mode (const uint8_t pin, const uint8_t direction) {
             uint8_t rubbish = 0;
             switch (direction) {
                 case INPUT:
@@ -276,7 +401,8 @@ namespace yh {
                     break;
             }
         }
-        void digital_write (const uint8_t pin, const uint8_t state) __attribute__((__always_inline__)) {
+        void digital_write (const uint8_t pin, const uint8_t state) __attribute__((__always_inline__));
+        void digital_write (const uint8_t pin, const uint8_t state) {
             #if 0
             volatile uint8_t *port;
             uint8_t mask;
@@ -410,21 +536,23 @@ namespace yh {
             PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
             state ? (PIN_TO_P(PORT, pin, rubbish) |= PIN_TO_BITMSK(pin)) : (PIN_TO_P(PORT, pin, rubbish) &= (~PIN_TO_BITMSK(pin))); // write low or high
         }
-        int digital_read (const uint8_t pin) __attribute__((__always_inline__)) {
+        int digital_read (const uint8_t pin) __attribute__((__always_inline__));
+        int digital_read (const uint8_t pin) {
             uint8_t rubbish = 0;
             PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
             return PIN_TO_P(PIN, pin, rubbish) & PIN_TO_BITMSK(pin) ? 1 : 0; // read 1 or 0
         }
-        void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__)) {
+        void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__));
+        void analog_write (const uint8_t pin, const uint8_t val) {
+            uint8_t rubbish = 0;
             PIN_TO_P(DDR, pin, rubbish) |= PIN_TO_BITMSK(pin); // set data direction to output
-            if (val == 0)
+            if (val == 0) {
                 PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
                 PIN_TO_P(PORT, pin, rubbish) &= (~PIN_TO_BITMSK(pin)); // write low
-            else if (val == 255)
+            } else if (val == 255) {
                 PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
                 PIN_TO_P(PORT, pin, rubbish) |= PIN_TO_BITMSK(pin); // write high
-            else {
-                uint8_t rubbish = 0;
+            } else {
                 PIN_TO_TIMER(pin, TCCR, A, rubbish) |= ((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff); // set pwm output
                 PIN_TO_COMPARE(pin, OCR, , rubbish) = val; // set pwm duty-cycle
             }
