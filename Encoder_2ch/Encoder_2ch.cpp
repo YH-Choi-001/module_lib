@@ -8,13 +8,12 @@ yh::rec::Encoder_2ch_timer_int::Encoder_2ch_timer_int (const Encoder_2ch_timer_i
     signal_B_pin(init_obj.signal_B_pin),
     log_idx(0),
     log_len(init_obj.log_len > 1000 ? 1000 : init_obj.log_len),
+    logged_displacements(NULL),
     current_displacement(0),
     instantaneous_velocity(0),
     instantaneous_acceleration(0)
 {
-    free(init_obj.logged_displacements);
-    init_obj.logged_displacements = NULL;
-    ( logged_displacements = (DISPLACEMENT_UNIT *)calloc(log_len, sizeof(DISPLACEMENT_UNIT)) );
+    //
 }
 
 yh::rec::Encoder_2ch_timer_int::Encoder_2ch_timer_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t request_log_len) :
@@ -22,6 +21,7 @@ yh::rec::Encoder_2ch_timer_int::Encoder_2ch_timer_int (const uint8_t init_signal
     signal_B_pin(init_signal_B_pin),
     log_idx(0),
     log_len(request_log_len > 1000 ? 1000 : request_log_len),
+    logged_displacements(NULL),
     current_displacement(0),
     instantaneous_velocity(0),
     instantaneous_acceleration(0)
@@ -35,6 +35,7 @@ yh::rec::Encoder_2ch_timer_int::~Encoder_2ch_timer_int () {
 }
 
 void yh::rec::Encoder_2ch_timer_int::begin () {
+    ( logged_displacements = (DISPLACEMENT_UNIT *)calloc(log_len, sizeof(DISPLACEMENT_UNIT)) );
     pinMode(signal_A_pin, INPUT);
     pinMode(signal_B_pin, INPUT);
     signal_A_input_reg = portInputRegister(digitalPinToPort(signal_A_pin));
@@ -86,7 +87,7 @@ yh::rec::Encoder_2ch_ext_int::Encoder_2ch_ext_int (const Encoder_2ch_ext_int &in
     instantaneous_acceleration(0),
     full_spd_velocity_val(255),
     full_spd_signal_change_time(84),
-    max_waiting_time(full_spd_signal_change_time * full_spd_velocity_val / 0.5)
+    max_waiting_time(full_spd_signal_change_time * full_spd_velocity_val)
 {
     //
 }
@@ -99,7 +100,7 @@ yh::rec::Encoder_2ch_ext_int::Encoder_2ch_ext_int (const uint8_t init_signal_A_p
     instantaneous_acceleration(0),
     full_spd_velocity_val(255),
     full_spd_signal_change_time(84),
-    max_waiting_time(full_spd_signal_change_time * full_spd_velocity_val / 0.5)
+    max_waiting_time(full_spd_signal_change_time * full_spd_velocity_val)
 {
     //
 }

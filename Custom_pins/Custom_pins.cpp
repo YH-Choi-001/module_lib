@@ -1,7 +1,7 @@
 #ifndef CUSTOM_PINS_CPP
 #define CUSTOM_PINS_CPP __DATE__ ", " __TIME__
 
-#if 0
+#if 1
 
 #include "Custom_pins.h"
 
@@ -12,166 +12,95 @@ namespace yh {
         namespace custom_pins {
             namespace {
                 #if defined(__AVR_ATmega32U4__)
-                static volatile uint16_t adc_data [14];
+                static volatile uint16_t adc_data [16];
                 #else
                 static volatile uint16_t adc_data [NUM_ANALOG_INPUTS];
                 #endif
             }
         }
-        Custom_pin pins [NUM_DIGITAL_PINS];
         uint8_t Custom_pin::auto_object_counter = 0; // initialize the counter to 0
+        Custom_pin pins [NUM_DIGITAL_PINS];
     }
 }
 
-uint16_t yh::rec::custom_pins::analog_read (uint8_t pin_or_channel) {
-    static const uint8_t ADIE_mask = (1 << ADIE);
-    // Controlling bits in ADCSRA:
-        // ADEN: ADC enable
-        // ADSC: ADC start new conversion
-        // ADIF: ADC interrupt flag
-        // ADIE: ADC interrupt enable
-        // ADPS == 0b111: ADC prescaler factor = 128
-#if defined(analogPinToChannel)
-#if defined(__AVR_ATmega32U4__)
-	if (pin_or_channel >= 18) pin_or_channel -= 18; // allow for channel or pin numbers
-#endif
-	pin_or_channel = analogPinToChannel(pin_or_channel);
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-	if (pin_or_channel >= 54) pin_or_channel -= 54; // allow for channel or pin numbers
-#elif defined(__AVR_ATmega32U4__)
-	if (pin_or_channel >= 18) pin_or_channel -= 18; // allow for channel or pin numbers
-#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega644__) || defined(__AVR_ATmega644A__) || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644PA__)
-	if (pin_or_channel >= 24) pin_or_channel -= 24; // allow for channel or pin numbers
-#else
-	if (pin_or_channel >= 14) pin_or_channel -= 14; // allow for channel or pin numbers
-#endif
-
-    uint8_t oldSREG = SREG;
-    noInterrupts();
-    if (!(ADCSRA & ADIE_mask)) {
-        // tries the best to maintain backwards compatability,
-        // so as to prevent using any begin() functions to perform an initial kickoff
-        ADCSRA |= (1 << ADEN) | (1 << ADSC) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0); // kicks off the first conversion with prescaler 128 (it is by default)
-    }
-    const uint16_t temp = adc_data[pin_or_channel];
-    SREG = oldSREG;
-    return temp;
-}
-
-uint16_t yh::rec::custom_pins::analog_read_and_wait (uint8_t pin_or_channel) {
-    static const uint8_t ADSC_mask = (1 << ADSC);
-    // Controlling bits in ADCSRA:
-        // ADEN: ADC enable
-        // ADSC: ADC start new conversion
-        // ADIF: ADC interrupt flag
-        // ADIE: ADC interrupt enable
-        // ADPS == 0b111: ADC prescaler factor = 128
-#if defined(analogPinToChannel)
-#if defined(__AVR_ATmega32U4__)
-	if (pin_or_channel >= 18) pin_or_channel -= 18; // allow for channel or pin numbers
-#endif
-	pin_or_channel = analogPinToChannel(pin_or_channel);
-#elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-	if (pin_or_channel >= 54) pin_or_channel -= 54; // allow for channel or pin numbers
-#elif defined(__AVR_ATmega32U4__)
-	if (pin_or_channel >= 18) pin_or_channel -= 18; // allow for channel or pin numbers
-#elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega644__) || defined(__AVR_ATmega644A__) || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644PA__)
-	if (pin_or_channel >= 24) pin_or_channel -= 24; // allow for channel or pin numbers
-#else
-	if (pin_or_channel >= 14) pin_or_channel -= 14; // allow for channel or pin numbers
-#endif
-
-    uint8_t oldSREG = SREG;
-    // disable interrupts
-    noInterrupts();
-    // save previous ADCSRA flags
-    uint8_t oldADCSRA = ADCSRA;
-    pause_automated_analog_read();
-
-    // select channel
-    #if defined(ADCSRB) && defined(MUX5)
+void select_adc_channel (const uint8_t channel) __attribute__((__always_inline__));
+void select_adc_channel (const uint8_t channel) {
+    ADMUX = (ADMUX & ~((1 << MUX4) | (1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0))) | ((channel & 0b111) << MUX0);
+#if defined(ADCSRB) && defined(MUX5)
 	// the MUX5 bit of ADCSRB selects whether we're reading from channels
 	// 0 to 7 (MUX5 low) or 8 to 15 (MUX5 high).
 	ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((channel >> 3) & 0x01) << MUX5);
-    #endif
-	// set the analog reference (high two bits of ADMUX) and select the
-	// channel (low 4 bits).  this also sets ADLAR (left-adjust result)
-	// to 0 (the default).
-    #if defined(ADMUX)
-        #if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-	ADMUX = (analog_reference << 4) | (channel & 0x07);
-        #else
-	ADMUX = (analog_reference << 6) | (channel & 0x07);
-        #endif
-    #endif
+#endif
+}
 
-    // start new conversion
-    ADCSRA |= ADSC_mask;
-    // re-enable interrupts
-    SREG = oldSREG;
-    while (ADCSRA & ADSC_mask) {} // wait for the conversion (~ 104 us)
-    const uint16_t temp = ADCL | (ADCH << 8);
-    ADCSRA = oldADCSRA;
-    return temp;
+void begin_adc () __attribute__((__always_inline__));
+void begin_adc () {
+    ADCSRA |= (1 << ADIF); // clear the interrupt flag first
+    ADCSRA = (1 << ADEN) | (1 << ADSC) | (0 << ADATE) | (0 << ADIF) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+    ADCSRB = (0 << MUX5) | (0 << ADTS2) | (0 << ADTS1) | (0 << ADTS0);
+    ADMUX = (0 << REFS1) | (0 << REFS0) | (0 << ADLAR) | (0 << MUX4) | (0 << MUX3) | (0 << MUX2) | (0 << MUX1) | (0 << MUX0);
+}
+
+void select_adc_prescaler (const uint8_t prescaler) {
+    ADCSRA = (ADCSRA & (~((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)))) | ((prescaler & 0b111) << ADPS0);
+}
+
+void start_new_adc () __attribute__((__always_inline__));
+void start_new_adc () {
+    ADCSRA |= (1 << ADSC);
+}
+
+void wait_for_adc_complete () __attribute__((__always_inline__));
+void wait_for_adc_complete () {
+    while (ADCSRA & (1 << ADSC)) {}
+}
+
+uint16_t read_adc_result () __attribute__((__always_inline__));
+uint16_t read_adc_result () {
+    const uint8_t temp = ADCL;
+    if (ADMUX & (1 << ADLAR))
+        return (temp >> 6) | (ADCH << 2);
+    return temp | (ADCH << 8);
+}
+
+uint8_t read_8_bit_adc_result () __attribute__((__always_inline__));
+uint8_t read_8_bit_adc_result () {
+    if (ADMUX & (1 << ADLAR))
+        return ADCH;
+    const uint8_t temp = ADCL;
+    return (temp >> 2) | (ADCH << 6);
 }
 
 ISR (ADC_vect) {
     static uint8_t channel = 0;
-    #ifdef ADCL
-	// we have to read ADCL first; doing so locks both ADCL
-	// and ADCH until ADCH is read.  reading ADCL second would
-	// cause the results of each conversion to be discarded,
-	// as ADCL and ADCH would be locked when it completed.
-    yh::rec::custom_pins::adc_data[channel] = ADCL | (ADCH << 8);
-    const uint8_t current_channel = channel;
-
-    #if defined(__AVR_ATmega32U4__)
-    // only channels 0, 1, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 are in use on micro and leonardo
-    // 0b 00111111 11110011
-    // 0x    3   f    f   3
-    yh::rec::custom_pins::analog_read_enable_byte &= 0x3ff3;
-    #endif
-
-    do {
-        channel++;
-        if (channel >= NUM_ANALOG_INPUTS) channel = 0;
-        // if (channel == current_channel) break; // prevent it from entering an infinite loop, and prevent it from selecting new channel, since all channels are disabled now
-        if (channel == current_channel) {
-            if ( yh::rec::custom_pins::analog_read_enable_byte & (0x01 << channel) ) {
-                // only this channel is enabled
-                // to prevent it from entering an infinite loop, just break
-                break;
-            } else {
-                // all channels are disabled before this ISR is called
-                // all operations should be stopped now
-                // turn off ADC interrupt enable flag
-                ADCSRA &= ~(1 << ADIE);
-                return;
-            }
-        }
-    } while ( !( yh::rec::custom_pins::analog_read_enable_byte & (0x01 << channel) ) ); // skip the disabled channels
-    #endif
-    #if defined(ADCSRB) && defined(MUX5)
-	// the MUX5 bit of ADCSRB selects whether we're reading from channels
-	// 0 to 7 (MUX5 low) or 8 to 15 (MUX5 high).
-	ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((channel >> 3) & 0x01) << MUX5);
-    #endif
-
-	// set the analog reference (high two bits of ADMUX) and select the
-	// channel (low 4 bits).  this also sets ADLAR (left-adjust result)
-	// to 0 (the default).
-    #if defined(ADMUX)
-        #if defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-	ADMUX = (analog_reference << 4) | (channel & 0x07);
-        #else
-	ADMUX = (analog_reference << 6) | (channel & 0x07);
-        #endif
-    #endif
-	// start new conversion
-    ADCSRA |= (1 << ADSC);
-
+    yh::rec::custom_pins::adc_data[channel] = read_adc_result();
+    channel++;
+    if (channel == NUM_ANALOG_INPUTS)
+        channel = 0;
+    select_adc_channel(channel);
+    start_new_adc();
 }
 
-#endif // #if 0
+uint16_t analog_read (const uint8_t channel) {
+    if (!(ADCSRA & (1 << ADEN)))
+        begin_adc();
+    if ( (ADCSRA & (1 << ADIE)) && (SREG & (1 << SREG_I)) ) {
+        uint8_t oldSREG = SREG;
+        noInterrupts();
+        const uint16_t temp = yh::rec::custom_pins::adc_data[channel];
+        SREG = oldSREG;
+        return temp;
+    }
+    #if defined(__AVR_ATmega32U4__)
+    select_adc_channel(analogPinToChannel(channel >= NUM_ANALOG_INPUTS ? channel - A0 : channel));
+    #else
+    select_adc_channel(channel >= NUM_ANALOG_INPUTS ? channel - A0 : channel);
+    #endif
+    start_new_adc();
+    wait_for_adc_complete();
+    return read_adc_result();
+}
+
+#endif // #if 1
 
 #endif // #ifndef CUSTOM_PINS_CPP

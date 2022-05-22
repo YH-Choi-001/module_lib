@@ -46,7 +46,15 @@ namespace yh {
                 // @brief waits until the transaction is completed
                 inline static void wait_for_trans_complete () { while (!(SPSR & (1 << SPIF))) {} }
                 // @return the status of SS pin
-                inline static uint8_t ss_status () { return (*ss_in_reg) & ss_mask; }
+                inline static uint8_t ss_status () {
+                    #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+                    return PINB & (1 << 0);
+                    #elif defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__)
+                    return PINB & (1 << 2);
+                    #else
+                    return (*ss_in_reg) & ss_mask;
+                    #endif
+                }
         };
     }
 }

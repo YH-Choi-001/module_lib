@@ -396,7 +396,7 @@ namespace yh {
                     const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
                     int8_t delta_displacement;
                     const unsigned long temp_delta_time = micros() - prev_time;
-                    const uint16_t delta_time = temp_delta_time > max_waiting_time ? max_waiting_time : temp_delta_time;
+                    const uint16_t delta_time = (temp_delta_time > max_waiting_time) ? max_waiting_time : temp_delta_time;
                     if ( (prev_A_state ^ curr_A_state) && (prev_B_state ^ curr_B_state) ) {
                         // both A has B has changed
                         // crashed (either +2 or -2)
