@@ -25,6 +25,8 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
 **tested with hardware modules provided by CSWCSS REC**  
 **and technically supported by CSWCSS REC hardware team.**  
   
+![Kicker Power Measuring Device Schematics](https://github.com/RoboCupJuniorTC/soccer-rules/blob/master/kicker_testing_schematics.png)
+
 [ATmega640 | ATmega1280 | ATmega2560 datasheet](https://ww1.microchip.com/downloads/en/devicedoc/atmel-2549-8-bit-avr-microcontroller-atmega640-1280-1281-2560-2561_datasheet.pdf)  
   
 [AVR Instruction Set Manual](http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf)  
