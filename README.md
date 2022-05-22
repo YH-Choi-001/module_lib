@@ -31,5 +31,7 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
 
 [AVR Inline ASM Manual](https://www.nongnu.org/avr-libc/user-manual/inline_asm.html)
   
+AVR objdump command in Mac: /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objdump -S "filepath"
+  
 ![](./Ningor_ir/ball_pulse_graph.png)
 ![](./ATmega2560_pinout_1.jpeg)
