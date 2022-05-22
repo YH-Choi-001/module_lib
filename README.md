@@ -34,4 +34,4 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
 AVR objdump command in Mac: /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objdump -S "filepath"
   
 ![](./Ningor_ir/ball_pulse_graph.png)
-![](./ATmega2560_pinout_1.jpeg)
+![](./pinout_diagrams/ATmega2560_pinout_2.png)
