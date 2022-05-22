@@ -24,8 +24,6 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
 **This repository is written and maintained by YH Choi,**  
 **tested with hardware modules provided by CSWCSS REC**  
 **and technically supported by CSWCSS REC hardware team.**  
-  
-![Kicker Power Measuring Device Schematics](https://github.com/RoboCupJuniorTC/soccer-rules/blob/master/kicker_testing_schematics.png)
 
 [ATmega640 | ATmega1280 | ATmega2560 datasheet](https://ww1.microchip.com/downloads/en/devicedoc/atmel-2549-8-bit-avr-microcontroller-atmega640-1280-1281-2560-2561_datasheet.pdf)  
   
@@ -35,5 +33,6 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
   
 AVR objdump command in Mac: /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objdump -S "filepath"
   
-![](./Ningor_ir/ball_pulse_graph.png)
-![](./pinout_diagrams/ATmega2560_pinout_2.png)
+![RCJ Soccer Lightweight IR ball pulse graph](./Ningor_ir/ball_pulse_graph.png)
+![ATmega2560 pinout](./pinout_diagrams/ATmega2560_pinout_2.png)
+![Kicker Power Measuring Device Schematics](https://github.com/RoboCupJuniorTC/soccer-rules/blob/master/kicker_testing_schematics.png)
