@@ -59,8 +59,7 @@ uint8_t yh::rec::CompoI::set_filter_off () {
 }
 
 uint8_t yh::rec::CompoI::calibrate () {
-    // return command(15); // the chip should be factory calibrated
-    return 0;
+    return command(15);
 }
 
 #endif // #ifndef JOINMAX_COMPOI_CPP

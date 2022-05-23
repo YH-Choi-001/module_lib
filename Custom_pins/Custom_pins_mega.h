@@ -536,6 +536,24 @@ namespace yh {
             PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
             state ? (PIN_TO_P(PORT, pin, rubbish) |= PIN_TO_BITMSK(pin)) : (PIN_TO_P(PORT, pin, rubbish) &= (~PIN_TO_BITMSK(pin))); // write low or high
         }
+        void digital_write_HIGH (const uint8_t pin) __attribute__((__always_inline__));
+        void digital_write_HIGH (const uint8_t pin) {
+            uint8_t rubbish = 0;
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            (PIN_TO_P(PORT, pin, rubbish) |= PIN_TO_BITMSK(pin)); // write high
+        }
+        void digital_write_LOW (const uint8_t pin) __attribute__((__always_inline__));
+        void digital_write_LOW (const uint8_t pin) {
+            uint8_t rubbish = 0;
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            (PIN_TO_P(PORT, pin, rubbish) &= (~PIN_TO_BITMSK(pin))); // write low
+        }
+        void digital_write_TOGGLE (const uint8_t pin) __attribute__((__always_inline__));
+        void digital_write_TOGGLE (const uint8_t pin) {
+            uint8_t rubbish = 0;
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            (PIN_TO_P(PORT, pin, rubbish) ^= PIN_TO_BITMSK(pin)); // write high
+        }
         int digital_read (const uint8_t pin) __attribute__((__always_inline__));
         int digital_read (const uint8_t pin) {
             uint8_t rubbish = 0;
@@ -562,6 +580,9 @@ namespace yh {
 
 #define pinMode(...) yh::rec::pin_mode(__VA_ARGS__)
 #define digitalWrite(...) yh::rec::digital_write(__VA_ARGS__)
+#define digitalWriteHIGH(...) yh::rec::digital_write_HIGH(__VA_ARGS__)
+#define digitalWriteLOW(...) yh::rec::digital_write_LOW(__VA_ARGS__)
+#define digitalWriteTOGGLE(...) yh::rec::digital_write_TOGGLE(__VA_ARGS__)
 #define digitalRead(...) yh::rec::digital_read(__VA_ARGS__)
 #define analogWrite(...) yh::rec::analog_write(__VA_ARGS__)
 

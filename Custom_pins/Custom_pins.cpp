@@ -5,8 +5,6 @@
 
 #include "Custom_pins.h"
 
-#include "wiring_analog.c"
-
 namespace yh {
     namespace rec {
         namespace custom_pins {
@@ -82,8 +80,6 @@ ISR (ADC_vect) {
 }
 
 uint16_t analog_read (const uint8_t channel) {
-    if (!(ADCSRA & (1 << ADEN)))
-        begin_adc();
     if ( (ADCSRA & (1 << ADIE)) && (SREG & (1 << SREG_I)) ) {
         uint8_t oldSREG = SREG;
         noInterrupts();
