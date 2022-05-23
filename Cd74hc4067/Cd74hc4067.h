@@ -5,6 +5,25 @@
 
 namespace yh {
     namespace rec {
+
+        #ifndef NC_PINNO
+        #define NC_PINNO 255
+        #endif // #ifndef NC_PINNO
+
+        //                  +-\/-+
+        //    Common I/O   1|    |24  VCC
+        //            I7   2|    |23  I8
+        //            I6   3|    |22  I9
+        //            I5   4|    |21  I10
+        //            I4   5|    |20  I11
+        //            I3   6|    |19  I12
+        //            I2   7|    |18  I13
+        //            I1   8|    |17  I14
+        //            I0   9|    |16  I15
+        //            S0  10|    |15  E
+        //            S1  11|    |14  S2
+        //           GND  12|    |13  S3
+        //                  +----+
         class Cd74hc4067 {
             private:
                 //

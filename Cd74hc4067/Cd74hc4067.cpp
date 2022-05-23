@@ -35,17 +35,24 @@ void yh::rec::Cd74hc4067::begin () {
     pinMode(pin_s1, OUTPUT);
     pinMode(pin_s2, OUTPUT);
     pinMode(pin_s3, OUTPUT);
-    pinMode(pin_en, OUTPUT);
+    if (pin_en != NC_PINNO)
+        pinMode(pin_en, OUTPUT);
     pin_s0_out_reg = portOutputRegister(digitalPinToPort(pin_s0));
     pin_s1_out_reg = portOutputRegister(digitalPinToPort(pin_s1));
     pin_s2_out_reg = portOutputRegister(digitalPinToPort(pin_s2));
     pin_s3_out_reg = portOutputRegister(digitalPinToPort(pin_s3));
-    pin_en_out_reg = portOutputRegister(digitalPinToPort(pin_en));
+    if (pin_en == NC_PINNO)
+        pin_en_out_reg = portOutputRegister(digitalPinToPort(0));
+    else
+        pin_en_out_reg = portOutputRegister(digitalPinToPort(pin_en));
     pin_s0_mask = digitalPinToBitMask(pin_s0);
     pin_s1_mask = digitalPinToBitMask(pin_s1);
     pin_s2_mask = digitalPinToBitMask(pin_s2);
     pin_s3_mask = digitalPinToBitMask(pin_s3);
-    pin_en_mask = digitalPinToBitMask(pin_en);
+    if (pin_en == NC_PINNO)
+        pin_en_mask = 0;
+    else
+        pin_en_mask = digitalPinToBitMask(pin_en);
     (*pin_en_out_reg) |= pin_en_mask; // write en pin to HIGH to disable the single ic
     (*pin_s0_out_reg) &= (~pin_s0_mask);
     (*pin_s1_out_reg) &= (~pin_s1_mask);
