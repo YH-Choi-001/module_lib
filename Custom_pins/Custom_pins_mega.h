@@ -177,51 +177,51 @@
 )
 
 // timer compare
-#define PIN_TO_COMPARE(pin,prefix,suffix,unknown) ( \
+#define PIN_TO_COMPARE(pin,prefix,suffix,rhs,unknown) ( \
     (pin == 2) ? \
-        (prefix##3B##suffix) : \
+        (prefix##3B##suffix rhs) : \
         ( \
             (pin == 3) ? \
-                (prefix##3C##suffix) : \
+                (prefix##3C##suffix rhs) : \
                 ( \
                     (pin == 4) ? \
-                        (prefix##0B##suffix) : \
+                        (prefix##0B##suffix rhs) : \
                         ( \
                             (pin == 5) ? \
-                                (prefix##3A##suffix) : \
+                                (prefix##3A##suffix rhs) : \
                                 ( \
                                     (pin == 6) ? \
-                                        (prefix##4A##suffix) : \
+                                        (prefix##4A##suffix rhs) : \
                                         ( \
                                             (pin == 7) ? \
-                                                (prefix##4B##suffix) : \
+                                                (prefix##4B##suffix rhs) : \
                                                 ( \
                                                     (pin == 8) ? \
-                                                        (prefix##4C##suffix) : \
+                                                        (prefix##4C##suffix rhs) : \
                                                         ( \
                                                             (pin == 9) ? \
-                                                                (prefix##2B##suffix) : \
+                                                                (prefix##2B##suffix rhs) : \
                                                                 ( \
                                                                     (pin == 10) ? \
-                                                                        (prefix##2A##suffix) : \
+                                                                        (prefix##2A##suffix rhs) : \
                                                                         ( \
                                                                             (pin == 11) ? \
-                                                                                (prefix##1A##suffix) : \
+                                                                                (prefix##1A##suffix rhs) : \
                                                                                 ( \
                                                                                     (pin == 12) ? \
-                                                                                        (prefix##1B##suffix) : \
+                                                                                        (prefix##1B##suffix rhs) : \
                                                                                         ( \
                                                                                             (pin == 13) ? \
-                                                                                                (prefix##0A##suffix) : \
+                                                                                                (prefix##0A##suffix rhs) : \
                                                                                                 ( \
                                                                                                     (pin == 44) ? \
-                                                                                                        (prefix##5C##suffix) : \
+                                                                                                        (prefix##5C##suffix rhs) : \
                                                                                                         ( \
                                                                                                             (pin == 45) ? \
-                                                                                                                (prefix##5B##suffix) : \
+                                                                                                                (prefix##5B##suffix rhs) : \
                                                                                                                 ( \
                                                                                                                     (pin == 46) ? \
-                                                                                                                        (prefix##5A##suffix) : \
+                                                                                                                        (prefix##5A##suffix rhs) : \
                                                                                                                         ( \
                                                                                                                             unknown \
                                                                                                                         ) \
@@ -533,58 +533,56 @@ namespace yh {
             #endif
 
             uint8_t rubbish = 0;
-            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
             state ? (PIN_TO_P(PORT, pin, rubbish) |= PIN_TO_BITMSK(pin)) : (PIN_TO_P(PORT, pin, rubbish) &= (~PIN_TO_BITMSK(pin))); // write low or high
         }
         void digital_write_HIGH (const uint8_t pin) __attribute__((__always_inline__));
         void digital_write_HIGH (const uint8_t pin) {
             uint8_t rubbish = 0;
-            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
             (PIN_TO_P(PORT, pin, rubbish) |= PIN_TO_BITMSK(pin)); // write high
         }
         void digital_write_LOW (const uint8_t pin) __attribute__((__always_inline__));
         void digital_write_LOW (const uint8_t pin) {
             uint8_t rubbish = 0;
-            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
             (PIN_TO_P(PORT, pin, rubbish) &= (~PIN_TO_BITMSK(pin))); // write low
         }
         void digital_write_TOGGLE (const uint8_t pin) __attribute__((__always_inline__));
         void digital_write_TOGGLE (const uint8_t pin) {
             uint8_t rubbish = 0;
-            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
             (PIN_TO_P(PORT, pin, rubbish) ^= PIN_TO_BITMSK(pin)); // write high
         }
         int digital_read (const uint8_t pin) __attribute__((__always_inline__));
         int digital_read (const uint8_t pin) {
             uint8_t rubbish = 0;
-            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
             return PIN_TO_P(PIN, pin, rubbish) & PIN_TO_BITMSK(pin) ? 1 : 0; // read 1 or 0
+        }
+        uint8_t digital_read_LOGICAL (const uint8_t pin) __attribute__((__always_inline__));
+        uint8_t digital_read_LOGICAL (const uint8_t pin) {
+            uint8_t rubbish = 0;
+            PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
+            return PIN_TO_P(PIN, pin, rubbish) & PIN_TO_BITMSK(pin); // read 0 or non-zero
         }
         void analog_write (const uint8_t pin, const uint8_t val) __attribute__((__always_inline__));
         void analog_write (const uint8_t pin, const uint8_t val) {
             uint8_t rubbish = 0;
             PIN_TO_P(DDR, pin, rubbish) |= PIN_TO_BITMSK(pin); // set data direction to output
             if (val == 0) {
-                PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+                PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
                 PIN_TO_P(PORT, pin, rubbish) &= (~PIN_TO_BITMSK(pin)); // write low
             } else if (val == 255) {
-                PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff)); // clear pwm output
+                PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
                 PIN_TO_P(PORT, pin, rubbish) |= PIN_TO_BITMSK(pin); // write high
             } else {
-                PIN_TO_TIMER(pin, TCCR, A, rubbish) |= ((1 << PIN_TO_COMPARE(pin, COM, 1, 8)) & 0xff); // set pwm output
-                PIN_TO_COMPARE(pin, OCR, , rubbish) = val; // set pwm duty-cycle
+                PIN_TO_TIMER(pin, TCCR, A, rubbish) |= ((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff); // set pwm output
+                PIN_TO_COMPARE(pin, OCR, , = val, rubbish); // set pwm duty-cycle
             }
         }
     }
 }
-
-#define pinMode(...) yh::rec::pin_mode(__VA_ARGS__)
-#define digitalWrite(...) yh::rec::digital_write(__VA_ARGS__)
-#define digitalWriteHIGH(...) yh::rec::digital_write_HIGH(__VA_ARGS__)
-#define digitalWriteLOW(...) yh::rec::digital_write_LOW(__VA_ARGS__)
-#define digitalWriteTOGGLE(...) yh::rec::digital_write_TOGGLE(__VA_ARGS__)
-#define digitalRead(...) yh::rec::digital_read(__VA_ARGS__)
-#define analogWrite(...) yh::rec::analog_write(__VA_ARGS__)
 
 #endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
 
