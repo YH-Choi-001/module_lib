@@ -384,8 +384,6 @@ namespace yh {
                 Encoder_2ch_ext_int (const Encoder_2ch_ext_int &init_obj);
                 // inits the arguments to the signal A and B pins, and the length of displacement stored
                 Encoder_2ch_ext_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin);
-                // frees the memory allocated
-                ~Encoder_2ch_ext_int ();
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 void begin ();
@@ -394,8 +392,8 @@ namespace yh {
                     // stores the current state of channel A and channel B
                     const uint8_t curr_A_state = (*signal_A_input_reg & signal_A_mask);
                     const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
-                    int8_t delta_displacement;
                     const unsigned long temp_delta_time = micros() - prev_time;
+                    int8_t delta_displacement;
                     const uint16_t delta_time = (temp_delta_time > max_waiting_time) ? max_waiting_time : temp_delta_time;
                     if ( (prev_A_state ^ curr_A_state) && (prev_B_state ^ curr_B_state) ) {
                         // both A has B has changed
@@ -408,12 +406,12 @@ namespace yh {
                         // B has changed
                         delta_displacement = (curr_A_state ^ curr_B_state) ? (-1) : (+1);
                     }
-                    const int16_t new_instantaneous_velocity = delta_displacement * full_spd_signal_change_time * full_spd_velocity_val / delta_time;
+                    const int16_t new_instantaneous_velocity = delta_displacement * static_cast<int8_t>(full_spd_signal_change_time) * static_cast<int16_t>(full_spd_velocity_val) / delta_time;
                     instantaneous_acceleration = (new_instantaneous_velocity - instantaneous_velocity) / delta_time; // a == (v - u) / t
                     instantaneous_velocity = new_instantaneous_velocity;
-                    prev_time += delta_time;
                     prev_A_state = curr_A_state;
                     prev_B_state = curr_B_state;
+                    prev_time += delta_time;
                 }
                 // gets the instantaneous velocity of the encoder
                 // the value of instantaneous_velocity increases as request_log_len in constructor increases
@@ -424,7 +422,8 @@ namespace yh {
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     const int16_t to_return = 
-                        instantaneous_velocity + instantaneous_acceleration * time_since_last_isr_ran; // return v = u + at
+                        // instantaneous_velocity + instantaneous_acceleration * time_since_last_isr_ran; // return v = u + at
+                        instantaneous_velocity;
                     SREG = oldSREG;
                     return to_return;
                 }
