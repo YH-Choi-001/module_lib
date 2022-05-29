@@ -1,14 +1,12 @@
-// This library is proved to be working on 6 Feb 2022 at 19:24
-
 #ifndef BUTTON_INVERSE_CPP
 #define BUTTON_INVERSE_CPP __DATE__ ", " __TIME__
 
-#include "button_inverse.h"
+#include <Arduino.h>
 
-yh::rec::Button_inverse::Button_inverse (const uint8_t init_button_signal_pin) :
-    button_signal_pin(init_button_signal_pin)
-{
-    //
-}
+#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) || defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+#include "Button_inverse_classic.cpp"
+#else
+#include "Button_inverse_universal.cpp"
+#endif
 
 #endif // #ifndef BUTTON_INVERSE_CPP
