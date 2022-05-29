@@ -22,12 +22,8 @@ namespace yh {
                 // pins that cannot be changed:
                 // the pin to trigger a sound wave
                 const uint8_t trig_pin;
-                uint8_t trig_pin_mask;
-                volatile uint8_t *trig_pin_output_register;
                 // the pin to read the soundwave sensor
                 const uint8_t echo_pin;
-                uint8_t echo_pin_mask;
-                volatile uint8_t *echo_pin_input_register;
                 // the max waiting time for the sound pulse to return (unit is microseconds)
                 unsigned long max_waiting_time_in_us;
             public:
@@ -61,12 +57,8 @@ namespace yh {
                 // pins that cannot be changed:
                 // the pin to trigger a sound wave
                 const uint8_t trig_pin;
-                uint8_t trig_pin_mask;
-                volatile uint8_t *trig_pin_output_register;
                 // the pin to read the soundwave sensor
                 const uint8_t echo_pin;
-                uint8_t echo_pin_mask;
-                volatile uint8_t *echo_pin_input_register;
                 // the counter to be incremented every time the ISR is run
                 volatile unsigned long ticks;
                 // // also acts as a flag to indicate whether the measurement has ended
@@ -192,12 +184,8 @@ namespace yh {
                 // pins that cannot be changed:
                 // the pin to trigger a sound wave
                 const uint8_t trig_pin;
-                uint8_t trig_pin_mask;
-                volatile uint8_t *trig_pin_output_register;
                 // the pin to read the soundwave sensor
                 const uint8_t echo_pin;
-                uint8_t echo_pin_mask;
-                volatile uint8_t *echo_pin_input_register;
                 // the time the measurement starts
                 unsigned long starting_time;
                 // the time the pulse returns
