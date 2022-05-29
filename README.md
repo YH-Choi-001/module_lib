@@ -4,6 +4,8 @@
   
 **Written exclusively for Arduino Nano, Uno, Mega, Mega2560, Mega2560 pro**  
   
+**The libraries will cover Arduino Micro and Leonardo if needed in the future**  
+  
 You may download the whole repository as a zip to your local drive, and then open your Arduino IDE.  
 Select from the IDE's toolbar: Sketch -> Include Library -> Add .ZIP library... -> and select the folder containing a desired module, maybe like Us_016  
 
@@ -31,7 +33,7 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
   
 [AVR Inline ASM Manual](https://www.nongnu.org/avr-libc/user-manual/inline_asm.html)
   
-AVR objdump command in Mac: /Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objdump -S "filepath"
+AVR objdump command in Mac: `/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objdump -S "filepath"`
   
 ![RCJ Soccer Lightweight IR ball pulse graph](./Ningor_ir/ball_pulse_graph.png)
 ![ATmega2560 pinout](./pinout_diagrams/ATmega2560_pinout_2.png)

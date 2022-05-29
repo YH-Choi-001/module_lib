@@ -18,9 +18,9 @@
 
 #else
 
-    #warning This Arduino board is not supported by Attach_pcint.h, but supported by Pcint.h.
-    #warning Attach_pcint.h officially supports Arduino classic Nano, Uno, Mega family boards only.
-    #warning Please self-define the ISR of all PCINTs.
+    #error This Arduino board is not supported by Attach_pcint.h, but supported by Pcint.h.
+    #error Attach_pcint.h officially supports Arduino classic Nano, Uno, Mega family boards only.
+    #error Please use Pcint.h library instead.
 
 #endif
 
