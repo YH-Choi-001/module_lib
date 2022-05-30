@@ -105,15 +105,15 @@ namespace yh {
                 // triggers a new sound pulse if the previous measurement has ended
                 inline void simple_update () {
                     // if (echo_pin is HIGH) or (measurement_ended == 0), just exit the function
-                    if (   ((*echo_pin_input_register) & echo_pin_mask) || (!measurement_ended)   ) return;
+                    if (   digitalRead(echo_pin) || (!measurement_ended)   ) return;
 
-                    (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
+                    digitalWrite(trig_pin, LOW); // write trig_pin to LOW
                     delayMicroseconds(2);
-                    (*trig_pin_output_register) |= trig_pin_mask; // write trig_pin to HIGH
+                    digitalWrite(trig_pin, HIGH); // write trig_pin to HIGH
                     delayMicroseconds(10);
-                    (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
+                    digitalWrite(trig_pin, LOW); // write trig_pin to LOW
                     //
-                    // while (!((*echo_pin_input_register) & echo_pin_mask)) {} // while LOW
+                    // while (!digitalRead(echo_pin)) {} // while LOW
                     waiting_for_echo_rise = true; // leave it for the ISR to check the echo pin status
                 }
                 // call me by polling in void loop ()
@@ -126,7 +126,7 @@ namespace yh {
                 // only call me in an ISR for each sensor
                 inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
                     if (waiting_for_echo_rise) {
-                        if ((*echo_pin_input_register) & echo_pin_mask) {
+                        if (digitalRead(echo_pin)) {
                             // echo pin has risen
                             // clear the flag
                             waiting_for_echo_rise = false;
@@ -147,7 +147,7 @@ namespace yh {
                             // isr is being ran in simple_update()
                             // noting to do
                         if (!measurement_ended) {
-                            if ((*echo_pin_input_register) & echo_pin_mask) // {
+                            if (digitalRead(echo_pin)) // {
                                 ticks++;
                             // } else {
                             else
@@ -241,13 +241,13 @@ namespace yh {
                 // triggers a new sound pulse if the previous measurement has ended
                 inline void simple_update () {
                     // if (echo_pin is HIGH) or (measurement not finished), just exit the function
-                    if (   ((*echo_pin_input_register) & echo_pin_mask) || (!(starting_time && ending_time))   ) return;
+                    if (   digitalRead(echo_pin) || (!(starting_time && ending_time))   ) return;
 
-                    (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
+                    digitalWrite(trig_pin, LOW); // write trig_pin to LOW
                     delayMicroseconds(2);
-                    (*trig_pin_output_register) |= trig_pin_mask; // write trig_pin to HIGH
+                    digitalWrite(trig_pin, HIGH); // write trig_pin to HIGH
                     delayMicroseconds(10);
-                    (*trig_pin_output_register) &= ~trig_pin_mask; // write trig_pin to LOW
+                    digitalWrite(trig_pin, LOW); // write trig_pin to LOW
                     uint8_t oldSREG = SREG;
                     noInterrupts();
                     starting_time = 0; // configures the flag into waiting mode
@@ -266,7 +266,7 @@ namespace yh {
                 // This method does not check if the echo pin has really changed,
                 // but treats the current state of echo pin as the state of echo pin after it is changed.
                 inline void isr_individual_sensor_routine () __attribute__((__always_inline__)) {
-                    if ((*echo_pin_input_register) & echo_pin_mask) {
+                    if (digitalRead(echo_pin)) {
                         // pin rises
                         if (!starting_time) { // configures the flag into measuring mode
                             starting_time = micros();
@@ -281,7 +281,7 @@ namespace yh {
                 // // only call me in an ISR for each sensor
                 // // this method also checks the status of echo pin, which is suitable for PCINTs
                 // inline void isr_individual_sensor_routine_with_checking_echo_status () __attribute__((__always_inline__)) {
-                //     if (!ending_time && (!((*echo_pin_input_register) & echo_pin_mask)) ) ending_time = micros();
+                //     if (!ending_time && (!digitalRead(echo_pin)) ) ending_time = micros();
                 // }
         };
     }

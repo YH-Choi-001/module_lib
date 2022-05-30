@@ -22,10 +22,6 @@ yh::rec::Hc_sr04::Hc_sr04 (const uint8_t init_trig_pin, const uint8_t init_echo_
 void yh::rec::Hc_sr04::begin () {
     pinMode(trig_pin, OUTPUT);
     pinMode(echo_pin, INPUT);
-    trig_pin_output_register = portOutputRegister(digitalPinToPort(trig_pin));
-    echo_pin_input_register = portInputRegister(digitalPinToPort(echo_pin));
-    trig_pin_mask = digitalPinToBitMask(trig_pin);
-    echo_pin_mask = digitalPinToBitMask(echo_pin);
 }
 
 
@@ -42,11 +38,11 @@ void yh::rec::Hc_sr04::set_max_range_in_cm (const double max_range_in_cm) {
 }
 
 uint16_t yh::rec::Hc_sr04::read_dist_mm () {
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     delayMicroseconds(2);
-    (*trig_pin_output_register) |= trig_pin_mask;
+    digitalWrite(trig_pin, HIGH);
     delayMicroseconds(10);
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     const unsigned long width =
         countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask,
             microsecondsToClockCycles(max_waiting_time_in_us) / 16);
@@ -56,11 +52,11 @@ uint16_t yh::rec::Hc_sr04::read_dist_mm () {
 }
 
 uint16_t yh::rec::Hc_sr04::read_dist_cm () {
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     delayMicroseconds(2);
-    (*trig_pin_output_register) |= trig_pin_mask;
+    digitalWrite(trig_pin, HIGH);
     delayMicroseconds(10);
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     const unsigned long width =
         countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask,
             microsecondsToClockCycles(max_waiting_time_in_us) / 16);
@@ -86,17 +82,13 @@ yh::rec::Hc_sr04_timer_int::Hc_sr04_timer_int (const uint8_t init_trig_pin, cons
 void yh::rec::Hc_sr04_timer_int::begin () {
     pinMode(trig_pin, OUTPUT);
     pinMode(echo_pin, INPUT);
-    trig_pin_output_register = portOutputRegister(digitalPinToPort(trig_pin));
-    echo_pin_input_register = portInputRegister(digitalPinToPort(echo_pin));
-    trig_pin_mask = digitalPinToBitMask(trig_pin);
-    echo_pin_mask = digitalPinToBitMask(echo_pin);
 
     // initial kick-off
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     delayMicroseconds(2);
-    (*trig_pin_output_register) |= trig_pin_mask;
+    digitalWrite(trig_pin, HIGH);
     delayMicroseconds(10);
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     // wait
     waiting_for_echo_rise = true;
 }
@@ -119,17 +111,13 @@ yh::rec::Hc_sr04_ext_int::Hc_sr04_ext_int (const uint8_t init_trig_pin, const ui
 void yh::rec::Hc_sr04_ext_int::begin () {
     pinMode(trig_pin, OUTPUT);
     pinMode(echo_pin, INPUT);
-    trig_pin_output_register = portOutputRegister(digitalPinToPort(trig_pin));
-    echo_pin_input_register = portInputRegister(digitalPinToPort(echo_pin));
-    trig_pin_mask = digitalPinToBitMask(trig_pin);
-    echo_pin_mask = digitalPinToBitMask(echo_pin);
 
     // initial kick-off
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     delayMicroseconds(2);
-    (*trig_pin_output_register) |= trig_pin_mask;
+    digitalWrite(trig_pin, HIGH);
     delayMicroseconds(10);
-    (*trig_pin_output_register) &= ~trig_pin_mask;
+    digitalWrite(trig_pin, LOW);
     uint8_t oldSREG = SREG;
     noInterrupts();
     starting_time = 0;
