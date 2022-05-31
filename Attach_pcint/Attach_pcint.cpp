@@ -17,7 +17,8 @@
 // #define RISING 3
 // supports 4 state: LOW, CHANGE, FALLING, RISING
 
-void (*pcint_isr_ptr[3][8])(void);
+void (*pcint_falling_ptr[3][8])(void);
+void (*pcint_rising_ptr[3][8])(void);
 
 uint8_t pcint_trig_rising [3] = {0, 0, 0};
 uint8_t pcint_trig_falling [3] = {0, 0, 0};
@@ -35,27 +36,44 @@ void attach_pcint (const uint8_t pcint_no, void (*pcint_isr)(void), const uint8_
         case LOW:
             pcint_trig_rising[PCINT_GROUP] &= ~PCINT_BITMASK;
             pcint_trig_falling[PCINT_GROUP] &= ~PCINT_BITMASK;
+            pcint_falling_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_isr;
+            pcint_rising_ptr[PCINT_GROUP][pcint_no & 0b111] = yh::rec::attach_pcints::pvt::empty_function;
             break;
         case CHANGE:
             pcint_trig_rising[PCINT_GROUP] |= PCINT_BITMASK;
             pcint_trig_falling[PCINT_GROUP] |= PCINT_BITMASK;
+            pcint_rising_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_falling_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_isr;
             break;
         case FALLING:
             pcint_trig_rising[PCINT_GROUP] &= ~PCINT_BITMASK;
             pcint_trig_falling[PCINT_GROUP] |= PCINT_BITMASK;
+            pcint_falling_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_isr;
+            pcint_rising_ptr[PCINT_GROUP][pcint_no & 0b111] = yh::rec::attach_pcints::pvt::empty_function;
             break;
         case RISING:
             pcint_trig_rising[PCINT_GROUP] |= PCINT_BITMASK;
             pcint_trig_falling[PCINT_GROUP] &= ~PCINT_BITMASK;
+            pcint_falling_ptr[PCINT_GROUP][pcint_no & 0b111] = yh::rec::attach_pcints::pvt::empty_function;
+            pcint_rising_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_isr;
             break;
     }
-    pcint_isr_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_isr;
+    enable_pcint_num(pcint_no);
+}
+
+
+void attach_pcint (const uint8_t pcint_no, void (*pcint_rising_isr)(void), void (*pcint_falling_isr)(void)) {
+    const uint8_t PCINT_GROUP = (pcint_no >> 3);
+    const uint8_t PCINT_BITMASK = (1 << (pcint_no & 0b111));
+    pcint_trig_rising[PCINT_GROUP] |= PCINT_BITMASK;
+    pcint_trig_falling[PCINT_GROUP] |= PCINT_BITMASK;
+    pcint_rising_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_rising_isr;
+    pcint_falling_ptr[PCINT_GROUP][pcint_no & 0b111] = pcint_falling_isr;
     enable_pcint_num(pcint_no);
 }
 
 void detach_pcint (const uint8_t pcint_no) {
     disable_pcint_num(pcint_no);
-    pcint_isr_ptr[pcint_no >> 3][pcint_no & 0b111] = yh::rec::attach_pcints::pvt::empty_function;
+    pcint_falling_ptr[pcint_no >> 3][pcint_no & 0b111] = yh::rec::attach_pcints::pvt::empty_function;
 }
 
 #endif
@@ -73,12 +91,12 @@ ISR (PCINT0_vect) {
     for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (mask & changed_pins & PCMSKx_for_GROUP) {
             if (mask & curr_PINx_state & pcint_trig_rising[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_rising_ptr[PCINT_GROUP][i]();
             } else if (mask & prev_PINx_state & pcint_trig_falling[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_falling_ptr[PCINT_GROUP][i]();
             } else {
                 while (!(PINx_for_GROUP & mask)) {
-                    pcint_isr_ptr[PCINT_GROUP][i]();
+                    pcint_falling_ptr[PCINT_GROUP][i]();
                 }
             }
         }
@@ -105,12 +123,12 @@ ISR (PCINT1_vect) {
     for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (mask & changed_pins & PCMSKx_for_GROUP) {
             if (mask & curr_PINx_state & pcint_trig_rising[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_rising_ptr[PCINT_GROUP][i]();
             } else if (mask & prev_PINx_state & pcint_trig_falling[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_falling_ptr[PCINT_GROUP][i]();
             } else {
                 while (!(((PINE & 0x01) | (PINJ << 1)) & mask)) {
-                    pcint_isr_ptr[PCINT_GROUP][i]();
+                    pcint_falling_ptr[PCINT_GROUP][i]();
                 }
             }
         }
@@ -134,12 +152,12 @@ ISR (PCINT2_vect) {
     for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (mask & changed_pins & PCMSKx_for_GROUP) {
             if (mask & curr_PINx_state & pcint_trig_rising[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_rising_ptr[PCINT_GROUP][i]();
             } else if (mask & prev_PINx_state & pcint_trig_falling[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_falling_ptr[PCINT_GROUP][i]();
             } else {
                 while (!(PINx_for_GROUP & mask)) {
-                    pcint_isr_ptr[PCINT_GROUP][i]();
+                    pcint_falling_ptr[PCINT_GROUP][i]();
                 }
             }
         }
@@ -167,12 +185,12 @@ ISR (PCINT0_vect) {
     for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (mask & changed_pins & PCMSKx_for_GROUP) {
             if (mask & curr_PINx_state & pcint_trig_rising[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_rising_ptr[PCINT_GROUP][i]();
             } else if (mask & prev_PINx_state & pcint_trig_falling[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_falling_ptr[PCINT_GROUP][i]();
             } else {
                 while (!(PINx_for_GROUP & mask)) {
-                    pcint_isr_ptr[PCINT_GROUP][i]();
+                    pcint_falling_ptr[PCINT_GROUP][i]();
                 }
             }
         }
@@ -196,12 +214,12 @@ ISR (PCINT1_vect) {
     for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (mask & changed_pins & PCMSKx_for_GROUP) {
             if (mask & curr_PINx_state & pcint_trig_rising[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_rising_ptr[PCINT_GROUP][i]();
             } else if (mask & prev_PINx_state & pcint_trig_falling[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_falling_ptr[PCINT_GROUP][i]();
             } else {
                 while (!(PINx_for_GROUP & mask)) {
-                    pcint_isr_ptr[PCINT_GROUP][i]();
+                    pcint_falling_ptr[PCINT_GROUP][i]();
                 }
             }
         }
@@ -225,12 +243,12 @@ ISR (PCINT2_vect) {
     for (uint8_t i = 0, mask = 1; i < 8; i++, mask <<= 1) {
         if (mask & changed_pins & PCMSKx_for_GROUP) {
             if (mask & curr_PINx_state & pcint_trig_rising[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_rising_ptr[PCINT_GROUP][i]();
             } else if (mask & prev_PINx_state & pcint_trig_falling[PCINT_GROUP]) {
-                pcint_isr_ptr[PCINT_GROUP][i]();
+                pcint_falling_ptr[PCINT_GROUP][i]();
             } else {
                 while (!(PINx_for_GROUP & mask)) {
-                    pcint_isr_ptr[PCINT_GROUP][i]();
+                    pcint_falling_ptr[PCINT_GROUP][i]();
                 }
             }
         }

@@ -14,6 +14,7 @@
     #define pin_to_pcint_no(pin_no) ((digitalPinToPCICRbit(pin_no) << 3) + digitalPinToPCMSKbit(pin_no)) // will be redefined in Arduino MEGA deviation
 
     void attach_pcint (const uint8_t pcint_no, void (*pcint_isr)(void), const uint8_t state);
+    void attach_pcint (const uint8_t pcint_no, void (*pcint_rising_isr)(void), void (*pcint_falling_isr)(void));
     void detach_pcint (const uint8_t pcint_no);
 
 #else
