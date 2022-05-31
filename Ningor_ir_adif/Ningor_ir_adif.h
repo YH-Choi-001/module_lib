@@ -14,11 +14,17 @@ namespace yh {
                 //
             public:
                 //
+                uint16_t ball_dir;
+                //
                 void begin ();
                 // read unfiltered IR signal
                 uint16_t read_sun (const uint8_t channel);
                 // read IR signal filtered for RCJ soccer ball
                 uint16_t read_ball (const uint8_t channel);
+                // get the direction of the ball in degrees
+                uint16_t get_ball_dir ();
+                // get the magnitude of the ball
+                uint16_t get_ball_mag ();
         };
     }
 }
