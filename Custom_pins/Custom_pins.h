@@ -269,7 +269,11 @@ namespace yh {
 
 
 
+            int analog_read (uint8_t pin);
         }
+
+
+
         class Custom_pin {
             private:
                 // the counter to count how many objects has been automatically created
@@ -613,13 +617,16 @@ namespace yh {
                     #endif // #if !FUNCTION_PWM
                 }
             public:
+                // pin number of the object
+                const uint8_t pin_no;
                 // inits the pin number into the object
                 Custom_pin (const uint8_t init_pin) :
                 output_reg(   portOutputRegister( digitalPinToPort(init_pin) )   ),
                 input_reg(   portInputRegister( digitalPinToPort(init_pin) )   ),
                 mode_reg(   portModeRegister( digitalPinToPort(init_pin) )   ),
                 bit_mask(digitalPinToBitMask(init_pin)),
-                timer(digitalPinToTimer(init_pin))
+                timer(digitalPinToTimer(init_pin)),
+                pin_no(init_pin)
                 {
                     timer_identification();
                 }
@@ -629,9 +636,10 @@ namespace yh {
                 input_reg(   portInputRegister( digitalPinToPort(auto_object_counter) )   ),
                 mode_reg(   portModeRegister( digitalPinToPort(auto_object_counter) )   ),
                 bit_mask(digitalPinToBitMask(auto_object_counter)),
-                timer(digitalPinToTimer(auto_object_counter++))
+                timer(digitalPinToTimer(auto_object_counter)),
+                pin_no(auto_object_counter)
                 {
-
+                    auto_object_counter++;
                     timer_identification();
                 }
                 //
@@ -709,6 +717,8 @@ namespace yh {
                     }
                     #endif // #if !FUNCTION_PWM
                 }
+                //
+                int analog_read () __attribute__((__always_inline__)) { return custom_pins::analog_read(pin_no); }
         };
         extern Custom_pin pins [];
         namespace custom_pins {
@@ -726,6 +736,55 @@ namespace yh {
             inline void digital_write_LOW    (const uint8_t pin)                                       { pins[pin].digital_write_LOW(); }
             inline void digital_write_TOGGLE (const uint8_t pin)   __attribute__((__always_inline__));
             inline void digital_write_TOGGLE (const uint8_t pin)                                       { pins[pin].digital_write_TOGGLE(); }
+            inline void select_adc_prescaler (const uint8_t prescaler) __attribute__((__always_inline__));
+            inline void select_adc_prescaler (const uint8_t prescaler)                                     {
+                ADCSRA = (ADCSRA & (~((1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0)))) | ((prescaler & 0b111) << ADPS0);
+            }
+            inline void select_adc_channel (const uint8_t channel) __attribute__((__always_inline__));
+            inline void select_adc_channel (const uint8_t channel)                                     {
+                ADMUX = (ADMUX & ~((1 << MUX4) | (1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0))) | ((channel & 0b111) << MUX0);
+                #if defined(ADCSRB) && defined(MUX5)
+                ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((channel >> 3) & 0x01) << MUX5);
+                #endif // #if defined(ADCSRB) && defined(MUX5)
+            }
+            inline void start_new_ad_conversion ()                     __attribute__((__always_inline__));
+            inline void start_new_ad_conversion ()                                                         { ADCSRA |= (1 << ADSC); }
+            inline void wait_for_ad_conversion_complete ()             __attribute__((__always_inline__));
+            inline void wait_for_ad_conversion_complete ()                                                 { while (ADCSRA & (1 << ADSC)) {} }
+            inline uint16_t read_adc_result ()                         __attribute__((__always_inline__));
+            inline uint16_t read_adc_result ()                                                             {
+                const uint8_t temp = ADCL;
+                if (ADMUX & (1 << ADLAR))
+                    return (temp >> 6) | (ADCH << 2);
+                return temp | (ADCH << 8);
+            }
+            inline uint8_t read_adc_8_bit_result ()                    __attribute__((__always_inline__));
+            inline uint8_t read_adc_8_bit_result ()                                                        {
+                if (ADMUX & (1 << ADLAR))
+                    return ADCH;
+                const uint8_t temp = ADCL;
+                return (temp >> 2) | (ADCH << 6);
+            }
+            int analog_read (uint8_t pin) {
+                #if defined(analogPinToChannel)
+                #if defined(__AVR_ATmega32U4__)
+                    if (pin >= 18) pin -= 18; // allow for channel or pin numbers
+                #endif
+                    pin = analogPinToChannel(pin);
+                #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
+                    if (pin >= 54) pin -= 54; // allow for channel or pin numbers
+                #elif defined(__AVR_ATmega32U4__)
+                    if (pin >= 18) pin -= 18; // allow for channel or pin numbers
+                #elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega644__) || defined(__AVR_ATmega644A__) || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644PA__)
+                    if (pin >= 24) pin -= 24; // allow for channel or pin numbers
+                #else
+                    if (pin >= 14) pin -= 14; // allow for channel or pin numbers
+                #endif
+                select_adc_channel(pin);
+                start_new_ad_conversion();
+                wait_for_ad_conversion_complete();
+                return read_adc_result();
+            }
         }
     }
 }
