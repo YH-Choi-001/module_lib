@@ -43,12 +43,8 @@ uint16_t yh::rec::Hc_sr04::read_dist_mm () {
     digitalWrite(trig_pin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trig_pin, LOW);
-    const unsigned long width =
-        countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask,
-            microsecondsToClockCycles(max_waiting_time_in_us) / 16);
-    return width ? (clockCyclesToMicroseconds(width * 16 + 16) * 0.17) : 8888;
-    // const unsigned long duration = pulseIn(echo_pin, HIGH, (max_waiting_time_in_us > 23530 ? 23530 : max_waiting_time_in_us));
-    // return duration ? duration * 0.17 : 8888;
+    const unsigned long duration = pulseIn(echo_pin, HIGH, max_waiting_time_in_us);
+    return duration ? duration * 0.17 : 8888;
 }
 
 uint16_t yh::rec::Hc_sr04::read_dist_cm () {
@@ -57,12 +53,8 @@ uint16_t yh::rec::Hc_sr04::read_dist_cm () {
     digitalWrite(trig_pin, HIGH);
     delayMicroseconds(10);
     digitalWrite(trig_pin, LOW);
-    const unsigned long width =
-        countPulseASM(echo_pin_input_register, echo_pin_mask, echo_pin_mask,
-            microsecondsToClockCycles(max_waiting_time_in_us) / 16);
-    return width ? (clockCyclesToMicroseconds(width * 16 + 16) * 0.017) : 888;
-    // const unsigned long duration = pulseIn(echo_pin, HIGH, (max_waiting_time_in_us > 23530 ? 23530 : max_waiting_time_in_us));
-    // return duration ? duration * 0.017 : 888;
+    const unsigned long duration = pulseIn(echo_pin, HIGH, max_waiting_time_in_us);
+    return duration ? duration * 0.017 : 888;
 }
 
 
