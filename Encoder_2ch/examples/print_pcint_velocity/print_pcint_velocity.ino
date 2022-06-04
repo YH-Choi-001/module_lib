@@ -49,30 +49,9 @@ ISR (PCINT1_vect) {
 
 void loop() {
     // put your main code here, to run repeatedly:
-    const int16_t
-        L_actual_spd = encoder_L.get_instantaneous_velocity(),
-        R_actual_spd = encoder_R.get_instantaneous_velocity();
-    Serial.print(L_actual_spd);
-    Serial.print('\t');
-    Serial.println(R_actual_spd);
-    // static unsigned long prev_time = micros();
-    // const unsigned long time_diff = micros() - prev_time;
-
-    // L_spd += pid_L.update_corr(100, encoder_L.get_instantaneous_velocity(), time_diff);
-    // R_spd += pid_R.update_corr(100, encoder_R.get_instantaneous_velocity(), time_diff);
-
-    if (L_actual_spd > 108) {
-        L_spd -= 0.003;
-    } else if (L_actual_spd < 92) {
-        L_spd += 0.003;
-    }
-    if (R_actual_spd > 108) {
-        R_spd -= 0.003;
-    } else if (R_actual_spd < 92) {
-        R_spd += 0.003;
-    }
-
-    set_L_spd(L_spd);
-    set_R_spd(R_spd);
-    // prev_time += time_diff;
+    Serial.print("Left velocity: ");
+    Serial.print(encoder_L.get_instantaneous_velocity());
+    Serial.print("\tRight velocity: ");
+    Serial.print(encoder_R.get_instantaneous_velocity());
+    Serial.print('\n');
 }
