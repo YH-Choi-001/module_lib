@@ -1,0 +1,8 @@
+yh			KEYWORD1
+rec			KEYWORD1
+Mcp_3008		KEYWORD1
+Mcp_3008_default_SPI	KEYWORD1
+
+begin			KEYWORD2
+analog_read		KEYWORD2
+analog_read_diff	KEYWORD2

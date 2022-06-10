@@ -8,3 +8,11 @@ off_timer_2A_interrupt		KEYWORD2
 off_timer_3A_interrupt		KEYWORD2
 off_timer_4A_interrupt		KEYWORD2
 off_timer_5A_interrupt		KEYWORD2
+set_timer_1_prescaler		KEYWORD2
+set_timer_3_prescaler		KEYWORD2
+set_timer_4_prescaler		KEYWORD2
+set_timer_5_prescaler		KEYWORD2
+set_timer_1_wgm_mode		KEYWORD2
+set_timer_3_wgm_mode		KEYWORD2
+set_timer_4_wgm_mode		KEYWORD2
+set_timer_5_wgm_mode		KEYWORD2

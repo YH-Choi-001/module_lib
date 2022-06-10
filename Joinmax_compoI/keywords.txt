@@ -1,0 +1,14 @@
+yh		KEYWORD1
+rec		KEYWORD1
+CompoI		KEYWORD1
+
+begin		KEYWORD2
+get_channel_val	KEYWORD2
+get_max_idx	KEYWORD2
+get_max_val	KEYWORD2
+get_min_idx	KEYWORD2
+get_min_val	KEYWORD2
+get_avg_val	KEYWORD2
+set_filter_on	KEYWORD2
+set_filter_off	KEYWORD2
+calibrate	KEYWORD2

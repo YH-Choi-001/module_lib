@@ -12,7 +12,7 @@ corr_yaw		KEYWORD1
 
 begin			KEYWORD2
 who_am_i		KEYWORD2
-update_temp		KEYWORD2
+get_temp		KEYWORD2
 cal_gyro		KEYWORD2
 reset_gyro		KEYWORD2
 update_gyro		KEYWORD2

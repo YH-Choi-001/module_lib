@@ -84,7 +84,7 @@ namespace yh {
                     return result;
                 }
                 // reads the 10-bit analog to digital voltage of the channel inputed in differential mode
-                uint16_t analog_read_differential (const uint8_t channel) __attribute__ ((__always_inline__)) {
+                uint16_t analog_read_diff (const uint8_t channel) __attribute__ ((__always_inline__)) {
                     (*cs_pin_out_reg) &= (~cs_pin_mask);
                     spi_ptr->beginTransaction(spi_settings);
                     spi_ptr->transfer(0x01); // transfer START bit

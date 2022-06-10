@@ -2,7 +2,3 @@ enable_pcint_on_specific_pin	KEYWORD2
 disable_pcint_on_specific_pin	KEYWORD2
 enable_pcint_num		KEYWORD2
 disable_pcint_num		KEYWORD2
-
-pin_to_pcint_no			KEYWORD2
-attach_pcint			KEYWORD2
-detach_pcint			KEYWORD2

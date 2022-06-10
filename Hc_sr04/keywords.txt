@@ -19,4 +19,3 @@ read_previous_dist_cm	KEYWORD2
 simple_update		KEYWORD2
 polling_update		KEYWORD2
 isr_individual_sensor_routine	KEYWORD2
-isr_individual_sensor_routine_with_checking_echo_status	KEYWORD2
