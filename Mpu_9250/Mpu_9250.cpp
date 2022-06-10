@@ -57,9 +57,9 @@ inline void yh::rec::Ak_8963::update_raw () {
                 // const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ( ((ASA_X - 128) * 0.5) / 128.0 + 1 );
                 // const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ( ((ASA_Y - 128) * 0.5) / 128.0 + 1 );
                 // const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ( ((ASA_Z - 128) * 0.5) / 128.0 + 1 );
-                const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * ((ASA_X + 128) / 256);
-                const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * ((ASA_Y + 128) / 256);
-                const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * ((ASA_Z + 128) / 256);
+                const int16_t temp_raw_x = (Wire.read() | Wire.read() << 8) * (ASA_X + 128) / 256;
+                const int16_t temp_raw_y = (Wire.read() | Wire.read() << 8) * (ASA_Y + 128) / 256;
+                const int16_t temp_raw_z = (Wire.read() | Wire.read() << 8) * (ASA_Z + 128) / 256;
                 if (!(Wire.read() & 0x10)) { // reading the ST2 register to check if magnetometer overflow has occured
                     // no overflow has occured
                     // update raw_x, raw_y, raw_z
@@ -101,18 +101,18 @@ void yh::rec::Ak_8963::single_calibrate () {
 void yh::rec::Ak_8963::reset_heading () {
     update_raw();
     const double
-        cal_x = (raw_x - min_x) * 2 / range_x + 1,
-        cal_y = (raw_y - min_y) * 2 / range_y + 1;
-        // cal_z = (raw_z - min_z) * 2 / range_z + 1;
+        cal_x = (raw_x - min_x) * 2 / range_x - 1,
+        cal_y = (raw_y - min_y) * 2 / range_y - 1;
+        // cal_z = (raw_z - min_z) * 2 / range_z - 1;
     rz_heading = atan2(cal_x, cal_y) * RAD_TO_DEG;
 }
 
 double yh::rec::Ak_8963::get_heading () {
     update_raw();
     const double
-        cal_x = (raw_x - min_x) * 2 / range_x + 1,
-        cal_y = (raw_y - min_y) * 2 / range_y + 1;
-        // cal_z = (raw_z - min_z) * 2 / range_z + 1;
+        cal_x = (raw_x - min_x) * 2 / range_x - 1,
+        cal_y = (raw_y - min_y) * 2 / range_y - 1;
+        // cal_z = (raw_z - min_z) * 2 / range_z - 1;
     double dir = atan2(cal_x, cal_y) * RAD_TO_DEG - rz_heading;
     if (dir < 0.0) dir += 360.0;
     return dir;

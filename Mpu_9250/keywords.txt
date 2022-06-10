@@ -1,9 +1,15 @@
 ################################
-# keywords in gy521 library are already declared in its keywords.txt
+# keywords in Mpu_6050 library are already declared in its keywords.txt
 
 Custom_gy9250		KEYWORD1
 Custom_ak8963		KEYWORD1
 mag			KEYWORD1
+min_x			KEYWORD1
+min_y			KEYWORD1
+min_z			KEYWORD1
+range_x			KEYWORD1
+range_y			KEYWORD1
+range_z			KEYWORD1
 rz_heading		KEYWORD1
 
 begin			KEYWORD2
