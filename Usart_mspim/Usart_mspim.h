@@ -607,7 +607,7 @@ namespace yh {
 #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
 // #warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
 // #warning If you insist to use USART_MSPIM, use Arduino Uno instead.
-// extern yh::rec::USART_MSPIM_Class USPI;
+extern yh::rec::USART_MSPIM_Class USPI1;
 #endif // #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
