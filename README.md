@@ -28,6 +28,7 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
 **and technically supported by CSWCSS REC hardware team.**  
 
 [ATmega640 | ATmega1280 | ATmega2560 datasheet](https://ww1.microchip.com/downloads/en/devicedoc/atmel-2549-8-bit-avr-microcontroller-atmega640-1280-1281-2560-2561_datasheet.pdf)  
+[ATmega16U4 | ATmega32U4 datasheet](https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7766-8-bit-AVR-ATmega16U4-32U4_Datasheet.pdf)  
   
 [AVR Instruction Set Manual](http://ww1.microchip.com/downloads/en/devicedoc/atmel-0856-avr-instruction-set-manual.pdf)  
   
