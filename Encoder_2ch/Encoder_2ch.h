@@ -206,6 +206,7 @@ namespace yh {
                     // stores the current state of channel A and channel B
                     const uint8_t curr_A_state = (*signal_A_input_reg & signal_A_mask);
                     const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
+                    const uint8_t A_B_sig_diff = (curr_A_state ? 1 : 0) ^ (curr_B_state ? 1 : 0);
                     // implementation
 
                     // if A_rise && B_is_low
@@ -255,10 +256,10 @@ namespace yh {
                         current_displacement += (instantaneous_velocity > 0) ? (+2) : (-2);
                     } else if (prev_A_state ^ curr_A_state) {
                         // A has changed
-                        current_displacement += (curr_A_state ^ curr_B_state) ? (+1) : (-1);
+                        current_displacement += A_B_sig_diff ? (+1) : (-1);
                     } else if (prev_B_state ^ curr_B_state) {
                         // B has changed
-                        current_displacement += (curr_A_state ^ curr_B_state) ? (-1) : (+1);
+                        current_displacement += A_B_sig_diff ? (-1) : (+1);
                     }
                     instantaneous_acceleration = -instantaneous_velocity;
                     instantaneous_velocity = current_displacement - logged_displacements[log_idx]; // v = ∆s / ∆t (let ∆t = 1), v = ∆s = s' - s
@@ -310,6 +311,7 @@ namespace yh {
                     // stores the current state of channel A and channel B
                     const uint8_t curr_A_state = (*signal_A_input_reg & signal_A_mask);
                     const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
+                    const uint8_t A_B_sig_diff = (curr_A_state ? 1 : 0) ^ (curr_B_state ? 1 : 0);
 
                     // if A_is_changed
                     // if A_is_high_now && B_is_low
@@ -337,10 +339,10 @@ namespace yh {
                         current_displacement += (instantaneous_velocity > 0) ? (+2) : (-2);
                     } else if (prev_A_state ^ curr_A_state) {
                         // A has changed
-                        current_displacement += (curr_A_state ^ curr_B_state) ? (+1) : (-1);
+                        current_displacement += A_B_sig_diff ? (+1) : (-1);
                     } else if (prev_B_state ^ curr_B_state) {
                         // B has changed
-                        current_displacement += (curr_A_state ^ curr_B_state) ? (-1) : (+1);
+                        current_displacement += A_B_sig_diff ? (-1) : (+1);
                     }
                     log_idx++;
                     if (log_idx == log_len) {
@@ -395,16 +397,17 @@ namespace yh {
                     const unsigned long temp_delta_time = micros() - prev_time;
                     int8_t delta_displacement;
                     const uint16_t delta_time = (temp_delta_time > max_waiting_time) ? max_waiting_time : temp_delta_time;
+                    const uint8_t A_B_sig_diff = (curr_A_state ? 1 : 0) ^ (curr_B_state ? 1 : 0);
                     if ( (prev_A_state ^ curr_A_state) && (prev_B_state ^ curr_B_state) ) {
                         // both A has B has changed
                         // crashed (either +2 or -2)
                         delta_displacement = (instantaneous_velocity > 0) ? (+2) : (-2);
                     } else if (prev_A_state ^ curr_A_state) {
                         // A has changed
-                        delta_displacement = (curr_A_state ^ curr_B_state) ? (+1) : (-1);
+                        delta_displacement = A_B_sig_diff ? (+1) : (-1);
                     } else if (prev_B_state ^ curr_B_state) {
                         // B has changed
-                        delta_displacement = (curr_A_state ^ curr_B_state) ? (-1) : (+1);
+                        delta_displacement = A_B_sig_diff ? (-1) : (+1);
                     }
                     const int16_t new_instantaneous_velocity = delta_displacement * static_cast<int8_t>(full_spd_signal_change_time) * static_cast<int16_t>(full_spd_velocity_val) / delta_time;
                     instantaneous_acceleration = (new_instantaneous_velocity - instantaneous_velocity) / delta_time; // a == (v - u) / t

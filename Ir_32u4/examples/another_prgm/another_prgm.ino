@@ -19,6 +19,12 @@ void setup () {
     ADCSRB = (0 << MUX5) | (0 << ADTS2) | (0 << ADTS1) | (0 << ADTS0);
     ADMUX = (0 << REFS1) | (0 << REFS0) | (1 << ADLAR) | (0 << MUX4) | (0 << MUX3) | (0 << MUX2) | (0 << MUX1) | (0 << MUX0);
     ADCSRA = (1 << ADEN) | (1 << ADSC) | (0 << ADATE) | (0 << ADIF) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
+    #define LED_OUTPUT 8
+    #if LED_OUTPUT == 8
+    DDRC |= (_BV(6) | _BV(7));
+    DDRB = (_BV(0) | _BV(1) | _BV(2) | _BV(3) | _BV(7));
+    DDRE |= _BV(6);
+    #endif
     Wire.begin('I'); // 'i' == 73 in decimal (ASCII)
     Wire.onReceive(rx);
     Wire.onRequest(tx);
@@ -70,6 +76,20 @@ void loop () {
     noInterrupts();
     ball_dir = angle;
     SREG = oldSREG;
+    #if defined(LED_OUTPUT) && (LED_OUTPUT > 0)
+    uint16_t temp_ball_dir = ball_dir;
+    temp_ball_dir += static_cast<uint8_t>(360 / LED_OUTPUT / 2);
+    if (temp_ball_dir >= static_cast<uint16_t>(360))
+        temp_ball_dir -= static_cast<uint16_t>(360);
+    {
+        uint8_t led_idx = 0;
+        while (temp_ball_dir >= static_cast<uint8_t>(LED_OUTPUT)) {
+            temp_ball_dir -= static_cast<uint8_t>(LED_OUTPUT);
+            led_idx++;
+        }
+        led_idx;
+    }
+    #endif
 }
 
 enum tx_data_t {
