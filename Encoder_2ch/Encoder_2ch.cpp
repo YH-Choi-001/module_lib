@@ -92,14 +92,14 @@ yh::rec::Encoder_2ch_ext_int::Encoder_2ch_ext_int (const Encoder_2ch_ext_int &in
     //
 }
 
-yh::rec::Encoder_2ch_ext_int::Encoder_2ch_ext_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin) :
+yh::rec::Encoder_2ch_ext_int::Encoder_2ch_ext_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t resolution, const uint8_t sig_change_time) :
     signal_A_pin(init_signal_A_pin),
     signal_B_pin(init_signal_B_pin),
     prev_time(0),
     instantaneous_velocity(0),
     instantaneous_acceleration(0),
-    full_spd_velocity_val(255),
-    full_spd_signal_change_time(84),
+    full_spd_velocity_val(resolution), // also interpreted as the resolution of the velocity
+    full_spd_signal_change_time(sig_change_time), // the minimum time for an interrupt to be triggered when the encoder is running at full speed
     max_waiting_time(full_spd_signal_change_time * full_spd_velocity_val)
 {
     //

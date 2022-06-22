@@ -379,13 +379,13 @@ namespace yh {
                 const uint16_t max_waiting_time;
 
                 // stores the instantaneous velocity of the encoder
-                int16_t instantaneous_velocity;
+                volatile int16_t instantaneous_velocity;
                 // stores the instantaneous acceleration of the encoder
-                int16_t instantaneous_acceleration;
+                volatile int16_t instantaneous_acceleration;
             public:
                 Encoder_2ch_ext_int (const Encoder_2ch_ext_int &init_obj);
                 // inits the arguments to the signal A and B pins, and the length of displacement stored
-                Encoder_2ch_ext_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin);
+                Encoder_2ch_ext_int (const uint8_t init_signal_A_pin, const uint8_t init_signal_B_pin, const uint16_t resolution = 255, const uint8_t sig_change_time = 84);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 void begin ();
@@ -395,21 +395,28 @@ namespace yh {
                     const uint8_t curr_A_state = (*signal_A_input_reg & signal_A_mask);
                     const uint8_t curr_B_state = (*signal_B_input_reg & signal_B_mask);
                     const unsigned long temp_delta_time = micros() - prev_time;
-                    int8_t delta_displacement;
-                    const uint16_t delta_time = (temp_delta_time > max_waiting_time) ? max_waiting_time : temp_delta_time;
                     const uint8_t A_B_sig_diff = (curr_A_state ? 1 : 0) ^ (curr_B_state ? 1 : 0);
+                    int16_t new_instantaneous_velocity = static_cast<int16_t>(max_waiting_time);
                     if ( (prev_A_state ^ curr_A_state) && (prev_B_state ^ curr_B_state) ) {
                         // both A has B has changed
                         // crashed (either +2 or -2)
-                        delta_displacement = (instantaneous_velocity > 0) ? (+2) : (-2);
+                        new_instantaneous_velocity *= 2;
+                        if (instantaneous_velocity < 0)
+                            new_instantaneous_velocity = -new_instantaneous_velocity;
                     } else if (prev_A_state ^ curr_A_state) {
                         // A has changed
-                        delta_displacement = A_B_sig_diff ? (+1) : (-1);
+                        if (!A_B_sig_diff) // state of A and B are the same
+                            new_instantaneous_velocity = -new_instantaneous_velocity;
                     } else if (prev_B_state ^ curr_B_state) {
                         // B has changed
-                        delta_displacement = A_B_sig_diff ? (-1) : (+1);
+                        if (A_B_sig_diff) // state of A and B are different
+                            new_instantaneous_velocity = -new_instantaneous_velocity;
+                    } else {
+                        // no pins have changed, quit the function (prevent updating velocity, accel and delta_time from PCINT group calling)
+                        return;
                     }
-                    const int16_t new_instantaneous_velocity = delta_displacement * static_cast<int8_t>(full_spd_signal_change_time) * static_cast<int16_t>(full_spd_velocity_val) / delta_time;
+                    const uint16_t delta_time = (temp_delta_time < max_waiting_time) ?  temp_delta_time : max_waiting_time;
+                    new_instantaneous_velocity /= delta_time;
                     instantaneous_acceleration = (new_instantaneous_velocity - instantaneous_velocity) / delta_time; // a == (v - u) / t
                     instantaneous_velocity = new_instantaneous_velocity;
                     prev_A_state = curr_A_state;
@@ -417,7 +424,7 @@ namespace yh {
                     prev_time += delta_time;
                 }
                 // gets the instantaneous velocity of the encoder
-                // the value of instantaneous_velocity increases as request_log_len in constructor increases
+                // the value of instantaneous_velocity increases as resolution in constructor increases
                 inline int16_t get_instantaneous_velocity () __attribute__((__always_inline__)) {
                     const unsigned long time_since_last_isr_ran = micros() - prev_time;
                     if (time_since_last_isr_ran > max_waiting_time) // check if timeout
@@ -427,6 +434,18 @@ namespace yh {
                     const int16_t to_return = 
                         // instantaneous_velocity + instantaneous_acceleration * time_since_last_isr_ran; // return v = u + at
                         instantaneous_velocity;
+                    SREG = oldSREG;
+                    return to_return;
+                }
+                // gets the instantaneous acceleration of the encoder
+                inline int16_t get_instantaneous_acceleration () __attribute__((__always_inline__)) {
+                    // const unsigned long time_since_last_isr_ran = micros() - prev_time;
+                    // if (time_since_last_isr_ran > max_waiting_time) // check if timeout
+                    //     return 0; // timeout, then return 0
+                    uint8_t oldSREG = SREG;
+                    noInterrupts();
+                    const int16_t to_return =
+                        instantaneous_acceleration;
                     SREG = oldSREG;
                     return to_return;
                 }
