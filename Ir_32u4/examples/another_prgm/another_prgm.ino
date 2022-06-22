@@ -4,6 +4,7 @@ void rx (int);
 void tx ();
 
 #define IR_CHANNEL 12
+#define LED_OUTPUT 8
 
 volatile uint8_t idx_of_max_eye;
 uint8_t eyes [IR_CHANNEL];
@@ -19,7 +20,6 @@ void setup () {
     ADCSRB = (0 << MUX5) | (0 << ADTS2) | (0 << ADTS1) | (0 << ADTS0);
     ADMUX = (0 << REFS1) | (0 << REFS0) | (1 << ADLAR) | (0 << MUX4) | (0 << MUX3) | (0 << MUX2) | (0 << MUX1) | (0 << MUX0);
     ADCSRA = (1 << ADEN) | (1 << ADSC) | (0 << ADATE) | (0 << ADIF) | (1 << ADIE) | (1 << ADPS2) | (1 << ADPS1) | (1 << ADPS0);
-    #define LED_OUTPUT 8
     #if LED_OUTPUT == 8
     DDRC |= (_BV(6) | _BV(7));
     DDRB = (_BV(0) | _BV(1) | _BV(2) | _BV(3) | _BV(7));
