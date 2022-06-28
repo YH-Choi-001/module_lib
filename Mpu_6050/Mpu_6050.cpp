@@ -56,7 +56,11 @@ void yh::rec::Mpu_6050::begin () {
     Wire.endTransmission();
     Wire.beginTransmission(i2c_address); // talk to GY-521
     Wire.write(static_cast<uint8_t>(0x1B)); // accessing the register 1B - Gyroscope Configuration
-    #if (GYRO_RANGE == 1000)
+    #if (GYRO_RANGE == 250)
+    Wire.write(static_cast<uint8_t>(0b00000000)); // setting the gyro to scale +/- 250deg./s (0 of [0:3])
+    #elif (GYRO_RANGE == 500)
+    Wire.write(static_cast<uint8_t>(0b00001000)); // setting the gyro to scale +/- 500deg./s (1 of [0:3])
+    #elif (GYRO_RANGE == 1000)
     Wire.write(static_cast<uint8_t>(0b00010000)); // setting the gyro to scale +/- 1000deg./s (2 of [0:3]) assume that the robot cannot rotate more than 2.5 circles per second
     #elif (GYRO_RANGE == 2000)
     Wire.write(static_cast<uint8_t>(0b00011000)); // setting the gyro to scale +/- 2000deg./s (3 of [0:3]) to minimize chance of error when the referee lifts up the robot during match
@@ -111,6 +115,41 @@ void yh::rec::Mpu_6050::cal_gyro (const uint32_t sampling_amount, void (*updatin
     corr_roll  /= static_cast<double>(sampling_amount);
     corr_pitch /= static_cast<double>(sampling_amount);
     corr_yaw   /= static_cast<double>(sampling_amount);
+    #if 0 // we subtract the offset by ourselves instead of letting the mpu chip do the job,
+          // because built-in offset-subtracting feature is only available on MPU6500 and MPU9250.
+    // by register map of MPU9250, n_OFFS_USR == OffsetLSB * 2^(FS_SEL - 2)
+    #if (GYRO_RANGE == 250) // FS_SEL == 0
+    corr_roll  /= 4;
+    corr_pitch /= 4;
+    corr_yaw   /= 4;
+    #elif (GYRO_RANGE == 500) // FS_SEL == 1
+    corr_roll  /= 2;
+    corr_pitch /= 2;
+    corr_yaw   /= 2;
+    #elif (GYRO_RANGE == 1000) // FS_SEL == 2
+    // nothing to do
+    #elif (GYRO_RANGE == 2000) // FS_SEL == 3
+    corr_roll  *= 2;
+    corr_pitch *= 2;
+    corr_yaw   *= 2;
+    #endif
+    Wire.beginTransmission(i2c_address);
+    Wire.write(0x13); // accessing the gyro offset (user) registers
+    {
+        uint16_t temp_buf [3] = {
+            static_cast<int16_t>(corr_roll),
+            static_cast<int16_t>(corr_pitch),
+            static_cast<int16_t>(corr_yaw)
+        };
+        Wire.write(temp_buf[0] >> 8);
+        Wire.write(temp_buf[0] & 0xff);
+        Wire.write(temp_buf[1] >> 8);
+        Wire.write(temp_buf[1] & 0xff);
+        Wire.write(temp_buf[2] >> 8);
+        Wire.write(temp_buf[2] & 0xff);
+    }
+    Wire.endTransmission();
+    #endif
 }
 
 void yh::rec::Mpu_6050::reset_gyro () {
@@ -128,7 +167,17 @@ void yh::rec::Mpu_6050::update_gyro () {
         // commands above take around 944 - 952 us at 100 KHz I2C clock rate
         const unsigned long t_diff = micros() - prev_micros_reading;
 
-        #if (GYRO_RANGE == 1000)
+        #if (GYRO_RANGE == 250)
+        // for sensitivity == +- 250 degree per sec.
+        d_roll  = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_roll    ) / 131000000.0 * t_diff; // angle change per sec * time past in secs
+        d_pitch = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_pitch   ) / 131000000.0 * t_diff; // angle change per sec * time past in secs
+        d_yaw   = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_yaw     ) / 131000000.0 * t_diff; // angle change per sec * time past in secs
+        #elif (GYRO_RANGE == 500)
+        // for sensitivity == +- 500 degree per sec.
+        d_roll  = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_roll    ) / 65500000.0 * t_diff; // angle change per sec * time past in secs
+        d_pitch = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_pitch   ) / 65500000.0 * t_diff; // angle change per sec * time past in secs
+        d_yaw   = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_yaw     ) / 65500000.0 * t_diff; // angle change per sec * time past in secs
+        #elif (GYRO_RANGE == 1000)
         // for sensitivity == +- 1000 degree per sec.
         d_roll  = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_roll    ) / 32800000.0 * t_diff; // angle change per sec * time past in secs
         d_pitch = (   ( (static_cast<int16_t>(Wire.read()) << 8) | Wire.read() ) - corr_pitch   ) / 32800000.0 * t_diff; // angle change per sec * time past in secs

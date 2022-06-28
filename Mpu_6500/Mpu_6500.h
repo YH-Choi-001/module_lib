@@ -320,6 +320,43 @@ namespace yh {
                     corr_roll  /= static_cast<double>(sampling_amount);
                     corr_pitch /= static_cast<double>(sampling_amount);
                     corr_yaw   /= static_cast<double>(sampling_amount);
+                    #if 0 // we subtract the offset by ourselves instead of letting the mpu chip do the job,
+                          // because built-in offset-subtracting feature is only available on MPU6500 and MPU9250.
+                    // by register map of MPU9250, n_OFFS_USR == OffsetLSB * 2^(FS_SEL - 2)
+                    #if (GYRO_RANGE == 250) // FS_SEL == 0
+                    corr_roll  /= 4;
+                    corr_pitch /= 4;
+                    corr_yaw   /= 4;
+                    #elif (GYRO_RANGE == 500) // FS_SEL == 1
+                    corr_roll  /= 2;
+                    corr_pitch /= 2;
+                    corr_yaw   /= 2;
+                    #elif (GYRO_RANGE == 1000) // FS_SEL == 2
+                    // nothing to do
+                    #elif (GYRO_RANGE == 2000) // FS_SEL == 3
+                    corr_roll  *= 2;
+                    corr_pitch *= 2;
+                    corr_yaw   *= 2;
+                    #endif
+                    (*cs_pin_output_reg) &= (~cs_pin_mask); // CS pin set to LOW
+                    spi_ptr->beginTransaction(SPI_read_sensor_reg_settings); // talk to MPU-6500
+                    spi_ptr->transfer(0x13); // accessing the gyro offset (user) registers
+                    {
+                        uint16_t temp_buf [3] = {
+                            static_cast<int16_t>(corr_roll),
+                            static_cast<int16_t>(corr_pitch),
+                            static_cast<int16_t>(corr_yaw)
+                        };
+                        spi_ptr->transfer(temp_buf[0] >> 8);
+                        spi_ptr->transfer(temp_buf[0] & 0xff);
+                        spi_ptr->transfer(temp_buf[1] >> 8);
+                        spi_ptr->transfer(temp_buf[1] & 0xff);
+                        spi_ptr->transfer(temp_buf[2] >> 8);
+                        spi_ptr->transfer(temp_buf[2] & 0xff);
+                    }
+                    spi_ptr->endTransaction();
+                    (*cs_pin_output_reg) |= cs_pin_mask; // CS pin set to HIGH
+                    #endif
                 }
 
                 // resets the roll, pitch and yaw values
