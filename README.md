@@ -37,5 +37,5 @@ If you find any problems, please raise an issue or contact me at yhei.choi@gmail
 AVR objdump command in Mac: `/Applications/Arduino.app/Contents/Java/hardware/tools/avr/bin/avr-objdump -S "filepath"`
   
 ![RCJ Soccer Lightweight IR ball pulse graph](./Ningor_ir/ball_pulse_graph.png)
-![ATmega2560 pinout](./pinout_diagrams/ATmega2560_pinout_2.png)
+![ATmega2560 pinout](./Mcu_chip_pinout/ATmega2560_to_Arduino_Mega_pinout.png)
 ![Kicker Power Measuring Device Schematics](https://github.com/RoboCupJuniorTC/soccer-rules/blob/master/kicker_testing_schematics.png)
