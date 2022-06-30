@@ -416,6 +416,14 @@ namespace yh {
                 volatile uint8_t *const xckn_port_ddr;
                 // the bit mask of XCKn pin in its port
                 const uint8_t xckn_port_bit_mask;
+                // the data direction register of the port of MOSIn pin
+                volatile uint8_t *const mosin_port_ddr;
+                // the bit mask of MOSIn pin in its port
+                const uint8_t mosin_port_bit_mask;
+                // the data direction register of the port of MISOn pin
+                volatile uint8_t *const mison_port_ddr;
+                // the bit mask of MISOn pin in its port
+                const uint8_t mison_port_bit_mask;
             public:
                 // default constructor
                 USART_MSPIM_Class (
@@ -425,7 +433,11 @@ namespace yh {
                     volatile uint8_t *const init_ucsrnc,
                     volatile uint8_t *const init_udrn,
                     volatile uint8_t *const init_xckn_port_ddr,
-                    const uint8_t init_xckn_port_bit_mask
+                    const uint8_t init_xckn_port_bit_mask,
+                    volatile uint8_t *const init_mosin_port_ddr,
+                    const uint8_t init_mosin_port_bit_mask,
+                    volatile uint8_t *const init_mison_port_ddr,
+                    const uint8_t init_mison_port_bit_mask
                 ) __attribute__((__always_inline__))
                 :
                     ubrrn(init_ubrrn),
@@ -434,7 +446,11 @@ namespace yh {
                     ucsrnc(init_ucsrnc),
                     udrn(init_udrn),
                     xckn_port_ddr(init_xckn_port_ddr),
-                    xckn_port_bit_mask(init_xckn_port_bit_mask)
+                    xckn_port_bit_mask(init_xckn_port_bit_mask),
+                    mosin_port_ddr(init_mosin_port_ddr),
+                    mosin_port_bit_mask(init_mosin_port_bit_mask),
+                    mison_port_ddr(init_mison_port_ddr),
+                    mison_port_bit_mask(init_mison_port_bit_mask)
                 {
                     //
                 }
@@ -450,6 +466,8 @@ namespace yh {
                     (*ucsrnb) = (1 << TXEN0) | (1 << RXEN0);  // transmit enable and receive enable, RX and TX and DR buf empty interrupts are disabled
                     // must be done last, see page 206
                     (*ubrrn) = F_CPU / 2 / 4000000 - 1; // clock frequency = default 4MHz
+                    (*mosin_port_ddr) |= mosin_port_bit_mask; // set MOSI pin as output
+                    (*mison_port_ddr) &= ~mison_port_bit_mask; // set MISO pin as input
                 }
                 // disables the USART_MSPIM bus
                 void end () {
@@ -603,24 +621,24 @@ namespace yh {
     }
 }
 
-
 #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
-// #warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
-// #warning If you insist to use USART_MSPIM, use Arduino Uno instead.
-extern yh::rec::USART_MSPIM_Class USPI1;
+#warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
+#warning If you insist to use USART_MSPIM, use Arduino Uno instead.
+//                                        UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
+static yh::rec::USART_MSPIM_Class USPI1 (&UBRR1, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1, &DDRD, (1 << 5), &DDRD, (1 << 3), &DDRD, (1 << 2));
 #endif // #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
-extern yh::rec::USART_MSPIM_Class USPI;
+//                                        UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
+static yh::rec::USART_MSPIM_Class USPI  (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRD, (1 << 4), &DDRD, (1 << 1), &DDRD, (1 << 0));
 #endif // #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
-#warning None of the XCKn pins on the Arduino Mega board are broken out.
-#warning If you insist to use USART_MSPIM, use Arduino Uno instead.
-extern yh::rec::USART_MSPIM_Class USPI;
-extern yh::rec::USART_MSPIM_Class USPI1;
-extern yh::rec::USART_MSPIM_Class USPI2;
-extern yh::rec::USART_MSPIM_Class USPI3;
-#endif // #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
+//                                        UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
+static yh::rec::USART_MSPIM_Class USPI  (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRE, (1 << 2), &DDRE, (1 << 1), &DDRE, (1 << 0));
+static yh::rec::USART_MSPIM_Class USPI1 (&UBRR1, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1, &DDRD, (1 << 5), &DDRD, (1 << 3), &DDRD, (1 << 2));
+static yh::rec::USART_MSPIM_Class USPI2 (&UBRR2, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2, &DDRH, (1 << 2), &DDRH, (1 << 1), &DDRH, (1 << 0));
+static yh::rec::USART_MSPIM_Class USPI3 (&UBRR3, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3, &DDRJ, (1 << 2), &DDRJ, (1 << 1), &DDRJ, (1 << 0));
+#endif
 
 #endif // #ifndef USART_MSPIM_H

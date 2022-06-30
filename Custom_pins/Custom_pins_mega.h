@@ -552,7 +552,7 @@ namespace yh {
         void digital_write_TOGGLE (const uint8_t pin) {
             uint8_t rubbish = 0;
             PIN_TO_TIMER(pin, TCCR, A, rubbish) &= (~((1 << PIN_TO_COMPARE(pin, COM, 1, , 8)) & 0xff)); // clear pwm output
-            (PIN_TO_P(PORT, pin, rubbish) ^= PIN_TO_BITMSK(pin)); // write high
+            (PIN_TO_P(PIN, pin, rubbish) |= PIN_TO_BITMSK(pin)); // write high to PINxn
         }
         int digital_read (const uint8_t pin) __attribute__((__always_inline__));
         int digital_read (const uint8_t pin) {
