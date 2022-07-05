@@ -68,13 +68,13 @@ uint16_t yh::rec::Tcs3200::read_single_colour () {
 void yh::rec::Tcs3200::read_rgb (uint8_t *const red, uint8_t *const green, uint8_t *const blue) {
     digitalWrite(s2_pin, LOW);
     digitalWrite(s3_pin, LOW);
-    (*red) = read_single_colour();
+    if (red) (*red) = read_single_colour();
     digitalWrite(s3_pin, HIGH);
     delayMicroseconds(100);
-    (*blue) = read_single_colour();
+    if (blue) (*blue) = read_single_colour();
     digitalWrite(s2_pin, HIGH);
     delayMicroseconds(100);
-    (*green) = read_single_colour();
+    if (green) (*green) = read_single_colour();
 }
 
 void yh::rec::Tcs3200::read_hsv (uint16_t *const hue, uint8_t *const sat, uint8_t *const val) {
@@ -97,7 +97,7 @@ void yh::rec::Tcs3200::read_hsv (uint16_t *const hue, uint8_t *const sat, uint8_
     
     val_temp = rgb[max];
     const uint8_t delta = val_temp - rgb[min];
-    if (val_temp == 0 || delta == 0) {
+    if (delta == 0) { // if val_temp == 0, delta == 0
         hue_temp = 0; // nan as it is black or grey
         sat_temp = 0;
     } else {
