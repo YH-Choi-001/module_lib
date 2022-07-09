@@ -317,6 +317,7 @@ size_t yh::rec::Usart::write (const uint8_t *buffer, const size_t size) {
     for (uint8_t i = 0; i < size; i++) {
         words_sent += write(buffer[i]);
     }
+    return words_sent;
 }
 
 size_t yh::rec::Usart::write (const uint16_t *buffer, const size_t size) {
@@ -324,6 +325,7 @@ size_t yh::rec::Usart::write (const uint16_t *buffer, const size_t size) {
     for (uint8_t i = 0; i < size; i++) {
         words_sent += write(buffer[i]);
     }
+    return words_sent;
 }
 
 void yh::rec::Usart::enable_isr () {
