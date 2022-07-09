@@ -12,358 +12,115 @@
 
 // UCSRnA:
 
-// 0:
-
-#ifndef UCSR0A
-#define UCSR0A UCSR0A
+#if defined(RXC0)
+#define RXCn RXC0
+#elif defined(RXC1)
+#define RXCn RXC1
+#else
+#define RXCn 7
 #endif
 
-#ifndef RXC0
-#define RXC0 7
+#if defined(TXC0)
+#define TXCn TXC0
+#elif defined(TXC1)
+#define TXCn TXC1
+#else
+#define TXCn 6
 #endif
 
-#ifndef TXC0
-#define TXC0 6
-#endif
-
-#ifndef UDRE0
-#define UDRE0 5
-#endif
-
-// 1:
-
-#ifndef UCSR1A
-#define UCSR1A UCSR1A
-#endif
-
-#ifndef RXC1
-#define RXC1 7
-#endif
-
-#ifndef TXC1
-#define TXC1 6
-#endif
-
-#ifndef UDRE1
-#define UDRE1 5
-#endif
-
-// 2:
-
-#ifndef UCSR2A
-#define UCSR2A UCSR2A
-#endif
-
-#ifndef RXC2
-#define RXC2 7
-#endif
-
-#ifndef TXC2
-#define TXC2 6
-#endif
-
-#ifndef UDRE2
-#define UDRE2 5
-#endif
-
-// 3:
-
-#ifndef UCSR3A
-#define UCSR3A UCSR3A
-#endif
-
-#ifndef RXC3
-#define RXC3 7
-#endif
-
-#ifndef TXC3
-#define TXC3 6
-#endif
-
-#ifndef UDRE3
-#define UDRE3 5
+#if defined(UDRE0)
+#define UDREn UDRE0
+#elif defined(UDRE1)
+#define UDREn UDRE1
+#else
+#define UDREn 5
 #endif
 
 // UCSRnB:
 
-// 0:
-
-#ifndef UCSR0B
-#define UCSR0B UCSR0B
+#if defined(RXCIE0)
+#define RXCIEn RXCIE0
+#elif defined(RXCIE1)
+#define RXCIEn RXCIE1
+#else
+#define RXCIEn 7
 #endif
 
-#ifndef RXCIE0
-#define RXCIE0 7
+#if defined(TXCIE0)
+#define TXCIEn TXCIE0
+#elif defined(TXCIE1)
+#define TXCIEn TXCIE1
+#else
+#define TXCIEn 6
 #endif
 
-#ifndef TXCIE0
-#define TXCIE0 6
+#if defined(UDRIE0)
+#define UDRIEn UDRIE0
+#elif defined(UDRIE1)
+#define UDRIEn UDRIE1
+#else
+#define UDRIEn 5
 #endif
 
-#ifndef UDRIE
-#define UDRIE 5
+#if defined(RXEN0)
+#define RXENn RXEN0
+#elif defined(RXEN1)
+#define RXENn RXEN1
+#else
+#define RXENn 4
 #endif
 
-#ifndef UDRIE0
-#define UDRIE0 5
-#endif
-
-#ifndef RXEN0
-#define RXEN0 4
-#endif
-
-#ifndef TXEN0
-#define TXEN0 3
-#endif
-
-// 1:
-
-#ifndef UCSR1B
-#define UCSR1B UCSR1B
-#endif
-
-#ifndef RXCIE1
-#define RXCIE1 7
-#endif
-
-#ifndef TXCIE1
-#define TXCIE1 6
-#endif
-
-#ifndef UDRIE
-#define UDRIE 5
-#endif
-
-#ifndef UDRIE1
-#define UDRIE1 5
-#endif
-
-#ifndef RXEN1
-#define RXEN1 4
-#endif
-
-#ifndef TXEN1
-#define TXEN1 3
-#endif
-
-// 2:
-
-#ifndef UCSR2B
-#define UCSR2B UCSR2B
-#endif
-
-#ifndef RXCIE2
-#define RXCIE2 7
-#endif
-
-#ifndef TXCIE2
-#define TXCIE2 6
-#endif
-
-#ifndef UDRIE
-#define UDRIE 5
-#endif
-
-#ifndef UDRIE2
-#define UDRIE2 5
-#endif
-
-#ifndef RXEN2
-#define RXEN2 4
-#endif
-
-#ifndef TXEN2
-#define TXEN2 3
-#endif
-
-// 3:
-
-#ifndef UCSR3B
-#define UCSR3B UCSR3B
-#endif
-
-#ifndef RXCIE3
-#define RXCIE3 7
-#endif
-
-#ifndef TXCIE3
-#define TXCIE3 6
-#endif
-
-#ifndef UDRIE
-#define UDRIE 5
-#endif
-
-#ifndef UDRIE3
-#define UDRIE3 5
-#endif
-
-#ifndef RXEN3
-#define RXEN3 4
-#endif
-
-#ifndef TXEN3
-#define TXEN3 3
+#if defined(TXEN0)
+#define TXENn TXEN0
+#elif defined(TXEN1)
+#define TXENn TXEN1
+#else
+#define TXENn 3
 #endif
 
 // UCSRnC:
 
 // 0:
 
-#ifndef UCSR0C
-#define UCSR0C UCSR0C
+#if defined(UMSEL01)
+#define UMSELn1 UMSEL01
+#elif defined(UMSEL11)
+#define UMSELn1 UMSEL11
+#else
+#define UMSELn1 7
 #endif
 
-#ifndef UMSEL01
-#define UMSEL01 7
+#if defined(UMSEL00)
+#define UMSELn0 UMSEL00
+#elif defined(UMSEL10)
+#define UMSELn0 UMSEL10
+#else
+#define UMSELn0 6
 #endif
 
-#ifndef UMSEL00
-#define UMSEL00 6
+#if defined(UDORD0)
+#define UDORDn UDORD0
+#elif defined(UDORD1)
+#define UDORDn UDORD1
+#else
+#define UDORDn 2
 #endif
 
-#ifndef UDORD0
-#define UDORD0 2
+#if defined(UCPHA0)
+#define UCPHAn UCPHA0
+#elif defined(UCPHA1)
+#define UCPHAn UCPHA1
+#else
+#define UCPHAn 1
 #endif
 
-#ifndef UCPHA0
-#define UCPHA0 1
+#if defined(UCPOL0)
+#define UCPOLn UCPOL0
+#elif defined(UCPOL1)
+#define UCPOLn UCPOL1
+#else
+#define UCPOLn 0
 #endif
-
-#ifndef UCPOL0
-#define UCPOL0 0
-#endif
-
-// 1:
-
-#ifndef UCSR1C
-#define UCSR1C UCSR1C
-#endif
-
-#ifndef UMSEL11
-#define UMSEL11 7
-#endif
-
-#ifndef UMSEL10
-#define UMSEL10 6
-#endif
-
-#ifndef UDORD1
-#define UDORD1 2
-#endif
-
-#ifndef UCPHA1
-#define UCPHA1 1
-#endif
-
-#ifndef UCPOL1
-#define UCPOL1 0
-#endif
-
-// 2:
-
-#ifndef UCSR2C
-#define UCSR2C UCSR2C
-#endif
-
-#ifndef UMSEL21
-#define UMSEL21 7
-#endif
-
-#ifndef UMSEL20
-#define UMSEL20 6
-#endif
-
-#ifndef UDORD2
-#define UDORD2 2
-#endif
-
-#ifndef UCPHA2
-#define UCPHA2 1
-#endif
-
-#ifndef UCPOL2
-#define UCPOL2 0
-#endif
-
-// 3:
-
-#ifndef UCSR3C
-#define UCSR3C UCSR3C
-#endif
-
-#ifndef UMSEL31
-#define UMSEL31 7
-#endif
-
-#ifndef UMSEL30
-#define UMSEL30 6
-#endif
-
-#ifndef UDORD3
-#define UDORD3 2
-#endif
-
-#ifndef UCPHA3
-#define UCPHA3 1
-#endif
-
-#ifndef UCPOL3
-#define UCPOL3 0
-#endif
-
-// UBRRn:
-
-// 0:
-
-#ifndef UBRR0
-#define UBRR0 UBRR0
-#endif
-
-// 1:
-
-#ifndef UBRR1
-#define UBRR1 UBRR1
-#endif
-
-// 2:
-
-#ifndef UBRR2
-#define UBRR2 UBRR2
-#endif
-
-// 3:
-
-#ifndef UBRR3
-#define UBRR3 UBRR3
-#endif
-
-// UDRn:
-
-// 0:
-
-#ifndef UDR0
-#define UDR0 UDR0
-#endif
-
-// 1:
-
-#ifndef UDR1
-#define UDR1 UDR1
-#endif
-
-// 2:
-
-#ifndef UDR2
-#define UDR2 UDR2
-#endif
-
-// 3:
-
-#ifndef UDR3
-#define UDR3 UDR3
-#endif
-
 
 namespace yh {
     namespace rec {
@@ -378,24 +135,24 @@ namespace yh {
                 USART_MSPIM_Settings (uint32_t clock, uint8_t bitOrder, uint8_t dataMode) __attribute__((__always_inline__)) {
                     const double ubrrn_double = F_CPU / 2 / static_cast<double>(clock) - 1;
                     ubrrn = (ubrrn_double < 0) ? 0 : ceil(ubrrn_double);
-                    ucsrnc = (1 << UMSEL00) | (1 << UMSEL01);
+                    ucsrnc = (1 << UMSELn0) | (1 << UMSELn1);
                     switch (dataMode) {
                         case SPI_MODE0: // CPOL == 0, CPHA == 0
                             break;
                         case SPI_MODE1: // CPOL == 0, CPHA == 1
-                            ucsrnc |= (1 << UCPHA0);
+                            ucsrnc |= (1 << UCPHAn);
                             break;
                         case SPI_MODE2: // CPOL == 1, CPHA == 0
-                            ucsrnc |= (1 << UCPOL0);
+                            ucsrnc |= (1 << UCPOLn);
                             break;
                         case SPI_MODE3: // CPOL == 1, CPHA == 1
-                            ucsrnc |= (1 << UCPOL0) | (1 << UCPHA0);
+                            ucsrnc |= (1 << UCPOLn) | (1 << UCPHAn);
                             break;
                         default:
                             break;
                     }
                     if (bitOrder == LSBFIRST)
-                        ucsrnc |= (1 << UDORD0);
+                        ucsrnc |= (1 << UDORDn);
                 }
         };
         class USART_MSPIM_Class {
@@ -460,10 +217,10 @@ namespace yh {
                 void begin () {
                     // must be zero before enabling the transmitter
                     (*ubrrn) = 0;
-                    (*ucsrna) = (1 << TXC0);  // any old transmit now complete (clear the bit by writing 1 to the bit location)
+                    (*ucsrna) = (1 << TXCn);  // any old transmit now complete (clear the bit by writing 1 to the bit location)
                     (*xckn_port_ddr) |= xckn_port_bit_mask;  // set XCK pin as output to enable master mode
-                    (*ucsrnc) = (1 << UMSEL00) | (1 << UMSEL01);  // Master SPI mode, default SPI mode 0 and MSBFIRST
-                    (*ucsrnb) = (1 << TXEN0) | (1 << RXEN0);  // transmit enable and receive enable, RX and TX and DR buf empty interrupts are disabled
+                    (*ucsrnc) = (1 << UMSELn0) | (1 << UMSELn1);  // Master SPI mode, default SPI mode 0 and MSBFIRST
+                    (*ucsrnb) = (1 << TXENn) | (1 << RXENn);  // transmit enable and receive enable, RX and TX and DR buf empty interrupts are disabled
                     // must be done last, see page 206
                     (*ubrrn) = F_CPU / 2 / 4000000 - 1; // clock frequency = default 4MHz
                     (*mosin_port_ddr) |= mosin_port_bit_mask; // set MOSI pin as output
@@ -495,94 +252,94 @@ namespace yh {
                 // Write to the USART_MSPIM bus (Tx pin) and also receive (Rx pin)
                 inline uint8_t transfer (const uint8_t data) {
                     // wait for transmitter buffer empty
-                    while (!((*ucsrna) & (1 << UDRE0))) {}
+                    while (!((*ucsrna) & (1 << UDREn))) {}
                     // send byte
                     (*udrn) = data;
                     asm volatile("nop");
                     // wait for data-receiving complete
-                    while (!((*ucsrna) & (1 << RXC0))) {}
+                    while (!((*ucsrna) & (1 << RXCn))) {}
                     const uint8_t received_data = (*udrn);
                     // wait for data-transmitting complete
-                    while (!((*ucsrna) & (1 << TXC0))) {}
-                    (*ucsrna) |= (1 << TXC0); // clear the bit manually
+                    while (!((*ucsrna) & (1 << TXCn))) {}
+                    (*ucsrna) |= (1 << TXCn); // clear the bit manually
                     return received_data;
                 }
                 // transfer 16 bits of data through the USART_MPSIM bus
                 inline uint16_t transfer16 (uint16_t data) {
                     union { uint16_t val; struct { uint8_t lsb; uint8_t msb; }; } in, out;
                     in.val = data;
-                    if (!((*ucsrnc) & (1 << UDORD0))) {
-                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                    if (!((*ucsrnc) & (1 << UDORDn))) {
+                        while (!((*ucsrna) & (1 << UDREn))) {} // wait for transmitter buffer empty
                         (*udrn) = in.msb;                      // write msb data to tx buf
                         asm volatile("nop");                   // nop
-                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        while (!((*ucsrna) & (1 << RXCn))) {}  // wait for data-receiving complete
                         out.msb = (*udrn);                     // read msb data from rx buf
-                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                        while (!((*ucsrna) & (1 << UDREn))) {} // wait for transmitter buffer empty
                         (*udrn) = in.lsb;                      // write lsb data to tx buf
                         asm volatile("nop");                   // nop
-                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        while (!((*ucsrna) & (1 << RXCn))) {}  // wait for data-receiving complete
                         out.lsb = (*udrn);                     // read lsb data from rx buf
                     } else {
-                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                        while (!((*ucsrna) & (1 << UDREn))) {} // wait for transmitter buffer empty
                         (*udrn) = in.lsb;                      // write lsb data to tx buf
                         asm volatile("nop");                   // nop
-                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        while (!((*ucsrna) & (1 << RXCn))) {}  // wait for data-receiving complete
                         out.lsb = (*udrn);                     // read lsb data from rx buf
-                        while (!((*ucsrna) & (1 << UDRE0))) {} // wait for transmitter buffer empty
+                        while (!((*ucsrna) & (1 << UDREn))) {} // wait for transmitter buffer empty
                         (*udrn) = in.msb;                      // write msb data to tx buf
                         asm volatile("nop");                   // nop
-                        while (!((*ucsrna) & (1 << RXC0))) {}  // wait for data-receiving complete
+                        while (!((*ucsrna) & (1 << RXCn))) {}  // wait for data-receiving complete
                         out.msb = (*udrn);                     // read msb data from rx buf
                     }
-                    while (!((*ucsrna) & (1 << TXC0))) {}     // wait for data-transmitting complete
-                    (*ucsrna) |= (1 << TXC0); // clear the bit manually
+                    while (!((*ucsrna) & (1 << TXCn))) {}     // wait for data-transmitting complete
+                    (*ucsrna) |= (1 << TXCn); // clear the bit manually
                     return out.val;
                 }
                 // transfer an array of data through the USART_MPSIM bus
                 inline void transfer (uint8_t *const buf, const uint8_t len) {
                     for (uint8_t i = 0; i < len; i++) {
                         // wait for transmitter buffer empty
-                        while (!((*ucsrna) & (1 << UDRE0))) {}
+                        while (!((*ucsrna) & (1 << UDREn))) {}
                         // send byte
                         (*udrn) = buf[i];
                         asm volatile("nop");
                         // wait for data-receiving complete
-                        while (!((*ucsrna) & (1 << RXC0))) {}
+                        while (!((*ucsrna) & (1 << RXCn))) {}
                         buf[i] = (*udrn);
                     }
                     // wait for data-transmitting complete
-                    while (!((*ucsrna) & (1 << TXC0))) {}
-                    (*ucsrna) |= (1 << TXC0); // clear the bit manually
+                    while (!((*ucsrna) & (1 << TXCn))) {}
+                    (*ucsrna) |= (1 << TXCn); // clear the bit manually
                 }
                 // This function is deprecated.  New applications should use
                 // beginTransaction() to configure USART_MSPIM settings.
                 inline void setBitOrder (uint8_t bitOrder) {
-                    if (bitOrder == LSBFIRST) (*ucsrnc) |= (1 << UDORD0);
-                    else (*ucsrnc) &= ~(1 << UDORD0);
+                    if (bitOrder == LSBFIRST) (*ucsrnc) |= (1 << UDORDn);
+                    else (*ucsrnc) &= ~(1 << UDORDn);
                 }
                 // This function is deprecated.  New applications should use
                 // beginTransaction() to configure USART_MSPIM settings.
                 inline void setDataMode (uint8_t dataMode) {
                     switch (dataMode) {
                         case SPI_MODE0: // CPOL == 0, CPHA == 0
-                            (*ucsrnc) &= ~(1 << UCPOL0);
-                            (*ucsrnc) &= ~(1 << UCPHA0);
+                            (*ucsrnc) &= ~(1 << UCPOLn);
+                            (*ucsrnc) &= ~(1 << UCPHAn);
                             break;
                         case SPI_MODE1: // CPOL == 0, CPHA == 1
-                            (*ucsrnc) &= ~(1 << UCPOL0);
-                            (*ucsrnc) |= (1 << UCPHA0);
+                            (*ucsrnc) &= ~(1 << UCPOLn);
+                            (*ucsrnc) |= (1 << UCPHAn);
                             break;
                         case SPI_MODE2: // CPOL == 1, CPHA == 0
-                            (*ucsrnc) |= (1 << UCPOL0);
-                            (*ucsrnc) &= ~(1 << UCPHA0);
+                            (*ucsrnc) |= (1 << UCPOLn);
+                            (*ucsrnc) &= ~(1 << UCPHAn);
                             break;
                         case SPI_MODE3: // CPOL == 1, CPHA == 1
-                            (*ucsrnc) |= (1 << UCPOL0);
-                            (*ucsrnc) |= (1 << UCPHA0);
+                            (*ucsrnc) |= (1 << UCPOLn);
+                            (*ucsrnc) |= (1 << UCPHAn);
                             break;
                         default:
-                            (*ucsrnc) &= ~(1 << UCPOL0);
-                            (*ucsrnc) &= ~(1 << UCPHA0);
+                            (*ucsrnc) &= ~(1 << UCPOLn);
+                            (*ucsrnc) &= ~(1 << UCPHAn);
                             break;
                     }
                 }
