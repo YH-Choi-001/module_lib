@@ -396,24 +396,20 @@ namespace yh {
     }
 }
 
-#if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
-#warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
-#warning If you insist to use USART_MSPIM, use Arduino Uno instead.
-//                             UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
-static yh::rec::Usart usart1 (&UBRR1, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1, &DDRD, (1 << 5) ); //, &DDRD, (1 << 3), &DDRD, (1 << 2));
-#endif // #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
+#if defined(UBRRH) || defined(UBRR0H)
+extern yh::rec::Usart usart;
+#endif
 
-#if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
-//                             UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
-static yh::rec::Usart usart  (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRD, (1 << 4) ); //, &DDRD, (1 << 1), &DDRD, (1 << 0));
-#endif // #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
+#if defined(UBRR1H)
+extern yh::rec::Usart usart1;
+#endif
 
-#if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
-//                             UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
-static yh::rec::Usart usart  (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRE, (1 << 2) ); //, &DDRE, (1 << 1), &DDRE, (1 << 0));
-static yh::rec::Usart usart1 (&UBRR1, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1, &DDRD, (1 << 5) ); //, &DDRD, (1 << 3), &DDRD, (1 << 2));
-static yh::rec::Usart usart2 (&UBRR2, &UCSR2A, &UCSR2B, &UCSR2C, &UDR2, &DDRH, (1 << 2) ); //, &DDRH, (1 << 1), &DDRH, (1 << 0));
-static yh::rec::Usart usart3 (&UBRR3, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3, &DDRJ, (1 << 2) ); //, &DDRJ, (1 << 1), &DDRJ, (1 << 0));
+#if defined(UBRR2H)
+extern yh::rec::Usart usart2;
+#endif
+
+#if defined(UBRR3H)
+extern yh::rec::Usart usart3;
 #endif
 
 #endif // #ifndef USART_H
