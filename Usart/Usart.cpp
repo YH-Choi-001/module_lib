@@ -277,6 +277,7 @@ size_t yh::rec::Usart::write (uint8_t val) {
     if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
         tx_buf_end = 0;
     }
+    return 1;
 }
 
 size_t yh::rec::Usart::write (uint16_t val) {
@@ -308,17 +309,20 @@ size_t yh::rec::Usart::write (uint16_t val) {
     if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
         tx_buf_end = 0;
     }
+    return 1;
 }
 
 size_t yh::rec::Usart::write (const uint8_t *buffer, const size_t size) {
+    size_t words_sent = 0;
     for (uint8_t i = 0; i < size; i++) {
-        write(buffer[i]);
+        words_sent += write(buffer[i]);
     }
 }
 
 size_t yh::rec::Usart::write (const uint16_t *buffer, const size_t size) {
+    size_t words_sent = 0;
     for (uint8_t i = 0; i < size; i++) {
-        write(buffer[i]);
+        words_sent += write(buffer[i]);
     }
 }
 
