@@ -273,7 +273,7 @@ namespace yh {
                 // @param baud max: F_CPU / 8
                 // @param data_len: 5 to 9 bits
                 // @param stop_bits: 1 to 2 bits
-                // @param parity_bits: 0 to 2 bits
+                // @param parity_bits: disable, odd or even (0, 1, or 2)
                 // @param is_uart: 0 or 1 (false or true)
                 // @param clock_pol: 0 or 1 (0 is data-change on rising XCKn, data-sample on falling XCKn, vice versa)
                 Usart_settings (
