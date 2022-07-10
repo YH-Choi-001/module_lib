@@ -278,7 +278,7 @@ namespace yh {
                     const uint8_t data_len = 8,
                     const uint8_t stop_bits = 1,
                     const uint8_t parity_bits = 0,
-                    const uint8_t is_uart = 0,
+                    const uint8_t is_uart = 1,
                     const uint8_t is_master = 0,
                     const uint8_t clock_pol = 0
                 ) __attribute__((__always_inline__)) :
@@ -336,6 +336,9 @@ namespace yh {
                 volatile uint64_t tx_buf_9_bit;
                 volatile uint8_t tx_buf_end; // ending index
                 volatile uint8_t tx_buf_start; // starting index
+
+                // a flag to indicate whether the tx has sent data out since begin() is called
+                uint8_t tx_used;
             public:
                 // default constructor
                 Usart (
@@ -374,7 +377,6 @@ namespace yh {
                 size_t write (const uint16_t *buffer, size_t size);
 
                 using Print::write; // pull in write(str) and write(buf, size) from Print
-                operator bool() { return true; }
 
                 // functions to tell the object whether or not to rely on interrupts
                 // (interrupts are enabled by default, to maintain compatibility with Arduino)
@@ -388,6 +390,9 @@ namespace yh {
                     disable_tx (),
                     enable_rx (),
                     disable_rx ();
+
+                int (*rx_error_routine)(uint8_t received_value, uint8_t ucsrna_err_flags); // pointer to function that is called when error is found
+                static int default_rx_error_routine (uint8_t received_value, uint8_t ucsrna_err_flags) { return -1; } // drops the error value
 
                 // these are not intended to be called by users
                 void tx_ddr_empty_isr ();

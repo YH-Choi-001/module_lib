@@ -3,7 +3,32 @@
 
 #include "Usart.h"
 
+yh::rec::Usart::Usart (
+    volatile uint16_t *const init_ubrrn,
+    volatile uint8_t *const init_ucsrna,
+    volatile uint8_t *const init_ucsrnb,
+    volatile uint8_t *const init_ucsrnc,
+    volatile uint8_t *const init_udrn,
+    volatile uint8_t *const init_xckn_port_ddr,
+    const uint8_t init_xckn_port_bit_mask//,
+    // volatile uint8_t *const init_mosin_port_ddr,
+    // const uint8_t init_mosin_port_bit_mask,
+    // volatile uint8_t *const init_mison_port_ddr,
+    // const uint8_t init_mison_port_bit_mask
+) :
+    ubrrn(init_ubrrn),
+    ucsrna(init_ucsrna),
+    ucsrnb(init_ucsrnb),
+    ucsrnc(init_ucsrnc),
+    udrn(init_udrn),
+    xckn_port_ddr(init_xckn_port_ddr),
+    xckn_port_bit_mask(init_xckn_port_bit_mask),
+    rx_error_routine(default_rx_error_routine)
+{
+    //
+}
 void yh::rec::Usart::begin (const uint32_t baud, const uint8_t config) {
+    tx_used = 0;
     // clear rx buf
     for (uint8_t i = 0; i < USART_RX_BUFFER_SIZE; i++) {
         rx_buf[i] = 0;
@@ -21,7 +46,7 @@ void yh::rec::Usart::begin (const uint32_t baud, const uint8_t config) {
         ucsrna_temp =
             (0 << RXCn)  | // rx complete flag no need to be cleared
             (1 << TXCn)  | // clear tx complete flag
-            (1 << UDREn) | // set data register empty flag
+            (0 << UDREn) | // not to write data register empty flag
             (0 << FEn)   | // clear frame error flag
             (0 << DORn)  | // clear data overrun flag
             (0 << UPEn)  | // clear parity error flag
@@ -55,6 +80,7 @@ void yh::rec::Usart::begin (const uint32_t baud, const uint8_t config) {
 }
 
 void yh::rec::Usart::begin (Usart_settings settings) {
+    tx_used = 0;
     // clear rx buf
     for (uint8_t i = 0; i < USART_RX_BUFFER_SIZE; i++) {
         rx_buf[i] = 0;
@@ -72,7 +98,7 @@ void yh::rec::Usart::begin (Usart_settings settings) {
         ucsrna_temp =
             (0 << RXCn)  | // rx complete flag no need to be cleared
             (1 << TXCn)  | // clear tx complete flag
-            (1 << UDREn) | // set data register empty flag
+            (0 << UDREn) | // not to write data register empty flag
             (0 << FEn)   | // clear frame error flag
             (0 << DORn)  | // clear data overrun flag
             (0 << UPEn)  | // clear parity error flag
@@ -167,8 +193,9 @@ void yh::rec::Usart::begin (Usart_settings settings) {
 }
 
 void yh::rec::Usart::end () {
-    // wait for last transmission to finish
-    while (!((*ucsrna) & (1 << TXCn))) { }
+    if (tx_used)
+        // wait for last transmission to finish
+        while (!((*ucsrna) & (1 << TXCn))) { }
     (*ucsrna) = 0;
     (*ucsrnb) = 0;
     (*ucsrnc) = 0;
@@ -218,14 +245,12 @@ int yh::rec::Usart::read () {
         return temp;
     } else {
         // RXC is unable to generate interrupts
-        uint16_t single_data = 0;
         if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
             if (ucsrnb_val & (1 << RXB8n)) {
-                single_data |= 0x0100;
+                return 0x0100 | (*udrn);
             }
         }
-        single_data |= (*udrn);
-        return single_data;
+        return (*udrn);
     }
 }
 
@@ -252,12 +277,13 @@ void yh::rec::Usart::flush () {
 }
 
 size_t yh::rec::Usart::write (uint8_t val) {
-    if (!((*ucsrnb) & (1 << UDRIEn))) {
+    tx_used = 1;
+    const uint8_t ucsrnb_val = (*ucsrnb);
+    if (!(ucsrnb_val & (1 << UDRIEn))) {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
         while (!((*ucsrna) & (1 << UDREn))) {}
     }
-    const uint8_t ucsrnb_val = (*ucsrnb);
     if ((*ucsrna) & (1 << UDREn)) {
         // data register is empty
         // write to UDRn directly
@@ -272,21 +298,22 @@ size_t yh::rec::Usart::write (uint8_t val) {
             // 9-bit mode
             tx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << tx_buf_start);
         }
-    }
-    tx_buf_end++;
-    if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
-        tx_buf_end = 0;
+        tx_buf_end++;
+        if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
+            tx_buf_end = 0;
+        }
     }
     return 1;
 }
 
 size_t yh::rec::Usart::write (uint16_t val) {
-    if (!((*ucsrnb) & (1 << UDRIEn))) {
+    tx_used = 1;
+    const uint8_t ucsrnb_val = (*ucsrnb);
+    if (!(ucsrnb_val & (1 << UDRIEn))) {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
         while (!((*ucsrna) & (1 << UDREn))) {}
     }
-    const uint8_t ucsrnb_val = (*ucsrnb);
     if ((*ucsrna) & (1 << UDREn)) {
         // data register is empty
         // write to UDRn directly
@@ -304,10 +331,10 @@ size_t yh::rec::Usart::write (uint16_t val) {
             :
                 (tx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << tx_buf_start));
         }
-    }
-    tx_buf_end++;
-    if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
-        tx_buf_end = 0;
+        tx_buf_end++;
+        if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
+            tx_buf_end = 0;
+        }
     }
     return 1;
 }
@@ -384,18 +411,35 @@ void yh::rec::Usart::rx_isr () {
         }
     }
     single_data |= (*udrn);
-    bool store_data_to_rx_buf = true;
     // check for errors
-    if (ucsrna_val & (1 << FEn)) {
-        // frame error
-    }
-    if (ucsrna_val & (1 << DORn)) {
-        // data overrun
-    }
-    if (ucsrna_val & (1 << UPEn)) {
-        // parity error
-    }
-    if (store_data_to_rx_buf) {
+    const uint8_t err_flags = (ucsrna_val & ((1 << FEn) | (1 << DORn) | (1 << UPEn)));
+    if (err_flags) {
+        // error is detected
+        if (rx_error_routine) {
+            int data_to_write = rx_error_routine(single_data, err_flags);
+            if (data_to_write >= 0) { // save the data
+                // storing received data into buffer
+                // load volatile mem to register
+                uint8_t rx_buf_end_temp = rx_buf_end;
+                // increments the buffer length
+                rx_buf_end_temp++;
+                if (rx_buf_end_temp >= USART_RX_BUFFER_SIZE) {
+                    rx_buf_end_temp = 0;
+                }
+                if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
+                    if (data_to_write & (1 << 8)) {
+                        // set the ninth-bit
+                        rx_buf_9_bit |= (static_cast<uint64_t>(1UL) << rx_buf_end_temp);
+                    } else {
+                        // clear the ninth-bit
+                        rx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << rx_buf_end_temp);
+                    }
+                }
+                rx_buf[rx_buf_end_temp] = (data_to_write & 0xff);
+                rx_buf_end = rx_buf_end_temp;
+            }
+        }
+    } else {
         // storing received data into buffer
         // load volatile mem to register
         uint8_t rx_buf_end_temp = rx_buf_end;
