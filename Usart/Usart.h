@@ -220,6 +220,7 @@
 #error "Not all bit positions for UART3 are the same as for UART0"
 #endif
 
+// for compatibility with Arduino
 // Define config for Serial.begin(baud, config);
 #define SERIAL_5N1 0x00
 #define SERIAL_6N1 0x02
