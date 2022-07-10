@@ -8,14 +8,12 @@
 yh::rec::Usart usart3 (&UBRR3, &UCSR3A, &UCSR3B, &UCSR3C, &UDR3, &DDRJ, (1 << 2) ); //, &DDRJ, (1 << 1), &DDRJ, (1 << 0));
 #endif
 
-ISR(USART3_RX_vect)
-{
-    usart3.rx_isr();
-}
+#if defined(USART3_RX_vect)
+ISR(USART3_RX_vect) { usart3.rx_isr(); }
+#endif // #if defined(USART3_RX_vect)
 
-ISR(USART3_UDRE_vect)
-{
-    usart3.tx_ddr_empty_isr();
-}
+#if defined(USART3_UDRE_vect)
+ISR(USART3_UDRE_vect) { usart3.tx_ddr_empty_isr(); }
+#endif // #if defined(USART3_UDRE_vect)
 
 #endif // #ifndef USART3_CUSTOM_CPP

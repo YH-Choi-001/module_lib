@@ -16,25 +16,19 @@ yh::rec::Usart usart1 (&UBRR1, &UCSR1A, &UCSR1B, &UCSR1C, &UDR1, &DDRD, (1 << 5)
 #endif
 
 #if defined(UART1_RX_vect)
-ISR(UART1_RX_vect)
+    ISR(UART1_RX_vect) { usart1.rx_isr(); }
 #elif defined(USART1_RX_vect)
-ISR(USART1_RX_vect)
+    ISR(USART1_RX_vect) { usart1.rx_isr(); }
 #else
-  #error "Don't know what the Data Received vector is called for Serial"
+    // #error "Don't know what the Data Received vector is called for Serial"
 #endif
-{
-    usart1.rx_isr();
-}
 
 #if defined(UART1_UDRE_vect)
-ISR(UART1_UDRE_vect)
+    ISR(UART1_UDRE_vect) { usart1.tx_ddr_empty_isr(); }
 #elif defined(USART1_UDRE_vect)
-ISR(USART1_UDRE_vect)
+    ISR(USART1_UDRE_vect) { usart1.tx_ddr_empty_isr(); }
 #else
-  #error "Don't know what the Data Register Empty vector is called for Serial"
+    // #error "Don't know what the Data Register Empty vector is called for Serial"
 #endif
-{
-    usart1.tx_ddr_empty_isr();
-}
 
 #endif // #ifndef USART1_CUSTOM_CPP

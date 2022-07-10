@@ -14,31 +14,25 @@ yh::rec::Usart usart  (&UBRR0, &UCSR0A, &UCSR0B, &UCSR0C, &UDR0, &DDRE, (1 << 2)
 #endif
 
 #if defined(USART_RX_vect)
-  ISR(USART_RX_vect)
+    ISR(USART_RX_vect) { usart.rx_isr(); }
 #elif defined(USART0_RX_vect)
-  ISR(USART0_RX_vect)
+    ISR(USART0_RX_vect) { usart.rx_isr(); }
 #elif defined(USART_RXC_vect)
-  ISR(USART_RXC_vect) // ATmega8
+    ISR(USART_RXC_vect) { usart.rx_isr(); } // ATmega8
 #else
-  #error "Don't know what the Data Received vector is called for Serial"
+    // #error "Don't know what the Data Received vector is called for Serial"
 #endif
-{
-    usart.rx_isr();
-}
 
 #if defined(UART0_UDRE_vect)
-ISR(UART0_UDRE_vect)
+    ISR(UART0_UDRE_vect) { usart.tx_ddr_empty_isr(); }
 #elif defined(UART_UDRE_vect)
-ISR(UART_UDRE_vect)
+    ISR(UART_UDRE_vect) { usart.tx_ddr_empty_isr(); }
 #elif defined(USART0_UDRE_vect)
-ISR(USART0_UDRE_vect)
+    ISR(USART0_UDRE_vect) { usart.tx_ddr_empty_isr(); }
 #elif defined(USART_UDRE_vect)
-ISR(USART_UDRE_vect)
+    ISR(USART_UDRE_vect) { usart.tx_ddr_empty_isr(); }
 #else
-  #error "Don't know what the Data Register Empty vector is called for Serial"
+    // #error "Don't know what the Data Register Empty vector is called for Serial"
 #endif
-{
-    usart.tx_ddr_empty_isr();
-}
 
 #endif // #ifndef USART0_CUSTOM_CPP
