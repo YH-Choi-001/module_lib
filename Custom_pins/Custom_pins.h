@@ -742,7 +742,7 @@ namespace yh {
             }
             inline void select_adc_channel (const uint8_t channel) __attribute__((__always_inline__));
             inline void select_adc_channel (const uint8_t channel)                                     {
-                ADMUX = (ADMUX & ~((1 << MUX4) | (1 << MUX3) | (1 << MUX2) | (1 << MUX1) | (1 << MUX0))) | ((channel & 0b111) << MUX0);
+                ADMUX = (ADMUX & ~((1 << MUX2) | (1 << MUX1) | (1 << MUX0))) | ((channel & 0b111) << MUX0);
                 #if defined(ADCSRB) && defined(MUX5)
                 ADCSRB = (ADCSRB & ~(1 << MUX5)) | (((channel >> 3) & 0x01) << MUX5);
                 #endif // #if defined(ADCSRB) && defined(MUX5)
@@ -764,26 +764,6 @@ namespace yh {
                     return ADCH;
                 const uint8_t temp = ADCL;
                 return (temp >> 2) | (ADCH << 6);
-            }
-            int analog_read (uint8_t pin) {
-                #if defined(analogPinToChannel)
-                #if defined(__AVR_ATmega32U4__)
-                    if (pin >= 18) pin -= 18; // allow for channel or pin numbers
-                #endif
-                    pin = analogPinToChannel(pin);
-                #elif defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__)
-                    if (pin >= 54) pin -= 54; // allow for channel or pin numbers
-                #elif defined(__AVR_ATmega32U4__)
-                    if (pin >= 18) pin -= 18; // allow for channel or pin numbers
-                #elif defined(__AVR_ATmega1284__) || defined(__AVR_ATmega1284P__) || defined(__AVR_ATmega644__) || defined(__AVR_ATmega644A__) || defined(__AVR_ATmega644P__) || defined(__AVR_ATmega644PA__)
-                    if (pin >= 24) pin -= 24; // allow for channel or pin numbers
-                #else
-                    if (pin >= 14) pin -= 14; // allow for channel or pin numbers
-                #endif
-                select_adc_channel(pin);
-                start_new_ad_conversion();
-                wait_for_ad_conversion_complete();
-                return read_adc_result();
             }
         }
     }
