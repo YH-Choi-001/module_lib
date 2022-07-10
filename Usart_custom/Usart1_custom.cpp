@@ -1,7 +1,7 @@
-#ifndef USART1_CPP
-#define USART1_CPP __DATE__ ", " __TIME__
+#ifndef USART1_CUSTOM_CPP
+#define USART1_CUSTOM_CPP __DATE__ ", " __TIME__
 
-#include "Usart.h"
+#include "Usart_custom.h"
 
 #if defined(__AVR_ATmega32U4__) // Arduino Micro or Leonardo
 #warning The only XCK1 pin on the Arduino Micro (or Leonardo) is broken out as the TX LED pin.
@@ -37,4 +37,4 @@ ISR(USART1_UDRE_vect)
     usart1.tx_ddr_empty_isr();
 }
 
-#endif // #ifndef USART1_CPP
+#endif // #ifndef USART1_CUSTOM_CPP

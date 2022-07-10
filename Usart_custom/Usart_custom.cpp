@@ -1,7 +1,7 @@
-#ifndef USART_CPP
-#define USART_CPP __DATE__ ", " __TIME__
+#ifndef USART_CUSTOM_CPP
+#define USART_CUSTOM_CPP __DATE__ ", " __TIME__
 
-#include "Usart.h"
+#include "Usart_custom.h"
 
 yh::rec::Usart::Usart (
     volatile uint16_t *const init_ubrrn,
@@ -462,4 +462,4 @@ void yh::rec::Usart::rx_isr () {
     }
 }
 
-#endif // #ifndef USART_CPP
+#endif // #ifndef USART_CUSTOM_CPP

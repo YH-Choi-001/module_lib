@@ -1,7 +1,7 @@
-#ifndef USART0_CPP
-#define USART0_CPP __DATE__ ", " __TIME__
+#ifndef USART0_CUSTOM_CPP
+#define USART0_CUSTOM_CPP __DATE__ ", " __TIME__
 
-#include "Usart.h"
+#include "Usart_custom.h"
 
 #if defined(__AVR_ATmega168__) || defined(__AVR_ATmega168P__) || defined(__AVR_ATmega328__) || defined(__AVR_ATmega328P__) // Arduino Uno
 //                      UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
@@ -41,4 +41,4 @@ ISR(USART_UDRE_vect)
     usart.tx_ddr_empty_isr();
 }
 
-#endif // #ifndef USART0_CPP
+#endif // #ifndef USART0_CUSTOM_CPP

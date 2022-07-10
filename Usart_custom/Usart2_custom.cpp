@@ -1,7 +1,7 @@
-#ifndef USART2_CPP
-#define USART2_CPP __DATE__ ", " __TIME__
+#ifndef USART2_CUSTOM_CPP
+#define USART2_CUSTOM_CPP __DATE__ ", " __TIME__
 
-#include "Usart.h"
+#include "Usart_custom.h"
 
 #if defined(__AVR_ATmega1280__) || defined(__AVR_ATmega2560__) // Arduino Mega
 //                      UBRRn,  UCSRnA,  UCSRnB,  UCSRnC,  UDRn,  DDRxck, MSKxck,  DDRtx, MSKtx,    DDRrx, MSKrx
@@ -18,4 +18,4 @@ ISR(USART2_UDRE_vect)
     usart2.tx_ddr_empty_isr();
 }
 
-#endif // #ifndef USART2_CPP
+#endif // #ifndef USART2_CUSTOM_CPP

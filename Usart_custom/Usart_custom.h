@@ -1,5 +1,5 @@
-#ifndef USART_H
-#define USART_H __DATE__ ", " __TIME__
+#ifndef USART_CUSTOM_H
+#define USART_CUSTOM_H __DATE__ ", " __TIME__
 
 #include <Arduino.h>
 
@@ -421,4 +421,4 @@ extern yh::rec::Usart usart2;
 extern yh::rec::Usart usart3;
 #endif
 
-#endif // #ifndef USART_H
+#endif // #ifndef USART_CUSTOM_H
