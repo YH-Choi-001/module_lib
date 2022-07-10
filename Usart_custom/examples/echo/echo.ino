@@ -6,6 +6,6 @@ void setup () {
 
 void loop () {
     if (usart.available()) {
-        usart.print(usart.read());
+        usart.print(static_cast<char>(usart.read()));
     }
 }
