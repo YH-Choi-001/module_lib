@@ -256,8 +256,9 @@ namespace yh {
         #define USART_TX_BUFFER_SIZE 64
         // #endif
 
+        class Usart;
         class Usart_settings {
-            public:
+            private:
                 const uint32_t baud;
                 const uint8_t data_len : 3;
                 const uint8_t stop_bits : 1;
@@ -265,6 +266,8 @@ namespace yh {
                 const uint8_t is_uart : 1;
                 const uint8_t is_master : 1;
                 const uint8_t clock_pol : 1;
+                friend class Usart;
+            public:
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // calls pinMode function and config the pin modes
                 // @param baud max: F_CPU / 8
