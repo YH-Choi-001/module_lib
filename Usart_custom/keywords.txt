@@ -1,0 +1,36 @@
+yh				KEYWORD1
+rec				KEYWORD1
+Usart				KEYWORD1
+Usart_settings			KEYWORD1
+
+rx_error_routine		KEYWORD1
+
+usart				KEYWORD1
+usart1				KEYWORD1
+usart2				KEYWORD1
+usart3				KEYWORD1
+
+begin				KEYWORD2
+end				KEYWORD2
+available			KEYWORD2
+peek				KEYWORD2
+read				KEYWORD2
+
+availableForWrite		KEYWORD2
+flush				KEYWORD2
+write				KEYWORD2
+print				KEYWORD2
+println				KEYWORD2
+
+enable_isr			KEYWORD2
+disable_isr			KEYWORD2
+
+enable_tx			KEYWORD2
+disable_tx			KEYWORD2
+enable_rx			KEYWORD2
+disable_rx			KEYWORD2
+
+default_rx_error_routine	KEYWORD2
+
+tx_ddr_empty_isr		KEYWORD2
+rx_isr				KEYWORD2

@@ -270,6 +270,7 @@ namespace yh {
                     prev_B_state = curr_B_state;
                 }
         };
+        /* delta displacement method is no longer supported due to heavy delay, experiments on this class is cut
         // for 2-channel rotary encoder use (memory saving)
         class Encoder_2ch_timer_int_light {
             private:
@@ -353,6 +354,7 @@ namespace yh {
                     prev_B_state = curr_B_state;
                 }
         };
+        //*/
         class Encoder_2ch_ext_int {
             private:
                 //

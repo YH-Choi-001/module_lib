@@ -1,9 +1,11 @@
 yh				KEYWORD1
 rec				KEYWORD1
-Encoder_2ch			KEYWORD1
+Encoder_2ch_timer_int		KEYWORD1
+Encoder_2ch_ext_int		KEYWORD1
 
 begin				KEYWORD2
 get_displacement		KEYWORD2
 get_instantaneous_velocity	KEYWORD2
+get_instantaneous_acceleration	KEYWORD2
 reset_displacement		KEYWORD2
 isr_individual_sensor_routine	KEYWORD2

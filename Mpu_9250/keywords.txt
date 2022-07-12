@@ -1,8 +1,8 @@
 ################################
 # keywords in Mpu_6050 library are already declared in its keywords.txt
 
-Custom_gy9250		KEYWORD1
-Custom_ak8963		KEYWORD1
+Mpu_9250		KEYWORD1
+Ak_8963			KEYWORD1
 mag			KEYWORD1
 min_x			KEYWORD1
 min_y			KEYWORD1

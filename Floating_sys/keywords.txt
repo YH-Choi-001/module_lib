@@ -1,0 +1,12 @@
+yh		KEYWORD1
+rec		KEYWORD1
+floating_syss	KEYWORD1
+
+get_bin		KEYWORD2
+get_exp		KEYWORD2
+get_sign	KEYWORD2
+get_man		KEYWORD2
+write_bin	KEYWORD2
+write_exp	KEYWORD2
+write_sign	KEYWORD2
+write_man	KEYWORD2

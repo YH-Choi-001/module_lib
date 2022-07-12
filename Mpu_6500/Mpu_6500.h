@@ -177,7 +177,7 @@ namespace yh {
                 // gyro features:
                 // the linear difference of roll, pitch, yaw between the latest and the previous measurement
                 volatile double d_roll, d_pitch, d_yaw;
-                // the correction added to every reading from the chip
+                // the correction subtracted from every reading from the chip
                 double corr_roll, corr_pitch, corr_yaw;
                 // inits the digital pin connected to the nCS pin of the MPU-6500
                 Mpu_6500 (const uint8_t init_cs_pin) :

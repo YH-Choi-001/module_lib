@@ -130,7 +130,7 @@ namespace yh {
                 // gyro features:
                 // the linear difference of roll, pitch, yaw between the latest and the previous measurement
                 volatile double d_roll, d_pitch, d_yaw;
-                // the correction added to every reading from the chip
+                // the correction subtracted from every reading from the chip
                 double corr_roll, corr_pitch, corr_yaw;
                 // inits the 7-bit I2C address of the chip to init_i2c_address
                 Mpu_6050 (const uint8_t init_i2c_address);

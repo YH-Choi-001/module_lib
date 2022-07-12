@@ -3,6 +3,9 @@ rec			KEYWORD1
 Euler_angle		KEYWORD1
 Quaternion		KEYWORD1
 Mpu_6050		KEYWORD1
+roll			KEYWORD1
+pitch			KEYWORD1
+yaw			KEYWORD1
 d_roll			KEYWORD1
 d_pitch			KEYWORD1
 d_yaw			KEYWORD1

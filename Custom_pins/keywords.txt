@@ -1,0 +1,21 @@
+yh			KEYWORD1
+rec			KEYWORD1
+custom_pins		KEYWORD1
+Custom_pin		KEYWORD1
+
+pin_mode		KEYWORD2
+digital_write		KEYWORD2
+digital_write_HIGH	KEYWORD2
+digital_write_LOW	KEYWORD2
+digital_write_TOGGLE	KEYWORD2
+digital_read		KEYWORD2
+digital_read_logical	KEYWORD2
+analog_write		KEYWORD2
+analog_read		KEYWORD2
+
+select_adc_prescaler	KEYWORD2
+select_adc_channel	KEYWORD2
+start_new_ad_conversion	KEYWORD2
+wait_for_ad_conversion_complete	KEYWORD2
+read_adc_result		KEYWORD2
+read_adc_8_bit_result	KEYWORD2
