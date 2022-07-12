@@ -404,42 +404,16 @@ void yh::rec::Usart::tx_ddr_empty_isr () {
 void yh::rec::Usart::rx_isr () {
     const uint8_t ucsrna_val = (*ucsrna); // check ucsrna for error flags
     const uint8_t ucsrnb_val = (*ucsrnb);
-    uint16_t single_data = 0;
+    uint16_t single_data = (*udrn);
     if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
         if (ucsrnb_val & (1 << RXB8n)) {
             single_data |= 0x0100;
         }
     }
-    single_data |= (*udrn);
     // check for errors
     const uint8_t err_flags = (ucsrna_val & ((1 << FEn) | (1 << DORn) | (1 << UPEn)));
-    if (err_flags) {
-        // error is detected
-        if (rx_error_routine) {
-            int data_to_write = rx_error_routine(single_data, err_flags);
-            if (data_to_write >= 0) { // save the data
-                // storing received data into buffer
-                // load volatile mem to register
-                uint8_t rx_buf_end_temp = rx_buf_end;
-                // increments the buffer length
-                rx_buf_end_temp++;
-                if (rx_buf_end_temp >= USART_RX_BUFFER_SIZE) {
-                    rx_buf_end_temp = 0;
-                }
-                if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
-                    if (data_to_write & (1 << 8)) {
-                        // set the ninth-bit
-                        rx_buf_9_bit |= (static_cast<uint64_t>(1UL) << rx_buf_end_temp);
-                    } else {
-                        // clear the ninth-bit
-                        rx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << rx_buf_end_temp);
-                    }
-                }
-                rx_buf[rx_buf_end_temp] = (data_to_write & 0xff);
-                rx_buf_end = rx_buf_end_temp;
-            }
-        }
-    } else {
+    int data_to_write = err_flags ? (rx_error_routine ? rx_error_routine(single_data, err_flags) : -1) : single_data;
+    if (data_to_write >= 0) { // save the data
         // storing received data into buffer
         // load volatile mem to register
         uint8_t rx_buf_end_temp = rx_buf_end;
@@ -449,7 +423,7 @@ void yh::rec::Usart::rx_isr () {
             rx_buf_end_temp = 0;
         }
         if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
-            if (single_data & (1 << 8)) {
+            if (data_to_write & (1 << 8)) {
                 // set the ninth-bit
                 rx_buf_9_bit |= (static_cast<uint64_t>(1UL) << rx_buf_end_temp);
             } else {
@@ -457,7 +431,7 @@ void yh::rec::Usart::rx_isr () {
                 rx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << rx_buf_end_temp);
             }
         }
-        rx_buf[rx_buf_end_temp] = (single_data & 0xff);
+        rx_buf[rx_buf_end_temp] = (data_to_write & 0xff);
         rx_buf_end = rx_buf_end_temp;
     }
 }
