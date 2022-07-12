@@ -396,7 +396,7 @@ namespace yh {
                     disable_rx ();
 
                 int (*rx_error_routine)(uint8_t received_value, uint8_t ucsrna_err_flags); // pointer to function that is called when error is found
-                static int default_rx_error_routine (uint8_t received_value, uint8_t ucsrna_err_flags) __attribute__((unused)) { return -1; } // drops the error value
+                static int default_rx_error_routine (uint8_t received_value, uint8_t ucsrna_err_flags) { return received_value = ucsrna_err_flags = -1; } // drops the error value
 
                 // these are not intended to be called by users
                 void tx_ddr_empty_isr ();
