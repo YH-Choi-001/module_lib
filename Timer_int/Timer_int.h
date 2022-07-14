@@ -487,16 +487,39 @@ OFF_TIMER_16bit_INTERRUPT(5,A)
 void set_timer_1_prescaler (const uint16_t request_prescaler) {
     uint8_t oldSREG = SREG;
     noInterrupts();
+    uint8_t old_nb = TCCR1B;
     if (request_prescaler <= 1) {
-        TCCR1B = (TCCR1B & ~((1 << CS12) | (1 << CS11)))               | (1 << CS10);
+        TCCR1B = (old_nb & ~((1 << CS12) | (1 << CS11)              ))                                 | (1 << CS10);
     } else if (request_prescaler <= 8) {
-        TCCR1B = (TCCR1B & ~((1 << CS12) | (1 << CS10)))               | (1 << CS11);
+        TCCR1B = (old_nb & ~((1 << CS12)               | (1 << CS10)))                   | (1 << CS11);
     } else if (request_prescaler <= 64) {
-        TCCR1B = (TCCR1B & ~(1 << CS12))                               | (1 << CS11) | (1 << CS10);
+        TCCR1B = (old_nb & ~((1 << CS12)                            ))                   | (1 << CS11) | (1 << CS10);
     } else if (request_prescaler <= 256) {
-        TCCR1B = (TCCR1B & ~((1 << CS11) | (1 << CS10)))               | (1 << CS12);
+        TCCR1B = (old_nb & ~(              (1 << CS11) | (1 << CS10)))     | (1 << CS12);
     } else if (request_prescaler <= 1024) {
-        TCCR1B = (TCCR1B & ~(1 << CS11))                               | (1 << CS12) | (1 << CS10);
+        TCCR1B = (old_nb & ~(              (1 << CS11)              ))     | (1 << CS12)               | (1 << CS10);
+    }
+    SREG = oldSREG;
+}
+
+void set_timer_2_prescaler (const uint16_t request_prescaler) {
+    uint8_t oldSREG = SREG;
+    noInterrupts();
+    uint8_t old_nb = TCCR2B;
+    if (request_prescaler <= 1) {
+        TCCR2B = (old_nb & ~((1 << CS22) | (1 << CS21)              ))                                 | (1 << CS20);
+    } else if (request_prescaler <= 8) {
+        TCCR2B = (old_nb & ~((1 << CS22)               | (1 << CS20)))                   | (1 << CS21);
+    } else if (request_prescaler <= 32) {
+        TCCR2B = (old_nb & ~((1 << CS22)                            ))                   | (1 << CS21) | (1 << CS20);
+    } else if (request_prescaler <= 64) {
+        TCCR2B = (old_nb & ~(              (1 << CS21) | (1 << CS20)))     | (1 << CS22);
+    } else if (request_prescaler <= 128) {
+        TCCR2B = (old_nb & ~(              (1 << CS21)              ))     | (1 << CS22)               | (1 << CS20);
+    } else if (request_prescaler <= 256) {
+        TCCR2B = (old_nb & ~(                            (1 << CS20)))     | (1 << CS22) | (1 << CS21);
+    } else if (request_prescaler <= 1024) {
+        TCCR2B = old_nb                                                    | (1 << CS22) | (1 << CS21) | (1 << CS20);
     }
     SREG = oldSREG;
 }
@@ -505,16 +528,17 @@ void set_timer_1_prescaler (const uint16_t request_prescaler) {
 void set_timer_##timer_no##_prescaler (const uint16_t request_prescaler) { \
     uint8_t oldSREG = SREG; \
     noInterrupts(); \
+    uint8_t old_nb = TCCR##timer_no##B; \
     if (request_prescaler <= 1) { \
-        TCCR##timer_no##B = (TCCR##timer_no##B & ~((1 << CS##timer_no##2) | (1 << CS##timer_no##1))) | (1 << CS##timer_no##0); \
+        TCCR##timer_no##B = (old_nb & ~((1 << CS##timer_no##2) | (1 << CS##timer_no##1))) | (1 << CS##timer_no##0); \
     } else if (request_prescaler <= 8) { \
-        TCCR##timer_no##B = (TCCR##timer_no##B & ~((1 << CS##timer_no##2) | (1 << CS##timer_no##0))) | (1 << CS##timer_no##1); \
+        TCCR##timer_no##B = (old_nb & ~((1 << CS##timer_no##2) | (1 << CS##timer_no##0))) | (1 << CS##timer_no##1); \
     } else if (request_prescaler <= 64) { \
-        TCCR##timer_no##B = (TCCR##timer_no##B & ~(1 << CS##timer_no##2))                            | (1 << CS##timer_no##1) | (1 << CS##timer_no##0); \
+        TCCR##timer_no##B = (old_nb & ~(1 << CS##timer_no##2))                            | (1 << CS##timer_no##1) | (1 << CS##timer_no##0); \
     } else if (request_prescaler <= 256) { \
-        TCCR##timer_no##B = (TCCR##timer_no##B & ~((1 << CS##timer_no##1) | (1 << CS##timer_no##0))) | (1 << CS##timer_no##2); \
+        TCCR##timer_no##B = (old_nb & ~((1 << CS##timer_no##1) | (1 << CS##timer_no##0))) | (1 << CS##timer_no##2); \
     } else if (request_prescaler <= 1024) { \
-        TCCR##timer_no##B = (TCCR##timer_no##B & ~(1 << CS##timer_no##1))                            | (1 << CS##timer_no##2) | (1 << CS##timer_no##0); \
+        TCCR##timer_no##B = (old_nb & ~(1 << CS##timer_no##1))                            | (1 << CS##timer_no##2) | (1 << CS##timer_no##0); \
     } \
     SREG = oldSREG; \
 }
