@@ -170,8 +170,9 @@ void rx (int buf_len) {
 
 void tx () {
     const uint8_t filter_on_flag = filter_on;
+    const char tx_data_special_request_for_switch = tx_data_special_request;
     if (filter_on_flag) {
-        switch (tx_data_special_request) {
+        switch (tx_data_special_request_for_switch) {
             case BALL_ANGLE:
                 {
                     const uint16_t temp_ball_dir = filtered_ball_dir;
@@ -202,7 +203,7 @@ void tx () {
                 break;
         }
     } else {
-        switch (tx_data_special_request) {
+        switch (tx_data_special_request_for_switch) {
             case BALL_ANGLE:
                 {
                     const uint16_t temp_ball_dir = sun_ball_dir;
