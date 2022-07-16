@@ -45,7 +45,7 @@ void select_led (const uint8_t idx) {
 
 // this array should be arranged in the clockwise order of the IR-photodiodes connected to the 32u4 adc channels
 static const uint8_t channel_selecting_order [12] = {
-    0, 1, 4, 5, 6, 7, 8, 10, 11, 12, 13, 9
+    0, 1, 4, 5, 6, 7, 13, 12, 11, 10, 9, 8
 };
 
 void setup () {
@@ -124,9 +124,11 @@ void loop () {
         if (result < min)
             min = result;
         const uint8_t delta_of_eye = max - min;
-        if ((filtered_eyes[eye_idx] = delta_of_eye) > filtered_eyes[max_filtered_eye_idx])
+        filtered_eyes[eye_idx] = delta_of_eye;
+        if (delta_of_eye > filtered_eyes[max_filtered_eye_idx])
             max_filtered_eye_idx = eye_idx;
-        if ((sun_eyes[eye_idx] = max) > sun_eyes[max_sun_eye_idx]) {
+        sun_eyes[eye_idx] = max;
+        if (max > sun_eyes[max_sun_eye_idx]) {
             max_sun_eye_idx = eye_idx;
         }
     }
