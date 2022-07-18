@@ -291,6 +291,7 @@ size_t yh::rec::Usart::write (uint8_t val) {
             (*ucsrnb) = ucsrnb_val & ~(1 << TXB8n);
         (*udrn) = val;
     } else {
+        while (tx_buf_end == tx_buf_start) {} // tx buffer is full, wait for empty space
         // data register is not empty
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
@@ -321,6 +322,7 @@ size_t yh::rec::Usart::write (uint16_t val) {
             (*ucsrnb) = ( (val & 0x0100) ? (ucsrnb_val | (1 << TXB8n)) : (ucsrnb_val & ~(1 << TXB8n)) );
         (*udrn) = val;
     } else {
+        while (tx_buf_end == tx_buf_start) {} // tx buffer is full, wait for empty space
         // data register is not empty
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
