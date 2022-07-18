@@ -334,7 +334,7 @@ namespace yh {
                 volatile uint8_t rx_buf [USART_RX_BUFFER_SIZE];
                 volatile uint64_t rx_buf_9_bit;
                 volatile uint8_t rx_buf_end; // ending index
-                uint8_t rx_buf_start; // starting index
+                volatile uint8_t rx_buf_start; // starting index
                 // tx buffer
                 volatile uint8_t tx_buf [USART_TX_BUFFER_SIZE];
                 volatile uint64_t tx_buf_9_bit;
@@ -342,7 +342,8 @@ namespace yh {
                 volatile uint8_t tx_buf_start; // starting index
 
                 // a flag to indicate whether the tx has sent data out since begin() is called
-                uint8_t tx_used;
+                uint8_t tx_used : 1;
+                uint8_t rx_about_overflow : 1;
             public:
                 // default constructor
                 Usart (
