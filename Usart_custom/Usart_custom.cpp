@@ -272,7 +272,7 @@ void yh::rec::Usart::flush () {
     } else {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
-        while (!((*ucsrna) & (1 << UDREn))) {}
+        while (!((*ucsrna) & (1 << TXCn))) {}
     }
 }
 
