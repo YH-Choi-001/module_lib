@@ -417,11 +417,6 @@ void yh::rec::Usart::rx_isr () {
         // storing received data into buffer
         // load volatile mem to register
         uint8_t rx_buf_end_temp = rx_buf_end;
-        // increments the buffer length
-        rx_buf_end_temp++;
-        if (rx_buf_end_temp >= USART_RX_BUFFER_SIZE) {
-            rx_buf_end_temp = 0;
-        }
         if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
             if (data_to_write & (1 << 8)) {
                 // set the ninth-bit
@@ -432,6 +427,11 @@ void yh::rec::Usart::rx_isr () {
             }
         }
         rx_buf[rx_buf_end_temp] = (data_to_write & 0xff);
+        // increments the buffer length
+        rx_buf_end_temp++;
+        if (rx_buf_end_temp >= USART_RX_BUFFER_SIZE) {
+            rx_buf_end_temp = 0;
+        }
         rx_buf_end = rx_buf_end_temp;
     }
 }
