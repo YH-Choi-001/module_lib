@@ -29,7 +29,6 @@ yh::rec::Usart::Usart (
 }
 void yh::rec::Usart::begin (const uint32_t baud, const uint8_t config) {
     tx_used = 0;
-    rx_about_overflow = 0;
     // clear rx buf
     for (uint8_t i = 0; i < USART_RX_BUFFER_SIZE; i++) {
         rx_buf[i] = 0;
@@ -82,7 +81,6 @@ void yh::rec::Usart::begin (const uint32_t baud, const uint8_t config) {
 
 void yh::rec::Usart::begin (Usart_settings settings) {
     tx_used = 0;
-    rx_about_overflow = 0;
     // clear rx buf
     for (uint8_t i = 0; i < USART_RX_BUFFER_SIZE; i++) {
         rx_buf[i] = 0;
@@ -197,21 +195,18 @@ void yh::rec::Usart::begin (Usart_settings settings) {
 void yh::rec::Usart::end () {
     if (tx_used)
         // wait for last transmission to finish
-        flush();
-    uint8_t oldSREG = SREG;
-    noInterrupts();
+        while (!((*ucsrna) & (1 << TXCn))) { }
     (*ucsrna) = 0;
     (*ucsrnb) = 0;
     (*ucsrnc) = 0;
     (*ubrrn) = 0;
-    SREG = oldSREG;
 }
 
 int yh::rec::Usart::available () {
     if ((*ucsrnb) & (1 << RXCIEn)) {
         // RXC is able to generate interrupts
         int unread_len = rx_buf_end + USART_RX_BUFFER_SIZE - rx_buf_start;
-        return (unread_len > USART_RX_BUFFER_SIZE) ? (unread_len - USART_RX_BUFFER_SIZE) : unread_len;
+        return (unread_len >= USART_RX_BUFFER_SIZE) ? (unread_len - USART_RX_BUFFER_SIZE) : unread_len;
     } else {
         // RXC is unable to generate interrupts
         return ((*ucsrna) & (1 << RXCn)) ? 1 : 0;
@@ -220,18 +215,14 @@ int yh::rec::Usart::available () {
 
 int yh::rec::Usart::peek () {
     if (!((*ucsrnb) & (1 << RXCIEn))) return -1; // peek feature unavailable in no-interrupts evnironment
-    const uint8_t rx_buf_start_temp = rx_buf_start;
-    if ((rx_buf_start_temp == rx_buf_end) && (!rx_about_overflow))
-    return -1;
-    uint8_t oldSREG = SREG;
-    noInterrupts();
-    uint16_t temp = rx_buf[rx_buf_start_temp];
+    if (rx_buf_start == rx_buf_end)
+        return -1;
+    uint16_t temp = rx_buf[rx_buf_start];
     if ((*ucsrnb) & (1 << UCSZn2)) {
-        if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start_temp)) {
+        if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start)) {
             temp |= 0x0100;
         }
     }
-    SREG = oldSREG;
     return temp;
 }
 
@@ -239,23 +230,18 @@ int yh::rec::Usart::read () {
     const uint8_t ucsrnb_val = (*ucsrnb);
     if (ucsrnb_val & (1 << RXCIEn)) {
         // RXC is able to generate interrupts
-        uint8_t rx_buf_start_temp = rx_buf_start;
-        if ((rx_buf_start_temp == rx_buf_end) && (!rx_about_overflow))
+        if (rx_buf_start == rx_buf_end)
             return -1;
-        uint8_t oldSREG = SREG;
-        noInterrupts();
-        uint16_t temp = rx_buf[rx_buf_start_temp];
+        uint16_t temp = rx_buf[rx_buf_start];
         if ((*ucsrnb) & (1 << UCSZn2)) {
-            if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start_temp)) {
+            if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start)) {
                 temp |= 0x0100;
             }
         }
-        rx_buf_start_temp++;
-        if (rx_buf_start_temp >= USART_RX_BUFFER_SIZE) {
-            rx_buf_start_temp = 0;
+        rx_buf_start++;
+        if (rx_buf_start >= USART_RX_BUFFER_SIZE) {
+            rx_buf_start = 0;
         }
-        rx_buf_start = rx_buf_start_temp;
-        SREG = oldSREG;
         return temp;
     } else {
         // RXC is unable to generate interrupts
@@ -286,7 +272,7 @@ void yh::rec::Usart::flush () {
     } else {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
-        while (!((*ucsrna) & (1 << TXCn))) {}
+        while (!((*ucsrna) & (1 << UDREn))) {}
     }
 }
 
@@ -305,9 +291,6 @@ size_t yh::rec::Usart::write (uint8_t val) {
             (*ucsrnb) = ucsrnb_val & ~(1 << TXB8n);
         (*udrn) = val;
     } else {
-        while (tx_buf_end == tx_buf_start) {} // tx buffer is full, wait for empty space
-        uint8_t oldSREG = SREG;
-        noInterrupts();
         // data register is not empty
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
@@ -319,7 +302,6 @@ size_t yh::rec::Usart::write (uint8_t val) {
         if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
             tx_buf_end = 0;
         }
-        SREG = oldSREG;
     }
     return 1;
 }
@@ -333,18 +315,12 @@ size_t yh::rec::Usart::write (uint16_t val) {
         while (!((*ucsrna) & (1 << UDREn))) {}
     }
     if ((*ucsrna) & (1 << UDREn)) {
-        uint8_t oldSREG = SREG;
-        noInterrupts();
         // data register is empty
         // write to UDRn directly
         if (ucsrnb_val & (1 << UCSZn2))
             (*ucsrnb) = ( (val & 0x0100) ? (ucsrnb_val | (1 << TXB8n)) : (ucsrnb_val & ~(1 << TXB8n)) );
         (*udrn) = val;
-        SREG = oldSREG;
     } else {
-        while (tx_buf_end == tx_buf_start) {} // tx buffer is full, wait for empty space
-        uint8_t oldSREG = SREG;
-        noInterrupts();
         // data register is not empty
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
@@ -359,7 +335,6 @@ size_t yh::rec::Usart::write (uint16_t val) {
         if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
             tx_buf_end = 0;
         }
-        SREG = oldSREG;
     }
     return 1;
 }
@@ -442,7 +417,6 @@ void yh::rec::Usart::rx_isr () {
         // storing received data into buffer
         // load volatile mem to register
         uint8_t rx_buf_end_temp = rx_buf_end;
-        uint8_t rx_buf_start_temp = rx_buf_start;
         if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
             if (data_to_write & (1 << 8)) {
                 // set the ninth-bit
@@ -458,18 +432,7 @@ void yh::rec::Usart::rx_isr () {
         if (rx_buf_end_temp >= USART_RX_BUFFER_SIZE) {
             rx_buf_end_temp = 0;
         }
-        if (rx_about_overflow) {
-            if (rx_buf_end_temp == rx_buf_start_temp) {
-                rx_buf_start_temp = rx_buf_end_temp;
-            } else {
-                rx_about_overflow = 0;
-            }
-        }
-        if (rx_buf_end_temp == rx_buf_start_temp) {
-            rx_about_overflow = 1;
-        }
         rx_buf_end = rx_buf_end_temp;
-        rx_buf_start = rx_buf_start_temp;
     }
 }
 

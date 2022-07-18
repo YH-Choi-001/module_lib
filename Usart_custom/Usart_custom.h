@@ -249,7 +249,7 @@
 
 namespace yh {
     namespace rec {
-        // at most 64 * 9-bits, since max size of integer supported by avr-gcc is uint64_t
+        // at most 64 * 9-bits, due to max size of integer supported by avr-gcc is uint64_t
         // #ifndef USART_RX_BUFFER_SIZE
         #define USART_RX_BUFFER_SIZE 64
         // #endif
@@ -334,7 +334,7 @@ namespace yh {
                 volatile uint8_t rx_buf [USART_RX_BUFFER_SIZE];
                 volatile uint64_t rx_buf_9_bit;
                 volatile uint8_t rx_buf_end; // ending index
-                volatile uint8_t rx_buf_start; // starting index
+                uint8_t rx_buf_start; // starting index
                 // tx buffer
                 volatile uint8_t tx_buf [USART_TX_BUFFER_SIZE];
                 volatile uint64_t tx_buf_9_bit;
@@ -342,8 +342,7 @@ namespace yh {
                 volatile uint8_t tx_buf_start; // starting index
 
                 // a flag to indicate whether the tx has sent data out since begin() is called
-                uint8_t tx_used : 1;
-                uint8_t rx_about_overflow : 1;
+                uint8_t tx_used;
             public:
                 // default constructor
                 Usart (
