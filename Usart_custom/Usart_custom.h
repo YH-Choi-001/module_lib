@@ -249,7 +249,7 @@
 
 namespace yh {
     namespace rec {
-        // at most 64 * 9-bits, due to max size of integer supported by avr-gcc is uint64_t
+        // at most 64 * 9-bits, since max size of integer supported by avr-gcc is uint64_t
         // #ifndef USART_RX_BUFFER_SIZE
         #define USART_RX_BUFFER_SIZE 64
         // #endif

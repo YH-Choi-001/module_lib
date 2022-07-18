@@ -195,7 +195,7 @@ void yh::rec::Usart::begin (Usart_settings settings) {
 void yh::rec::Usart::end () {
     if (tx_used)
         // wait for last transmission to finish
-        while (!((*ucsrna) & (1 << TXCn))) { }
+        flush();
     (*ucsrna) = 0;
     (*ucsrnb) = 0;
     (*ucsrnc) = 0;
