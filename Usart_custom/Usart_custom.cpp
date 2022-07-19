@@ -73,10 +73,13 @@ void yh::rec::Usart::begin (const uint32_t baud, const uint8_t config) {
         // disable async double speed mode
         // -----default selected: ucsrna_temp &= ~(1 << U2Xn);
     }
+    uint8_t oldSREG = SREG;
+    noInterrupts();
     (*ucsrna) = ucsrna_temp;
     (*ucsrnb) = ucsrnb_temp;
     (*ucsrnc) = ucsrnc_temp;
     (*ubrrn) = (ubrrn_temp < 0) ? static_cast<uint16_t>(0) : static_cast<uint16_t>(ceil(ubrrn_temp));
+    SREG = oldSREG;
 }
 
 void yh::rec::Usart::begin (Usart_settings settings) {
@@ -195,15 +198,18 @@ void yh::rec::Usart::begin (Usart_settings settings) {
 void yh::rec::Usart::end () {
     if (tx_used)
         // wait for last transmission to finish
-        while (!((*ucsrna) & (1 << TXCn))) { }
+        flush();
     (*ucsrna) = 0;
     (*ucsrnb) = 0;
     (*ucsrnc) = 0;
     (*ubrrn) = 0;
 }
 
+#define RX_INT_ABLE ((*ucsrnb) & (1 << RXCIEn))
+#define TX_INT_ABLE (SREG & (1 << SREG_I))
+
 int yh::rec::Usart::available () {
-    if ((*ucsrnb) & (1 << RXCIEn)) {
+    if (RX_INT_ABLE) {
         // RXC is able to generate interrupts
         int unread_len = rx_buf_end + USART_RX_BUFFER_SIZE - rx_buf_start;
         return (unread_len >= USART_RX_BUFFER_SIZE) ? (unread_len - USART_RX_BUFFER_SIZE) : unread_len;
@@ -214,7 +220,7 @@ int yh::rec::Usart::available () {
 }
 
 int yh::rec::Usart::peek () {
-    if (!((*ucsrnb) & (1 << RXCIEn))) return -1; // peek feature unavailable in no-interrupts evnironment
+    if (!RX_INT_ABLE) return -1; // peek feature unavailable in no-interrupts evnironment
     if (rx_buf_start == rx_buf_end)
         return -1;
     uint16_t temp = rx_buf[rx_buf_start];
@@ -227,8 +233,7 @@ int yh::rec::Usart::peek () {
 }
 
 int yh::rec::Usart::read () {
-    const uint8_t ucsrnb_val = (*ucsrnb);
-    if (ucsrnb_val & (1 << RXCIEn)) {
+    if (RX_INT_ABLE) {
         // RXC is able to generate interrupts
         if (rx_buf_start == rx_buf_end)
             return -1;
@@ -242,20 +247,23 @@ int yh::rec::Usart::read () {
         if (rx_buf_start >= USART_RX_BUFFER_SIZE) {
             rx_buf_start = 0;
         }
-        return temp;
+        return static_cast<int>(temp);
     } else {
         // RXC is unable to generate interrupts
+        while ((*ucsrna) & (1 << RXCn)) {} // wait for the byte to be received
+        const uint8_t ucsrnb_val = (*ucsrnb);
+        const uint8_t temp = (*udrn);
         if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
             if (ucsrnb_val & (1 << RXB8n)) {
-                return 0x0100 | (*udrn);
+                return 0x0100 | temp;
             }
         }
-        return (*udrn);
+        return temp;
     }
 }
 
 int yh::rec::Usart::availableForWrite () {
-    if ((*ucsrnb) & (1 << UDRIEn)) {
+    if (TX_INT_ABLE) {
         // UDRE is able to generate interrupts
         int empty_len = USART_TX_BUFFER_SIZE - tx_buf_end + tx_buf_start;
         return (empty_len >= USART_TX_BUFFER_SIZE) ? (empty_len - USART_TX_BUFFER_SIZE) : empty_len;
@@ -266,20 +274,20 @@ int yh::rec::Usart::availableForWrite () {
 }
 
 void yh::rec::Usart::flush () {
-    if ((*ucsrnb) & (1 << UDRIEn)) {
+    if (TX_INT_ABLE) {
         // UDRE is able to generate interrupts
         while (tx_buf_start != tx_buf_end) {}
     } else {
         // UDRE is unable to generate interrupts
-        // wait for data register to be empty
-        while (!((*ucsrna) & (1 << UDREn))) {}
+        // wait for transmit complete
+        while (!((*ucsrna) & (1 << TXCn))) {}
     }
 }
 
 size_t yh::rec::Usart::write (uint8_t val) {
     tx_used = 1;
     const uint8_t ucsrnb_val = (*ucsrnb);
-    if (!(ucsrnb_val & (1 << UDRIEn))) {
+    if (!TX_INT_ABLE) {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
         while (!((*ucsrna) & (1 << UDREn))) {}
@@ -292,6 +300,8 @@ size_t yh::rec::Usart::write (uint8_t val) {
         (*udrn) = val;
     } else {
         // data register is not empty
+        // enable data-register-empty interrupt
+        (*ucsrnb) = (ucsrnb_val | (1 << UDRIEn));
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
         if (ucsrnb_val & (1 << UCSZn2)) {
@@ -309,7 +319,7 @@ size_t yh::rec::Usart::write (uint8_t val) {
 size_t yh::rec::Usart::write (uint16_t val) {
     tx_used = 1;
     const uint8_t ucsrnb_val = (*ucsrnb);
-    if (!(ucsrnb_val & (1 << UDRIEn))) {
+    if (!TX_INT_ABLE) {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
         while (!((*ucsrna) & (1 << UDREn))) {}
@@ -322,6 +332,10 @@ size_t yh::rec::Usart::write (uint16_t val) {
         (*udrn) = val;
     } else {
         // data register is not empty
+        // enable data-register-empty interrupt
+        (*ucsrnb) = (ucsrnb_val | (1 << UDRIEn));
+        // enable data-register-empty interrupt
+        (*ucsrnb) |= (1 << UDRIEn);
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
         if (ucsrnb_val & (1 << UCSZn2)) {
@@ -381,8 +395,10 @@ void yh::rec::Usart::disable_rx () {
 
 void yh::rec::Usart::tx_ddr_empty_isr () {
     uint8_t tx_buf_start_temp = tx_buf_start;
-    if (tx_buf_end == tx_buf_start)
+    if (tx_buf_end == tx_buf_start_temp) {
+        (*ucsrnb) &= (~(1 << UDRIEn)); // disable the udr interrupt
         return;
+    }
     const uint8_t ucsrnb_val = (*ucsrnb);
     if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
         if (tx_buf_9_bit & (static_cast<uint64_t>(1UL) << tx_buf_start_temp)) {
