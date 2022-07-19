@@ -205,7 +205,7 @@ void yh::rec::Usart::end () {
     (*ubrrn) = 0;
 }
 
-#define RX_INT_ABLE ((*ucsrnb) & (1 << RXCIEn))
+#define RX_INT_ABLE ((SREG & (1 << SREG_I)) && ((*ucsrnb) & (1 << RXCIEn)))
 #define TX_INT_ABLE (SREG & (1 << SREG_I))
 
 int yh::rec::Usart::available () {
@@ -294,24 +294,35 @@ size_t yh::rec::Usart::write (uint8_t val) {
     }
     if ((*ucsrna) & (1 << UDREn)) {
         // data register is empty
+        uint8_t oldSREG = SREG;
+        noInterrupts();
         // write to UDRn directly
         if (ucsrnb_val & (1 << UCSZn2))
             (*ucsrnb) = ucsrnb_val & ~(1 << TXB8n);
         (*udrn) = val;
+        SREG = oldSREG;
     } else {
         // data register is not empty
         // enable data-register-empty interrupt
         (*ucsrnb) = (ucsrnb_val | (1 << UDRIEn));
+        // wait for completely-filled tx buf to give a byte of space
+        while (tx_about_overflow) {}
+        uint8_t oldSREG = SREG;
+        noInterrupts();
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
         if (ucsrnb_val & (1 << UCSZn2)) {
             // 9-bit mode
-            tx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << tx_buf_start);
+            tx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << tx_buf_end);
         }
         tx_buf_end++;
         if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
             tx_buf_end = 0;
         }
+        if (tx_buf_end == tx_buf_start) {
+            tx_about_overflow = 1;
+        }
+        SREG = oldSREG;
     }
     return 1;
 }
@@ -326,29 +337,38 @@ size_t yh::rec::Usart::write (uint16_t val) {
     }
     if ((*ucsrna) & (1 << UDREn)) {
         // data register is empty
+        uint8_t oldSREG = SREG;
+        noInterrupts();
         // write to UDRn directly
         if (ucsrnb_val & (1 << UCSZn2))
             (*ucsrnb) = ( (val & 0x0100) ? (ucsrnb_val | (1 << TXB8n)) : (ucsrnb_val & ~(1 << TXB8n)) );
         (*udrn) = val;
+        SREG = oldSREG;
     } else {
         // data register is not empty
         // enable data-register-empty interrupt
         (*ucsrnb) = (ucsrnb_val | (1 << UDRIEn));
-        // enable data-register-empty interrupt
-        (*ucsrnb) |= (1 << UDRIEn);
+        // wait for completely-filled tx buf to give a byte of space
+        while (tx_about_overflow) {}
+        uint8_t oldSREG = SREG;
+        noInterrupts();
         // load the value to tx buffer
         tx_buf[tx_buf_end] = val;
         if (ucsrnb_val & (1 << UCSZn2)) {
             // 9-bit mode
             (val & 0x0100) ?
-                (tx_buf_9_bit |= (static_cast<uint64_t>(1UL) << tx_buf_start))
+                (tx_buf_9_bit |= (static_cast<uint64_t>(1UL) << tx_buf_end))
             :
-                (tx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << tx_buf_start));
+                (tx_buf_9_bit &= ~(static_cast<uint64_t>(1UL) << tx_buf_end));
         }
         tx_buf_end++;
         if (tx_buf_end >= USART_TX_BUFFER_SIZE) {
             tx_buf_end = 0;
         }
+        if (tx_buf_end == tx_buf_start) {
+            tx_about_overflow = 1;
+        }
+        SREG = oldSREG;
     }
     return 1;
 }
@@ -395,8 +415,8 @@ void yh::rec::Usart::disable_rx () {
 
 void yh::rec::Usart::tx_ddr_empty_isr () {
     uint8_t tx_buf_start_temp = tx_buf_start;
-    if (tx_buf_end == tx_buf_start_temp) {
-        (*ucsrnb) &= (~(1 << UDRIEn)); // disable the udr interrupt
+    if ((tx_buf_end == tx_buf_start_temp) && (!tx_about_overflow)) {
+        (*ucsrnb) &= (~(1 << UDRIEn)); // tx buf empty, disable the udr interrupt
         return;
     }
     const uint8_t ucsrnb_val = (*ucsrnb);
@@ -415,6 +435,7 @@ void yh::rec::Usart::tx_ddr_empty_isr () {
         tx_buf_start_temp = 0;
     }
     tx_buf_start = tx_buf_start_temp;
+    tx_about_overflow = 0;
 }
 
 void yh::rec::Usart::rx_isr () {

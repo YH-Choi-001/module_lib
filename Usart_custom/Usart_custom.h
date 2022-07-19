@@ -343,6 +343,7 @@ namespace yh {
 
                 // a flag to indicate whether the tx has sent data out since begin() is called
                 uint8_t tx_used;
+                volatile uint8_t tx_about_overflow;
             public:
                 // default constructor
                 Usart (
