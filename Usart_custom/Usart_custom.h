@@ -334,16 +334,17 @@ namespace yh {
                 volatile uint8_t rx_buf [USART_RX_BUFFER_SIZE];
                 volatile uint64_t rx_buf_9_bit;
                 volatile uint8_t rx_buf_end; // ending index
-                uint8_t rx_buf_start; // starting index
+                volatile uint8_t rx_buf_start; // starting index
+                volatile uint8_t rx_about_overflow; // about to overflow flag
                 // tx buffer
                 volatile uint8_t tx_buf [USART_TX_BUFFER_SIZE];
                 volatile uint64_t tx_buf_9_bit;
                 volatile uint8_t tx_buf_end; // ending index
                 volatile uint8_t tx_buf_start; // starting index
+                volatile uint8_t tx_about_overflow; // about to overflow flag
 
                 // a flag to indicate whether the tx has sent data out since begin() is called
                 uint8_t tx_used;
-                volatile uint8_t tx_about_overflow;
             public:
                 // default constructor
                 Usart (
@@ -396,8 +397,11 @@ namespace yh {
                     enable_rx (),
                     disable_rx ();
 
-                int (*rx_error_routine)(uint8_t received_value, uint8_t ucsrna_err_flags); // pointer to function that is called when error is found
-                static int default_rx_error_routine (uint8_t received_value, uint8_t ucsrna_err_flags) { return received_value = ucsrna_err_flags = -1; } // drops the error value
+                int (*rx_data_error)(uint16_t received_value, uint8_t ucsrna_err_flags); // pointer to function that is called when error is found
+                static int default_rx_data_error (uint16_t received_value, uint8_t ucsrna_err_flags) { return received_value = ucsrna_err_flags = -1; } // drops the error value
+
+                void (*rx_buf_overflow)(uint16_t removed_value); // pointer to function that is called when the rx_buffer overflows
+                static void default_rx_buf_overflow (uint16_t removed_value) { return; } // do nothing to drop the overflown value
 
                 // these are not intended to be called by users
                 void tx_ddr_empty_isr ();

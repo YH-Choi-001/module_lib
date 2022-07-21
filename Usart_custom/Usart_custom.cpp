@@ -23,7 +23,8 @@ yh::rec::Usart::Usart (
     udrn(init_udrn),
     xckn_port_ddr(init_xckn_port_ddr),
     xckn_port_bit_mask(init_xckn_port_bit_mask),
-    rx_error_routine(default_rx_error_routine)
+    rx_data_error(default_rx_data_error),
+    rx_buf_overflow(default_rx_buf_overflow)
 {
     //
 }
@@ -35,12 +36,14 @@ void yh::rec::Usart::begin (const uint32_t baud, const uint8_t config) {
     }
     rx_buf_9_bit = 0;
     rx_buf_end = rx_buf_start = 0;
+    rx_about_overflow = 0;
     // clear tx buf
     for (uint8_t i = 0; i < USART_TX_BUFFER_SIZE; i++) {
         tx_buf[i] = 0;
     }
     tx_buf_9_bit = 0;
     tx_buf_end = tx_buf_start = 0;
+    tx_about_overflow = 0;
     // pre-assign values to UCSRnX registers
     uint8_t
         ucsrna_temp =
@@ -211,8 +214,12 @@ void yh::rec::Usart::end () {
 int yh::rec::Usart::available () {
     if (RX_INT_ABLE) {
         // RXC is able to generate interrupts
-        int unread_len = rx_buf_end + USART_RX_BUFFER_SIZE - rx_buf_start;
-        return (unread_len >= USART_RX_BUFFER_SIZE) ? (unread_len - USART_RX_BUFFER_SIZE) : unread_len;
+        if (rx_about_overflow) {
+            return USART_RX_BUFFER_SIZE;
+        } else {
+            int unread_len = rx_buf_end + USART_RX_BUFFER_SIZE - rx_buf_start;
+            return (unread_len >= USART_RX_BUFFER_SIZE) ? (unread_len - USART_RX_BUFFER_SIZE) : unread_len;
+        }
     } else {
         // RXC is unable to generate interrupts
         return ((*ucsrna) & (1 << RXCn)) ? 1 : 0;
@@ -221,11 +228,12 @@ int yh::rec::Usart::available () {
 
 int yh::rec::Usart::peek () {
     if (!RX_INT_ABLE) return -1; // peek feature unavailable in no-interrupts evnironment
-    if (rx_buf_start == rx_buf_end)
+    const uint8_t rx_buf_start_temp = rx_buf_start;
+    if ((rx_buf_start_temp == rx_buf_end) && (!rx_about_overflow))
         return -1;
-    uint16_t temp = rx_buf[rx_buf_start];
+    uint16_t temp = rx_buf[rx_buf_start_temp];
     if ((*ucsrnb) & (1 << UCSZn2)) {
-        if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start)) {
+        if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start_temp)) {
             temp |= 0x0100;
         }
     }
@@ -234,19 +242,25 @@ int yh::rec::Usart::peek () {
 
 int yh::rec::Usart::read () {
     if (RX_INT_ABLE) {
+        uint8_t oldSREG = SREG;
+        noInterrupts();
+        uint8_t rx_buf_start_temp = rx_buf_start;
         // RXC is able to generate interrupts
-        if (rx_buf_start == rx_buf_end)
+        if ((rx_buf_start_temp == rx_buf_end) && (!rx_about_overflow))
             return -1;
-        uint16_t temp = rx_buf[rx_buf_start];
+        uint16_t temp = rx_buf[rx_buf_start_temp];
         if ((*ucsrnb) & (1 << UCSZn2)) {
-            if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start)) {
+            if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start_temp)) {
                 temp |= 0x0100;
             }
         }
-        rx_buf_start++;
-        if (rx_buf_start >= USART_RX_BUFFER_SIZE) {
-            rx_buf_start = 0;
+        rx_buf_start_temp++;
+        if (rx_buf_start_temp >= USART_RX_BUFFER_SIZE) {
+            rx_buf_start_temp = 0;
         }
+        rx_buf_start = rx_buf_start_temp;
+        rx_about_overflow = 0;
+        SREG = oldSREG;
         return static_cast<int>(temp);
     } else {
         // RXC is unable to generate interrupts
@@ -276,7 +290,7 @@ int yh::rec::Usart::availableForWrite () {
 void yh::rec::Usart::flush () {
     if (TX_INT_ABLE) {
         // UDRE is able to generate interrupts
-        while (tx_buf_start != tx_buf_end) {}
+        while ((tx_buf_start != tx_buf_end) || tx_about_overflow) {}
     } else {
         // UDRE is unable to generate interrupts
         // wait for transmit complete
@@ -286,12 +300,12 @@ void yh::rec::Usart::flush () {
 
 size_t yh::rec::Usart::write (uint8_t val) {
     tx_used = 1;
-    const uint8_t ucsrnb_val = (*ucsrnb);
     if (!TX_INT_ABLE) {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
         while (!((*ucsrna) & (1 << UDREn))) {}
     }
+    const uint8_t ucsrnb_val = (*ucsrnb);
     if ((*ucsrna) & (1 << UDREn)) {
         // data register is empty
         uint8_t oldSREG = SREG;
@@ -329,12 +343,12 @@ size_t yh::rec::Usart::write (uint8_t val) {
 
 size_t yh::rec::Usart::write (uint16_t val) {
     tx_used = 1;
-    const uint8_t ucsrnb_val = (*ucsrnb);
     if (!TX_INT_ABLE) {
         // UDRE is unable to generate interrupts
         // wait for data register to be empty
         while (!((*ucsrna) & (1 << UDREn))) {}
     }
+    const uint8_t ucsrnb_val = (*ucsrnb);
     if ((*ucsrna) & (1 << UDREn)) {
         // data register is empty
         uint8_t oldSREG = SREG;
@@ -449,11 +463,25 @@ void yh::rec::Usart::rx_isr () {
     }
     // check for errors
     const uint8_t err_flags = (ucsrna_val & ((1 << FEn) | (1 << DORn) | (1 << UPEn)));
-    int data_to_write = err_flags ? (rx_error_routine ? rx_error_routine(single_data, err_flags) : -1) : single_data;
+    int data_to_write = err_flags ? (rx_data_error ? rx_data_error(single_data, err_flags) : -1) : single_data;
     if (data_to_write >= 0) { // save the data
         // storing received data into buffer
         // load volatile mem to register
         uint8_t rx_buf_end_temp = rx_buf_end;
+        uint8_t rx_buf_start_temp = rx_buf_start;
+        if (rx_about_overflow && rx_buf_overflow) {
+            uint16_t temp = rx_buf[rx_buf_start_temp];
+            if ((*ucsrnb) & (1 << UCSZn2)) {
+                if (rx_buf_9_bit & (static_cast<uint64_t>(1UL) << rx_buf_start_temp)) {
+                    temp |= 0x0100;
+                }
+            }
+            rx_buf_start_temp++;
+            if (rx_buf_start_temp >= USART_RX_BUFFER_SIZE) {
+                rx_buf_start_temp = 0;
+            }
+            rx_buf_overflow(temp);
+        }
         if (ucsrnb_val & (1 << UCSZn2)) { // 9-bit data package
             if (data_to_write & (1 << 8)) {
                 // set the ninth-bit
@@ -469,7 +497,11 @@ void yh::rec::Usart::rx_isr () {
         if (rx_buf_end_temp >= USART_RX_BUFFER_SIZE) {
             rx_buf_end_temp = 0;
         }
+        if (rx_buf_end_temp == rx_buf_start_temp) {
+            rx_about_overflow = 1;
+        }
         rx_buf_end = rx_buf_end_temp;
+        rx_buf_start = rx_buf_start_temp;
     }
 }
 
