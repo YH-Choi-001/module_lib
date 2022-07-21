@@ -217,7 +217,10 @@ int yh::rec::Usart::available () {
         if (rx_about_overflow) {
             return USART_RX_BUFFER_SIZE;
         } else {
-            int unread_len = rx_buf_end + USART_RX_BUFFER_SIZE - rx_buf_start;
+            uint8_t oldSREG = SREG;
+            noInterrupts();
+            uint8_t unread_len = USART_RX_BUFFER_SIZE + rx_buf_end - rx_buf_start;
+            SREG = oldSREG;
             return (unread_len >= USART_RX_BUFFER_SIZE) ? (unread_len - USART_RX_BUFFER_SIZE) : unread_len;
         }
     } else {
@@ -279,8 +282,15 @@ int yh::rec::Usart::read () {
 int yh::rec::Usart::availableForWrite () {
     if (TX_INT_ABLE) {
         // UDRE is able to generate interrupts
-        int empty_len = USART_TX_BUFFER_SIZE - tx_buf_end + tx_buf_start;
-        return (empty_len >= USART_TX_BUFFER_SIZE) ? (empty_len - USART_TX_BUFFER_SIZE) : empty_len;
+        if (tx_about_overflow) {
+            return 0;
+        } else {
+            uint8_t oldSREG = SREG;
+            noInterrupts();
+            uint8_t empty_len = USART_TX_BUFFER_SIZE + tx_buf_start - tx_buf_end;
+            SREG = oldSREG;
+            return (empty_len > USART_TX_BUFFER_SIZE) ? (empty_len - USART_TX_BUFFER_SIZE) : empty_len;
+        }
     } else {
         // UDRE is unable to generate interrupts
         return ((*ucsrna) & (1 << UDREn)) ? 1 : 0;
