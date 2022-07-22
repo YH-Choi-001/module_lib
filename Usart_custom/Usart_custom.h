@@ -260,13 +260,7 @@ namespace yh {
         class Usart;
         class Usart_settings {
             private:
-                const uint32_t baud;
-                const uint8_t data_len : 3;
-                const uint8_t stop_bits : 1;
-                const uint8_t parity_bits : 2;
-                const uint8_t is_uart : 1;
-                const uint8_t is_master : 1;
-                const uint8_t clock_pol : 1;
+                uint8_t ucsrna, ucsrnb, ucsrnc, ubrrn, master_mode;
                 friend class Usart;
             public:
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
@@ -278,22 +272,201 @@ namespace yh {
                 // @param is_uart: 0 or 1 (false or true)
                 // @param clock_pol: 0 or 1 (0 is data-change on rising XCKn, data-sample on falling XCKn, vice versa)
                 Usart_settings (
-                    const uint32_t baud,
-                    const uint8_t data_len = 8,
-                    const uint8_t stop_bits = 1,
-                    const uint8_t parity_bits = 0,
-                    const uint8_t is_uart = 1,
-                    const uint8_t is_master = 0,
-                    const uint8_t clock_pol = 0
+                    uint32_t baud = 9600,
+                    uint8_t data_len = 8,
+                    uint8_t stop_bits = 1,
+                    uint8_t parity_bits = 0,
+                    uint8_t is_uart = 1,
+                    uint8_t is_master = 0,
+                    uint8_t clock_pol = 0
                 ) __attribute__((__always_inline__)) :
-                    baud(baud),
-                    data_len((data_len - 5) & 0b111),
-                    stop_bits((stop_bits - 1) & 0b1),
-                    parity_bits(parity_bits & 0b11),
-                    is_uart(is_uart != 0),
-                    is_master(is_master != 0),
-                    clock_pol(clock_pol != 0)
-                { }
+                    // pre-assign values to UCSRnX registers
+                    ucsrna(
+                        (0 << RXCn)  | // rx complete flag no need to be cleared
+                        (1 << TXCn)  | // clear tx complete flag
+                        (0 << UDREn) | // not to write data register empty flag
+                        (0 << FEn)   | // clear frame error flag
+                        (0 << DORn)  | // clear data overrun flag
+                        (0 << UPEn)  | // clear parity error flag
+                        (0 << U2Xn)  | // double speed flag to be set in baud rate config part
+                        (0 << MPCMn)   // clear multi-master flag by default (currently not supported)
+                    ),
+                    ucsrnb(
+                        (1 << RXCIEn) | // enable RXCn flag to generate interrupt by default
+                        (0 << TXCIEn) | // disable TXCn flag to generate interrupt by default (useless)
+                        (1 << UDRIEn) | // enable UDREn flag to generate interrupt by default
+                        (1 << RXENn)  | // enable receiver by default
+                        (1 << TXENn)  | // enable transmitter by default
+                        (0 << UCSZn2) | // 9-bit flag to be set in data frame config part
+                        (0 << RXB8n)  | // write a 0 to bits that have no writing permission
+                        (0 << TXB8n)    // clear 8th bit of 9-bit mode
+                    ),
+                    ucsrnc(
+                        (0 << UMSELn1) | // clear MSPIM flag as we are using the port as uart / usart
+                        (0 << UMSELn0) | // clear sync flag by default to select uart (asynchronous)
+                        (0 << UPMn1)   | // clear parity enable flag by default to disable parity bit
+                        (0 << UPMn0)   | // clear parity odd flag by default to disable parity bit
+                        (0 << USBSn)   | // clear 2-stop-bits flag by default to select 1 stop bit
+                        (1 << UCSZn1)  | // to be set in data frame config part
+                        (1 << UCSZn0)  | // to be set in data frame config part
+                        (0 << UCPOLn)    // to be set in data mode config part
+                    )
+                {
+                    double ubrrn_temp;
+                    // set baud rate
+                    if (is_uart) { // uart async normal mode
+                        // select uart
+                        // -----default selected: ucsrnc_temp &= ~(1 << UMSELn0);
+                        if (baud > (F_CPU / 16UL)) { // async double speed mode
+                            ubrrn_temp = F_CPU / 8 / static_cast<double>(baud) - 1;
+                            // enable async double speed mode
+                            ucsrna |= (1 << U2Xn);
+                        } else { // async normal mode
+                            ubrrn_temp = F_CPU / 16 / static_cast<double>(baud) - 1;
+                            // disable async double speed mode
+                            // -----default selected: ucsrna_temp &= ~(1 << U2Xn);
+                        }
+                        // XCKn pin is not involved in the communication bus, so we do not touch it
+                        // write clock polarity bit to 0
+                        ucsrnc &= ~(1 << UCPOLn);
+                    } else { // usart sync mode
+                        // select usart
+                        ucsrnc |= (1 << UMSELn0);
+                        // select clock polarity
+                        if (clock_pol) {
+                            ucsrnc |= (1 << UCPOLn);
+                        } else {
+                            // -----default selected: ucsrnc_temp &= ~(1 << UCPOLn);
+                        }
+                        if (is_master) { // sync master mode (or mpsim)
+                            master_mode = 1;
+                            ubrrn_temp = F_CPU / 2 / static_cast<double>(baud) - 1;
+                        } else {
+                            master_mode = 0;
+                            // sync slave mode
+                        }
+                    }
+                    ubrrn = static_cast<uint16_t>(ceil(ubrrn_temp));
+                    // set frame format (data frame and data mode)
+                    if (parity_bits) {
+                        // enable parity bits and select number of parity bits
+                        ucsrnc |= (1 << UPMn1);
+                        if (parity_bits & static_cast<uint8_t>(0b1)) {
+                            ucsrnc |= (1 << UPMn0);
+                        } else {
+                            // select even parity bits
+                            // -----default selected: ucsrnc &= ~(1 << UPMn0);
+                        }
+                    } else {
+                        // disable parity bits
+                        // -----default selected: ucsrnc_temp &= ~((1 << UPMn1) | (1 << UPMn0));
+                    }
+                    if (stop_bits == static_cast<uint8_t>(2U)) {
+                        // enable 2 stop bits
+                        ucsrnc |= (1 << USBSn);
+                    } else {
+                        // disable 2 stop bits to select 1 stop bit
+                        // -----default selected: ucsrnc_temp &= ~(1 << USBSn);
+                    }
+                    if (data_len == static_cast<uint8_t>(9U)) {
+                        // 9-bits
+                        // enable 9-bit
+                        ucsrnb |= (1 << UCSZn2);
+                        // select 9-bit
+                        ucsrnc |= (1 << UCSZn1) | (1 << UCSZn0);
+                    } else {
+                        // 5 to 8-bits
+                        // disable 9-bit
+                        // -----default selected: ucsrnb_temp &= ~(1 << UCSZn2);
+                        // select 5 to 8-bits
+                        ucsrnc |= (((data_len - static_cast<uint8_t>(5U)) & static_cast<uint8_t>(0b11)) << UCSZn0);
+                    }
+                }
+                // inline void set_syncing (const uint8_t is_sync);
+                // inline void set_baud_rate (const uint32_t baud);
+                // inline void set_clock_polarity (const uint8_t clock_pol);
+                // inline void set_parity_bits (const uint8_t parity_bits);
+                // inline void set_stop_bits (const uint8_t stop_bits);
+                // inline void set_data_len (const uint8_t data_len);
+                // inline void set_master_mode (const uint8_t is_master);
+                inline void set_syncing (const uint8_t is_sync) {
+                    if (is_sync)
+                        // sync mode
+                        ucsrnc |= (1 << UMSELn0);
+                    else
+                        // async mode
+                        ucsrnc &= ~(1 << UMSELn0);
+                }
+                inline void set_baud_rate (const uint32_t baud) {
+                    if (ucsrnc & (1 << UMSELn0)) {
+                        // sync mode
+                        ubrrn = static_cast<uint16_t>(ceil(F_CPU / 2 / static_cast<double>(baud) - 1));
+                    } else {
+                        // async mode
+                        if (baud > (F_CPU / 16UL)) { // async double speed mode
+                            ubrrn = static_cast<uint16_t>(ceil(F_CPU / 8 / static_cast<double>(baud) - 1));
+                            // enable async double speed mode
+                            ucsrna |= (1 << U2Xn);
+                        } else { // async normal mode
+                            ubrrn = static_cast<uint16_t>(ceil(F_CPU / 16 / static_cast<double>(baud) - 1));
+                            // disable async double speed mode
+                            ucsrna &= ~(1 << U2Xn);
+                        }
+                    }
+                }
+                inline void set_clock_polarity (const uint8_t clock_pol) {
+                    if (ucsrnc & (1 << UMSELn0)) {
+                        // sync mode
+                        // set clock polarity
+                        if (clock_pol) {
+                            ucsrnc |= (1 << UCPOLn);
+                        } else {
+                            ucsrnc &= ~(1 << UCPOLn);
+                        }
+                    }
+                }
+                inline void set_parity_bits (const uint8_t parity_bits) {
+                    if (parity_bits) {
+                        // enable parity bits and select number of parity bits
+                        ucsrnc |= (1 << UPMn1);
+                        if (parity_bits & static_cast<uint8_t>(0b1)) {
+                            ucsrnc |= (1 << UPMn0);
+                        } else {
+                            // select even parity bits
+                            ucsrnc &= ~(1 << UPMn0);
+                        }
+                    } else {
+                        // disable parity bits
+                        ucsrnc &= ~((1 << UPMn1) | (1 << UPMn0));
+                    }
+                }
+                inline void set_stop_bits (const uint8_t stop_bits) {
+                    if (stop_bits == static_cast<uint8_t>(2U)) {
+                        // enable 2 stop bits
+                        ucsrnc |= (1 << USBSn);
+                    } else {
+                        // disable 2 stop bits to select 1 stop bit
+                        ucsrnc &= ~(1 << USBSn);
+                    }
+                }
+                inline void set_data_len (const uint8_t data_len) {
+                    if (data_len == static_cast<uint8_t>(9U)) {
+                        // 9-bits
+                        // enable 9-bit
+                        ucsrnb |= (1 << UCSZn2);
+                        // select 9-bit
+                        ucsrnc |= (1 << UCSZn1) | (1 << UCSZn0);
+                    } else {
+                        // 5 to 8-bits
+                        // disable 9-bit
+                        ucsrnb &= ~(1 << UCSZn2);
+                        // select 5 to 8-bits
+                        ucsrnc |= (((data_len - static_cast<uint8_t>(5U)) & static_cast<uint8_t>(0b11)) << UCSZn0);
+                    }
+                }
+                inline void set_master_mode (const uint8_t is_master) {
+                    master_mode = is_master;
+                }
         };
         // data frame:
             // 1 start bit
@@ -330,18 +503,20 @@ namespace yh {
                 // // the bit mask of MISOn pin in its port
                 // const uint8_t mison_port_bit_mask;
 
+                #define BIT2BYTE(x) (x>>3)
+                #define BIT2BITMASK(x) (1<<(x&0b111))
                 // rx buffer
                 volatile uint8_t rx_buf [USART_RX_BUFFER_SIZE];
                 volatile uint64_t rx_buf_9_bit;
                 volatile uint8_t rx_buf_end; // ending index
                 volatile uint8_t rx_buf_start; // starting index
-                volatile uint8_t rx_about_overflow; // about to overflow flag
+                volatile uint8_t rx_buf_full; // rx buffer full flag
                 // tx buffer
                 volatile uint8_t tx_buf [USART_TX_BUFFER_SIZE];
                 volatile uint64_t tx_buf_9_bit;
                 volatile uint8_t tx_buf_end; // ending index
                 volatile uint8_t tx_buf_start; // starting index
-                volatile uint8_t tx_about_overflow; // about to overflow flag
+                volatile uint8_t tx_buf_full; // tx buffer full flag
 
                 // a flag to indicate whether the tx has sent data out since begin() is called
                 uint8_t tx_used;
@@ -401,11 +576,12 @@ namespace yh {
                 static int default_rx_data_error (uint16_t received_value, uint8_t ucsrna_err_flags) { return received_value = ucsrna_err_flags = -1; } // drops the error value
 
                 void (*rx_buf_overflow)(uint16_t removed_value); // pointer to function that is called when the rx_buffer overflows
-                static void default_rx_buf_overflow (uint16_t removed_value) { return; } // do nothing to drop the overflown value
+                static void default_rx_buf_overflow (uint16_t removed_value) { removed_value = 0; return; } // do nothing to drop the overflown value
 
                 // these are not intended to be called by users
                 void tx_ddr_empty_isr ();
                 void rx_isr ();
+                void rx_isr_light ();
         };
     }
 }
