@@ -151,7 +151,11 @@ uint16_t yh::rec::Encoder_1ch_pulse::get_spd_simple () {
     //     return 0;
     // return amplifying_factor / delta_time;
 
+    #if F_CPU == 16000000UL
+    const unsigned long maxloops = amplifying_factor;
+    #else
     const unsigned long maxloops = microsecondsToClockCycles(amplifying_factor)/16;
+    #endif
 
     const uint8_t sig_pin_prev_state = ((*sig_pin_in_reg) & sig_pin_mask);
     const uint8_t stateMask = (sig_pin_prev_state ^ sig_pin_mask);
@@ -212,12 +216,11 @@ void yh::rec::Encoder_2ch_pulse::begin () {
 }
 
 int16_t yh::rec::Encoder_2ch_pulse::get_spd_simple () {
-    // unsigned long delta_time = pulseIn(sig_pin, !digitalRead(sig_pin), amplifying_factor);
-    // if (delta_time == 0)
-    //     return 0;
-    // return amplifying_factor / delta_time;
-
+    #if F_CPU == 16000000UL
+    const unsigned long maxloops = amplifying_factor;
+    #else
     const unsigned long maxloops = microsecondsToClockCycles(amplifying_factor)/16;
+    #endif
 
     const uint8_t sig_pin_prev_state = ((*sig_pin_in_reg) & sig_pin_mask);
     const uint8_t stateMask = (sig_pin_prev_state ^ sig_pin_mask);
