@@ -4,6 +4,7 @@
 #if defined(ARDUINO) && !defined(Arduino_h)
 #include <Arduino.h>
 #endif // #if defined(ARDUINO) && !defined(Arduino_h)
+#include <wiring_private.h>
 
 //                      <-- anti-clockwise                      clockwise -->
 
@@ -451,6 +452,35 @@ namespace yh {
                     SREG = oldSREG;
                     return to_return;
                 }
+        };
+        class Encoder_1ch_pulse {
+            private:
+                const uint8_t sig_pin;
+                volatile uint8_t *sig_pin_in_reg;
+                uint8_t sig_pin_mask;
+                const uint32_t amplifying_factor;
+            public:
+                Encoder_1ch_pulse (const Encoder_1ch_pulse &init_obj);
+                Encoder_1ch_pulse (const uint8_t sig_pin, const uint16_t resolution = 255, const uint16_t shortest_sig_chng_time = 140);
+                void begin ();
+                uint16_t get_spd_simple ();
+                uint16_t get_spd_mean ();
+        };
+        class Encoder_2ch_pulse {
+            private:
+                const uint8_t sig_pin;
+                volatile uint8_t *sig_pin_in_reg;
+                uint8_t sig_pin_mask;
+                const uint8_t dir_pin;
+                volatile uint8_t *dir_pin_in_reg;
+                uint8_t dir_pin_mask;
+                const uint32_t amplifying_factor;
+            public:
+                Encoder_2ch_pulse (const Encoder_2ch_pulse &init_obj);
+                Encoder_2ch_pulse (const uint8_t sig_A_pin, const uint8_t sig_B_pin, const uint16_t resolution = 255, const uint16_t shortest_sig_chng_time = 140);
+                void begin ();
+                int16_t get_spd_simple ();
+                int16_t get_spd_mean ();
         };
     }
 }

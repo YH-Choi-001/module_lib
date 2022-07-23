@@ -46,6 +46,7 @@ void yh::rec::Encoder_2ch_timer_int::begin () {
     prev_B_state = (*signal_B_input_reg) & signal_B_mask;
 }
 
+/*
 yh::rec::Encoder_2ch_timer_int_light::Encoder_2ch_timer_int_light (const Encoder_2ch_timer_int_light &init_obj) :
     signal_A_pin(init_obj.signal_A_pin),
     signal_B_pin(init_obj.signal_B_pin),
@@ -78,6 +79,7 @@ void yh::rec::Encoder_2ch_timer_int_light::begin () {
     prev_A_state = (*signal_A_input_reg) & signal_A_mask;
     prev_B_state = (*signal_B_input_reg) & signal_B_mask;
 }
+//*/
 
 yh::rec::Encoder_2ch_ext_int::Encoder_2ch_ext_int (const Encoder_2ch_ext_int &init_obj) :
     signal_A_pin(init_obj.signal_A_pin),
@@ -115,6 +117,134 @@ void yh::rec::Encoder_2ch_ext_int::begin () {
     prev_A_state = (*signal_A_input_reg) & signal_A_mask;
     prev_B_state = (*signal_B_input_reg) & signal_B_mask;
     prev_time = micros();
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+yh::rec::Encoder_1ch_pulse::Encoder_1ch_pulse (const Encoder_1ch_pulse &init_obj) :
+    sig_pin(init_obj.sig_pin),
+    amplifying_factor(init_obj.amplifying_factor)
+{
+    //
+}
+
+yh::rec::Encoder_1ch_pulse::Encoder_1ch_pulse (const uint8_t sig_pin, const uint16_t resolution, const uint16_t shortest_sig_chng_time) :
+    sig_pin(sig_pin),
+    amplifying_factor(resolution * shortest_sig_chng_time)
+{
+    //
+}
+
+void yh::rec::Encoder_1ch_pulse::begin () {
+    pinMode(sig_pin, INPUT);
+    sig_pin_in_reg = portInputRegister(digitalPinToPort(sig_pin));
+    sig_pin_mask = digitalPinToBitMask(sig_pin);
+}
+
+uint16_t yh::rec::Encoder_1ch_pulse::get_spd_simple () {
+    // unsigned long delta_time = pulseIn(sig_pin, !digitalRead(sig_pin), amplifying_factor);
+    // if (delta_time == 0)
+    //     return 0;
+    // return amplifying_factor / delta_time;
+
+    const unsigned long maxloops = microsecondsToClockCycles(amplifying_factor)/16;
+
+    const uint8_t sig_pin_prev_state = ((*sig_pin_in_reg) & sig_pin_mask);
+    const uint8_t stateMask = (sig_pin_prev_state ^ sig_pin_mask);
+
+    const unsigned long width = countPulseASM(sig_pin_in_reg, sig_pin_mask, stateMask, maxloops);
+
+    if (width)
+        return amplifying_factor / clockCyclesToMicroseconds(width * 16 + 16);
+    else
+        return 0;
+}
+
+uint16_t yh::rec::Encoder_1ch_pulse::get_spd_mean () {
+    const unsigned long prev = micros();
+    uint32_t temp_spd = 0;
+    uint16_t i = 0;
+    while ((micros() - prev) < 10000) {
+        temp_spd += get_spd_simple();
+        i++;
+    }
+    uint16_t mean_spd = 0;
+    while (temp_spd >= i) {
+        temp_spd -= i;
+        mean_spd++;
+    }
+    return mean_spd;
+}
+
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------------------
+
+yh::rec::Encoder_2ch_pulse::Encoder_2ch_pulse (const Encoder_2ch_pulse &init_obj) :
+    sig_pin(init_obj.sig_pin),
+    dir_pin(init_obj.dir_pin),
+    amplifying_factor(init_obj.amplifying_factor)
+{
+    //
+}
+
+yh::rec::Encoder_2ch_pulse::Encoder_2ch_pulse (const uint8_t sig_A_pin, const uint8_t sig_B_pin, const uint16_t resolution, const uint16_t shortest_sig_chng_time) :
+    sig_pin(sig_A_pin),
+    dir_pin(sig_B_pin),
+    amplifying_factor(resolution * shortest_sig_chng_time)
+{
+    //
+}
+
+void yh::rec::Encoder_2ch_pulse::begin () {
+    pinMode(sig_pin, INPUT);
+    pinMode(dir_pin, INPUT);
+    sig_pin_in_reg = portInputRegister(digitalPinToPort(sig_pin));
+    sig_pin_mask = digitalPinToBitMask(sig_pin);
+    dir_pin_in_reg = portInputRegister(digitalPinToPort(dir_pin));
+    dir_pin_mask = digitalPinToBitMask(dir_pin);
+}
+
+int16_t yh::rec::Encoder_2ch_pulse::get_spd_simple () {
+    // unsigned long delta_time = pulseIn(sig_pin, !digitalRead(sig_pin), amplifying_factor);
+    // if (delta_time == 0)
+    //     return 0;
+    // return amplifying_factor / delta_time;
+
+    const unsigned long maxloops = microsecondsToClockCycles(amplifying_factor)/16;
+
+    const uint8_t sig_pin_prev_state = ((*sig_pin_in_reg) & sig_pin_mask);
+    const uint8_t stateMask = (sig_pin_prev_state ^ sig_pin_mask);
+
+    const unsigned long width = countPulseASM(sig_pin_in_reg, sig_pin_mask, stateMask, maxloops);
+
+    if (width) {
+        const int16_t absolute_spd = amplifying_factor / clockCyclesToMicroseconds(width * 16U + 16U);
+        if ((((*dir_pin_in_reg) & dir_pin_mask) ? 1 : 0) ^ (sig_pin_prev_state ? 1 : 0)) {
+            return -absolute_spd;
+        } else {
+            return absolute_spd;
+        }
+    } else {
+        return 0;
+    }
+}
+
+int16_t yh::rec::Encoder_2ch_pulse::get_spd_mean () {
+    const unsigned long prev = micros();
+    int32_t temp_spd = 0;
+    uint16_t i = 0;
+    while ((micros() - prev) < 10000) {
+        temp_spd += get_spd_simple();
+        i++;
+    }
+    return temp_spd / i;
 }
 
 #endif // #ifndef ENCODER_2CH_CPP
