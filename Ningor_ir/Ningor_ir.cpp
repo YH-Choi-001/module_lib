@@ -244,4 +244,72 @@ uint16_t yh::rec::Ningor_ir_filtered::get_ball_direction_filtered (const bool re
     return dir_of_ball_filtered;
 }
 
+const uint8_t IR_pin [12] = {
+    A0, A1, A2, A3, A4, A5, A6, A7, A8, A9, A10, A11
+};
+
+uint16_t calibration () {
+    uint16_t IR_mean_value[50];
+    // for i < 50 do
+    for (uint8_t i = 0; i < 50; i++) {
+        uint16_t IR_value_reference[12];
+        // for IR_number < 12 do
+        for (uint8_t IR_number = 0; IR_number < 12; IR_number++) {
+            // IR_value_reference[ IR_number ] = analogRead( IR_pin[ IR_number ] )
+            IR_value_reference[IR_number] = analogRead(IR_pin[IR_number]);
+        }
+        // uint16_t max = find_max( IR_value_reference );
+        // uint16_t min = find_min( IR_value_reference );
+        uint16_t max = 0;
+        uint16_t min = 0;
+        {
+            for (uint8_t idk_idx = 1; idk_idx < 12; idk_idx++) {
+                const uint16_t checking_val = IR_value_reference[idk_idx];
+                if (checking_val > IR_value_reference[max]) {
+                    max = idk_idx;
+                }
+                if (checking_val < IR_value_reference[min]) {
+                    min = idk_idx;
+                }
+            }
+        }
+        uint16_t IR_value_reference_total = 0;
+        // for j < 12 do
+        for (uint8_t j = 0; j < 12; j++) {
+            // if not( max , min ) do
+            if ((j != max) && (j != min)) {
+                // IR_value_reference_total += IR_value_reference[ j ]
+                IR_value_reference_total += IR_value_reference[j];
+            }
+        }
+        // IR_mean_value[ i ]= IR_value_reference_total / 12
+        IR_mean_value[i] = IR_value_reference_total / 12;
+    }
+    // max = find_max( IR_mean_value )
+    // min = find_min( IR_mean_value )
+    uint16_t max = 0;
+    uint16_t min = 0;
+    {
+        for (uint8_t idk_idx = 1; idk_idx < 50; idk_idx++) {
+            const uint16_t checking_val = IR_mean_value[idk_idx];
+            if (checking_val > IR_mean_value[max]) {
+                max = idk_idx;
+            }
+            if (checking_val < IR_mean_value[min]) {
+                min = idk_idx;
+            }
+        }
+    }
+    uint16_t IR_mean_value_total = 0;
+    // for z < 12 do
+    for (uint8_t z = 0; z < 12; z++) {
+        if ((z != max) && (z != min)) {
+            // IR_mean_value_total += IR_mean_value[ z ]
+            IR_mean_value_total += IR_mean_value[z];
+        }
+    }
+    uint16_t IR_mean = IR_mean_value_total / 12;
+    return IR_mean;
+}
+
 #endif // #ifndef NINGOR_IR_CPP

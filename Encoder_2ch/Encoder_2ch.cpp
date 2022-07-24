@@ -250,8 +250,8 @@ int16_t yh::rec::Encoder_2ch_pulse::get_spd_simple () {
 int16_t yh::rec::Encoder_2ch_pulse::get_spd_mean () {
     const unsigned long prev = micros();
     int32_t temp_spd = 0;
-    uint16_t i = 0;
-    while ((micros() - prev) < 10000) {
+    uint8_t i = 0;
+    while ((micros() - prev) < 2500) {
         temp_spd += get_spd_simple();
         i++;
     }
