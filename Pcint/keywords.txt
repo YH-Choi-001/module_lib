@@ -1,3 +1,7 @@
+yh				KEYWORD1
+rec				KEYWORD1
+pcints				KEYWORD1
+
 enable_pcint_on_specific_pin	KEYWORD2
 disable_pcint_on_specific_pin	KEYWORD2
 enable_pcint_num		KEYWORD2

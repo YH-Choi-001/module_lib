@@ -3,7 +3,7 @@
 
 #include "Pcint.h"
 
-void enable_pcint_on_specific_pin (const uint8_t pin) {
+void yh::rec::pcints::enable_pcint_on_specific_pin (const uint8_t pin) {
     // Pin Change Interrupt - single pin Mask
     (*digitalPinToPCMSK(pin)) |= (1 << digitalPinToPCMSKbit(pin));  // enable specific pin in the PCINT group to trigger the interrupt
     // Pin Change Interrupt Flag Register
@@ -13,7 +13,7 @@ void enable_pcint_on_specific_pin (const uint8_t pin) {
     PCICR |= (1 << digitalPinToPCICRbit(pin)); // enable interrupt for the group
 }
 
-void disable_pcint_on_specific_pin (const uint8_t pin) {
+void yh::rec::pcints::disable_pcint_on_specific_pin (const uint8_t pin) {
     // Pin Change Interrupt - single pin Mask
     (*digitalPinToPCMSK(pin)) &= ~(1 << digitalPinToPCMSKbit(pin));  // disable specific pin in the PCINT group to trigger the interrupt
     if (!(*digitalPinToPCMSK(pin))) {
@@ -21,7 +21,7 @@ void disable_pcint_on_specific_pin (const uint8_t pin) {
     }
 }
 
-void enable_pcint_num (const uint8_t pcint_num) {
+void yh::rec::pcints::enable_pcint_num (const uint8_t pcint_num) {
     // switch (pcint_num / 8) {
     switch (pcint_num >> 3) {
         #ifdef PCMSK0
@@ -47,7 +47,7 @@ void enable_pcint_num (const uint8_t pcint_num) {
     }
 }
 
-void disable_pcint_num (const uint8_t pcint_num) {
+void yh::rec::pcints::disable_pcint_num (const uint8_t pcint_num) {
     // switch (pcint_num / 8) {
     switch (pcint_num >> 3) {
         #ifdef PCMSK0
