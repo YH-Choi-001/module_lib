@@ -227,9 +227,17 @@ int16_t yh::rec::Encoder_2ch_pulse::get_spd_simple () {
 
     const unsigned long width = countPulseASM(sig_pin_in_reg, sig_pin_mask, stateMask, maxloops);
 
+    const uint8_t dir_pin_curr_state = ((*dir_pin_in_reg) & dir_pin_mask);
+
     if (width) {
-        const int16_t absolute_spd = amplifying_factor / clockCyclesToMicroseconds(width * 16U + 16U);
-        if ((((*dir_pin_in_reg) & dir_pin_mask) ? 1 : 0) ^ (sig_pin_prev_state ? 1 : 0)) {
+        uint32_t numerator = amplifying_factor;
+        int16_t absolute_spd = 0;
+        const unsigned long actual_time = clockCyclesToMicroseconds(width * 16U + 16U);
+        while (numerator >= actual_time) {
+            numerator -= actual_time;
+            absolute_spd++;
+        }
+        if ((dir_pin_curr_state ? 1 : 0) ^ (sig_pin_prev_state ? 1 : 0)) {
             return -absolute_spd;
         } else {
             return absolute_spd;
