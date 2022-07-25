@@ -238,9 +238,9 @@ int16_t yh::rec::Encoder_2ch_pulse::get_spd_simple () {
             absolute_spd++;
         }
         if ((dir_pin_curr_state ? 1 : 0) ^ (sig_pin_prev_state ? 1 : 0)) {
-            return -absolute_spd;
-        } else {
             return absolute_spd;
+        } else {
+            return -absolute_spd;
         }
     } else {
         return 0;
