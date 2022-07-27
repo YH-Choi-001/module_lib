@@ -19,7 +19,7 @@ yh::rec::CompoI::CompoI (const uint8_t init_i2c_address) :
 }
 
 void yh::rec::CompoI::begin () {
-    // init settings to the GY-521 module through I2C
+    // init settings for I2C
     if (!(TWCR & (1 << TWEN))) { // if (TwoWireENable bit is off) { begin I2C communication }
         Wire.begin();
         Wire.setClock(400000); // set I2C to fast mode for faster communication
@@ -27,7 +27,7 @@ void yh::rec::CompoI::begin () {
 }
 
 uint8_t yh::rec::CompoI::get_channel_val (const uint8_t channel) {
-    return command((channel < 5) ? (5 - channel) : (12 - channel));
+    return command(((channel < 5) ? (5) : (12)) - channel);
 }
 
 uint8_t yh::rec::CompoI::get_max_idx () {
