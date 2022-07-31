@@ -4,6 +4,10 @@
 #include <Arduino.h>
 #include <Wire.h>
 
+#ifndef NC_PINNO
+#define NC_PINNO 255
+#endif
+
 namespace yh {
     namespace rec {
         struct Mag_field_raw_t {
@@ -14,14 +18,21 @@ namespace yh {
         };
         class Qmc5883l {
             private:
-                //
+                // the 7-bit I2C address of the chip [0x00:0x7f]
                 const uint8_t i2c_address;
+                // pins that cannot be changed:
+                // DRDY pin (data ready pin) (HIGH for ready, LOW for not ready)
+                const uint8_t drdy_pin;
+                volatile uint8_t *drdy_pin_in_reg;
+                uint8_t drdy_pin_mask;
+                // stores the heading of the compass
+                uint16_t heading;
             public:
                 // for compass calibration use only
                 int16_t x_range, x_min, y_range, y_min;
                 uint16_t re_zero_heading;
                 //
-                Qmc5883l (const uint8_t init_i2c_address = 0x0D);
+                Qmc5883l (const uint8_t init_i2c_address = 0x0D, const uint8_t init_drdy_pin = NC_PINNO);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // configures the settings of the I2C bus and the chip
                 void begin ();

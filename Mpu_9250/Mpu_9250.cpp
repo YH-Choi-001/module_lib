@@ -82,6 +82,13 @@ uint8_t yh::rec::Ak_8963::who_i_am () {
     return 0;
 }
 
+void yh::rec::Ak_8963::soft_reset () {
+    Wire.beginTransmission(i2c_address); // talk to AK8963
+    Wire.write(0x0B); // accessing the register 0x0B - CNTL2 register
+    Wire.write(1 << 0); // writes 1 to SRST bit to reset the chip in software
+    Wire.endTransmission();
+}
+
 void yh::rec::Ak_8963::single_calibrate () {
     update_raw();
     // update max values

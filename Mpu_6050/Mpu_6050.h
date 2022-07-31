@@ -133,7 +133,7 @@ namespace yh {
                 // the correction subtracted from every reading from the chip
                 double corr_roll, corr_pitch, corr_yaw;
                 // inits the 7-bit I2C address of the chip to init_i2c_address
-                Mpu_6050 (const uint8_t init_i2c_address);
+                Mpu_6050 (const uint8_t init_i2c_address = 0x68);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // configures the settings of the I2C bus and the chip
                 virtual void begin ();

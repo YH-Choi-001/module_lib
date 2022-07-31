@@ -56,7 +56,7 @@ namespace yh {
                 // the return-to-zero heading
                 double rz_heading;
                 // inits the 7-bit I2C address of the chip to init_i2c_address
-                Ak_8963 (const uint8_t init_i2c_address);
+                Ak_8963 (const uint8_t init_i2c_address = 0x0C);
                 // YOU MUST CALL ME IN void setup () FUNCTION TO USE THIS OBJECT PROPERLY
                 // configures the settings of the I2C bus and the chip
                 void begin ();
@@ -64,6 +64,9 @@ namespace yh {
                 // gets the WIA value to clarify whether this chip is ak8963
                 // if the chip is ak8963, the returned value should be 0x48
                 uint8_t who_i_am ();
+
+                // resets the AK8963 in software
+                void soft_reset ();
 
                 // calibrates the magnetometer, and give the mean values to x_mean, y_mean, z_mean for compass usage
                 // ATTENTION: WHEN MAGNETOMETER CALIBRATION IS IN PROGRESS, SWING THE CHIP IN ALL DIRECTIONS OF X, Y AND Z.
@@ -85,7 +88,7 @@ namespace yh {
                 // the AK-8963 magnetometer object inside the MPU-9250 chip
                 Ak_8963 mag;
                 //
-                Mpu_9250 (const uint8_t init_i2c_address);
+                Mpu_9250 (const uint8_t init_i2c_address = 0x68);
         };
 
     }
