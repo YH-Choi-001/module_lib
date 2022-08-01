@@ -32,8 +32,9 @@ No arguments should be inputed when calling this function.
 Syntax: `uint8_t who_am_i = mpu.who_am_i();`  
 This `who_am_i()` function asks the chip to give a value to identify itself.  
 The value returned by this method can tell you whether this chip is MPU6500 or MPU9250.  
-If the value returned by this function is 0x70 (or 106 in decimal), then this chip is MPU6500.  
-If the value returned by this function is 0x71 (or 107 in decimal), then this chip is MPU9250.  
+If the value returned by this function is 0x70 (or 112 in decimal), then this chip is MPU6500.  
+If the value returned by this function is 0x71 (or 113 in decimal), then this chip is MPU9250.  
+If the value returned by this function is 0x73 (or 115 in decimal), then this chip is MPU9255.  
   
 4. **`volatile double yh::rec::Mpu_6500::d_roll, yh::rec::Mpu_6500::d_pitch, yh::rec::Mpu_6500::d_yaw` members**  
 These 3 members with the data type of `double` stores the instantaneous difference in roll, pitch and yaw axes of the chip.  
