@@ -56,25 +56,31 @@ This `who_i_am()` function asks the chip to give a value to identify itself.
 The value returned by this method can tell you whether this chip is AK-8963 or not.  
 If the value returned by this function is 0x48 (or 72 in decimal), then this chip is AK-8963.  
   
-8. **`void yh::rec::Ak_8963::single_calibrate ()` method**  
+8. **`uint8_t yh::rec::Ak_8963::soft_reset ()` method**  
+Syntax: `mag.soft_reset();` (or `gy9250.mag.soft_reset();` for GY-9250 users)  
+This `soft_reset()` function resets the chip in software manner.  
+You should call `mag.begin();` (or `gy9250.mag.begin();` for GY-9250 users) after calling this function to re-initialize settings to the chip.  
+You may call this function when you find the readings of the chip abnormal.  
+  
+9. **`void yh::rec::Ak_8963::single_calibrate ()` method**  
 Syntax: `mag.single_calibrate();` (or `gy9250.mag.single_calibrate();` for GY-9250 users)  
 This `single_calibrate()` function calibrates the magnetometer for 1 time.  
 You should call this method in a for-loop for hundreds or thousands times, depending on your preference for the precision required.  
 The calibrated data only helps give a relatively-zero value to each axis for direction-finding when using AK-8963 as a compass.  
 These data do not do anything if you intended to collect the strength of magnetic field only.  
   
-9. **`void yh::rec::Ak_8963::reset_heading ()` method**  
+10. **`void yh::rec::Ak_8963::reset_heading ()` method**  
 Syntax: `mag.reset_heading();` (or `gy9250.mag.reset_heading();` for GY-9250 users)  
 This `reset_heading()` function sets the instantaneous heading as a relative-zero.  
 The `get_heading()` method will return the heading of the chip with respect to this relative-zero set.  
 It is advised to call this method before every kick-off in a RCJ-soccer tournament.  
   
-10. **`double yh::rec::Ak_8963::get_heading ()` method**  
+11. **`double yh::rec::Ak_8963::get_heading ()` method**  
 Syntax: `double heading = mag.get_heading();` (or `double heading = gy9250.mag.get_heading();` for GY-9250 users)  
 This `get_heading()` function gets the heading of the chip, taking the relative-zero direction as 0.  
 The value returned ranges from 0 to 359.99999999 degrees, and increases clockwisely.  
   
-11. **`double yh::rec::Ak_8963::rz_heading` member**  
+12. **`double yh::rec::Ak_8963::rz_heading` member**  
 Syntax: `mag.rz_heading = 351.12;` (or `gy9250.mag.rz_heading = 351.12;` for GY-9250 users)  
 The `get_heading()` method takes the direction indicated by `rz_heading` as 0.  
 You may write `0` to this member to get the true heading of the world.  
