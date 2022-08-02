@@ -25,11 +25,13 @@ namespace yh {
                 const uint8_t drdy_pin;
                 volatile uint8_t *drdy_pin_in_reg;
                 uint8_t drdy_pin_mask;
+                // stores the raw values of field strength in each axis
+                Mag_field_raw_t raw_data;
                 // stores the heading of the compass
                 uint16_t heading;
             public:
                 // for compass calibration use only
-                int16_t x_range, x_min, y_range, y_min;
+                int16_t x_range, x_min, y_range, y_min, z_range, z_min;
                 uint16_t re_zero_heading;
                 //
                 Qmc5883l (const uint8_t init_i2c_address = 0x0D, const uint8_t init_drdy_pin = NC_PINNO);
@@ -39,8 +41,10 @@ namespace yh {
 
                 // low-level functions
 
-                // @brief resets the QMC5883L in software
+                // @brief Resets the QMC5883L in software.
                 void soft_reset ();
+                // @brief Updates new data from the QMC5883L.
+                bool update ();
                 // @return The raw value recorded by the magnetometer in the x axis.
                 int16_t get_raw_x ();
                 // @return The raw value recorded by the magnetometer in the y axis.
@@ -65,7 +69,7 @@ namespace yh {
                 // high-level functions
 
                 // @brief calibrate the compass
-                void compass_cal (uint16_t cal_times = 4000);
+                void compass_cal ();
                 // @brief takes the current heading of compass as zero
                 void reset_heading ();
                 // @return the heading of compass in degrees [0:359]

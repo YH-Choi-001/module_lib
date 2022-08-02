@@ -67,58 +67,66 @@ void yh::rec::Qmc5883l::soft_reset () {
     Wire.endTransmission();
 }
 
+bool yh::rec::Qmc5883l::update () {
+    if (drdy_pin != NC_PINNO) {
+        if ((*drdy_pin_in_reg) & drdy_pin_mask) {
+            Wire.beginTransmission(i2c_address); // address QMC5883L compass
+            Wire.write(0x00); // select register 0x00 - XOUT_L
+            Wire.endTransmission();
+            Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U)); // request 6 bytes from compass
+            const uint8_t xlow = Wire.available() ? Wire.read() : 0;
+            const uint8_t xhigh = Wire.available() ? Wire.read() : 0;
+            raw_data.x = (xhigh << 8) | xlow;
+            const uint8_t ylow = Wire.available() ? Wire.read() : 0;
+            const uint8_t yhigh = Wire.available() ? Wire.read() : 0;
+            raw_data.y = (yhigh << 8) | ylow;
+            const uint8_t zlow = Wire.available() ? Wire.read() : 0;
+            const uint8_t zhigh = Wire.available() ? Wire.read() : 0;
+            raw_data.z = (zhigh << 8) | zlow;
+            return true;
+        }
+    } else {
+        Wire.beginTransmission(i2c_address); // address QMC5883L compass
+        Wire.write(0x06); // select register 0x06 - Status Register
+        Wire.endTransmission();
+        Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
+        const uint8_t status = Wire.read();
+        if (status & (1 << 2)) { // check if new data is ready
+            if (!(status & (1 << 1))) { // check if overflow does not occur
+                Wire.beginTransmission(i2c_address); // address QMC5883L compass
+                Wire.write(0x00); // select register 0x00 - XOUT_L
+                Wire.endTransmission();
+                Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U)); // request 6 bytes from compass
+                const uint8_t xlow = Wire.available() ? Wire.read() : 0;
+                const uint8_t xhigh = Wire.available() ? Wire.read() : 0;
+                raw_data.x = (xhigh << 8) | xlow;
+                const uint8_t ylow = Wire.available() ? Wire.read() : 0;
+                const uint8_t yhigh = Wire.available() ? Wire.read() : 0;
+                raw_data.y = (yhigh << 8) | ylow;
+                const uint8_t zlow = Wire.available() ? Wire.read() : 0;
+                const uint8_t zhigh = Wire.available() ? Wire.read() : 0;
+                raw_data.z = (zhigh << 8) | zlow;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
 int16_t yh::rec::Qmc5883l::get_raw_x () {
-    Wire.beginTransmission(i2c_address); // address QMC5883L compass
-    Wire.write(0x00); // select register 0x00 - XOUT_L
-    Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U)); // request 2 bytes from compass
-    uint8_t low = Wire.available() ? Wire.read() : 0;
-    uint8_t high = Wire.available() ? Wire.read() : 0;
-    return (high << 8) | low;
+    return raw_data.x;
 }
 
 int16_t yh::rec::Qmc5883l::get_raw_y () {
-    Wire.beginTransmission(i2c_address); // address QMC5883L compass
-    Wire.write(0x02); // select register 0x00 - YOUT_L
-    Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U)); // request 2 bytes from compass
-    uint8_t low = Wire.available() ? Wire.read() : 0;
-    uint8_t high = Wire.available() ? Wire.read() : 0;
-    return (high << 8) | low;
+    return raw_data.y;
 }
 
 int16_t yh::rec::Qmc5883l::get_raw_z () {
-    Wire.beginTransmission(i2c_address); // address QMC5883L compass
-    Wire.write(0x04); // select register 0x04 - ZOUT_L
-    Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(2U)); // request 2 bytes from compass
-    uint8_t low = Wire.available() ? Wire.read() : 0;
-    uint8_t high = Wire.available() ? Wire.read() : 0;
-    return (high << 8) | low;
+    return raw_data.z;
 }
 
 yh::rec::Mag_field_raw_t yh::rec::Qmc5883l::get_raw_mag () {
-    Wire.beginTransmission(i2c_address); // address QMC5883L compass
-    Wire.write(0x00); // select register 0x00 - XOUT_L
-    Wire.endTransmission();
-    Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U)); // request 6 bytes from compass
-    yh::rec::Mag_field_raw_t temp;
-    {
-        uint8_t low = Wire.available() ? Wire.read() : 0;
-        uint8_t high = Wire.available() ? Wire.read() : 0;
-        temp.x = (high << 8) | low;
-    }
-    {
-        uint8_t low = Wire.available() ? Wire.read() : 0;
-        uint8_t high = Wire.available() ? Wire.read() : 0;
-        temp.y = (high << 8) | low;
-    }
-    {
-        uint8_t low = Wire.available() ? Wire.read() : 0;
-        uint8_t high = Wire.available() ? Wire.read() : 0;
-        temp.z = (high << 8) | low;
-    }
-    return temp;
+    return raw_data;
 }
 
 int16_t yh::rec::Qmc5883l::get_raw_temperature () {
@@ -157,35 +165,43 @@ double yh::rec::Qmc5883l::get_uT_z () {
 
 yh::rec::Mag_field_uT_t yh::rec::Qmc5883l::get_uT_mag () {
     Mag_field_uT_t temp;
-    Mag_field_raw_t raw = get_raw_mag();
     #if (RNG == RNG_8G)
-    temp.x = raw.x / 3000.0;
-    temp.y = raw.y / 3000.0;
-    temp.z = raw.z / 3000.0;
+    temp.x = raw_data.x / 3000.0;
+    temp.y = raw_data.y / 3000.0;
+    temp.z = raw_data.z / 3000.0;
     #else // (RNG == RNG_2G)
-    temp.x = raw.x / 12000.0;
-    temp.y = raw.y / 12000.0;
-    temp.z = raw.z / 12000.0;
+    temp.x = raw_data.x / 12000.0;
+    temp.y = raw_data.y / 12000.0;
+    temp.z = raw_data.z / 12000.0;
     #endif
     return temp;
 }
 
-void yh::rec::Qmc5883l::compass_cal (uint16_t cal_times) {
-    int16_t x_max_temp = -32768, x_min_temp = 32767, y_max_temp = -32768, y_min_temp = 32767;
-    for (uint16_t i = 0; i < cal_times; i++) {
+void yh::rec::Qmc5883l::compass_cal () {
+    int16_t
+        x_max_temp = -32768,
+        x_min_temp = 32767,
+        y_max_temp = -32768,
+        y_min_temp = 32767,
+        z_max_temp = -32768,
+        z_min_temp = 32767;
+    unsigned long prev = millis();
+    while ((millis() - prev) < 5000) {
         Wire.beginTransmission(i2c_address); // address QMC5883L compass
         Wire.write(0x00); // select register 0x00 - XOUT_L
         Wire.endTransmission();
-        Wire.requestFrom(i2c_address, static_cast<uint8_t>(4U)); // request 4 bytes from compass
+        Wire.requestFrom(i2c_address, static_cast<uint8_t>(6U)); // request 6 bytes from compass
         {
             const uint8_t xlow = Wire.available() ? Wire.read() : 0;
             const uint8_t xhigh = Wire.available() ? Wire.read() : 0;
             const int16_t x = (xhigh << 8) | xlow;
             if (x > x_max_temp) {
                 x_max_temp = x;
+                prev = millis();
             }
             if (x < x_min_temp) {
                 x_min_temp = x;
+                prev = millis();
             }
         }
         {
@@ -194,9 +210,24 @@ void yh::rec::Qmc5883l::compass_cal (uint16_t cal_times) {
             const int16_t y = (yhigh << 8) | ylow;
             if (y > y_max_temp) {
                 y_max_temp = y;
+                prev = millis();
             }
             if (y < y_min_temp) {
                 y_min_temp = y;
+                prev = millis();
+            }
+        }
+        {
+            const uint8_t zlow = Wire.available() ? Wire.read() : 0;
+            const uint8_t zhigh = Wire.available() ? Wire.read() : 0;
+            const int16_t z = (zhigh << 8) | zlow;
+            if (z > z_max_temp) {
+                z_max_temp = z;
+                prev = millis();
+            }
+            if (z < z_min_temp) {
+                z_min_temp = z;
+                prev = millis();
             }
         }
     }
@@ -204,6 +235,8 @@ void yh::rec::Qmc5883l::compass_cal (uint16_t cal_times) {
     x_min = x_min_temp;
     y_range = y_max_temp - y_min_temp;
     y_min = y_min_temp;
+    z_range = z_max_temp - z_min_temp;
+    z_min = z_min_temp;
 }
 
 void yh::rec::Qmc5883l::reset_heading () {
@@ -212,19 +245,8 @@ void yh::rec::Qmc5883l::reset_heading () {
 }
 
 uint16_t yh::rec::Qmc5883l::get_heading () {
-    if (drdy_pin != NC_PINNO) {
-        if ((*drdy_pin_in_reg) & drdy_pin_mask) {
-            Wire.beginTransmission(i2c_address); // address QMC5883L compass
-            Wire.write(0x00); // select register 0x00 - XOUT_L
-            Wire.endTransmission();
-            Wire.requestFrom(i2c_address, static_cast<uint8_t>(4U)); // request 4 bytes from compass
-            const uint8_t xlow = Wire.available() ? Wire.read() : 0;
-            const uint8_t xhigh = Wire.available() ? Wire.read() : 0;
-            const int16_t x = (xhigh << 8) | xlow;
-            const uint8_t ylow = Wire.available() ? Wire.read() : 0;
-            const uint8_t yhigh = Wire.available() ? Wire.read() : 0;
-            const int16_t y = (yhigh << 8) | ylow;
-            int16_t temp_heading = 360 - atan2(static_cast<double>((y - y_min) * 2) / y_range - 1, static_cast<double>((x - x_min) * 2) / x_range - 1) * RAD_TO_DEG;
+    if (update()) {
+        int16_t temp_heading = atan2(static_cast<double>((raw_data.y - y_min) * 2) / y_range - 1, static_cast<double>((raw_data.x - x_min) * 2) / x_range - 1) * RAD_TO_DEG;
             temp_heading -= re_zero_heading;
             if (temp_heading < 0) {
                 temp_heading += 360;
@@ -233,36 +255,6 @@ uint16_t yh::rec::Qmc5883l::get_heading () {
                 temp_heading -= 360;
             }
             return (heading = temp_heading);
-        }
-    } else {
-        Wire.beginTransmission(i2c_address); // address QMC5883L compass
-        Wire.write(0x06); // select register 0x06 - Status Register
-        Wire.endTransmission();
-        Wire.requestFrom(i2c_address, static_cast<uint8_t>(1U));
-        const uint8_t status = Wire.read();
-        if (status & (1 << 2)) { // check if new data is ready
-            if (!(status & (1 << 1))) { // check if overflow does not occur
-                Wire.beginTransmission(i2c_address); // address QMC5883L compass
-                Wire.write(0x00); // select register 0x00 - XOUT_L
-                Wire.endTransmission();
-                Wire.requestFrom(i2c_address, static_cast<uint8_t>(4U)); // request 4 bytes from compass
-                const uint8_t xlow = Wire.available() ? Wire.read() : 0;
-                const uint8_t xhigh = Wire.available() ? Wire.read() : 0;
-                const int16_t x = (xhigh << 8) | xlow;
-                const uint8_t ylow = Wire.available() ? Wire.read() : 0;
-                const uint8_t yhigh = Wire.available() ? Wire.read() : 0;
-                const int16_t y = (yhigh << 8) | ylow;
-                int16_t temp_heading = 360 - atan2(static_cast<double>((y - y_min) * 2) / y_range - 1, static_cast<double>((x - x_min) * 2) / x_range - 1) * RAD_TO_DEG;
-                temp_heading -= re_zero_heading;
-                if (temp_heading < 0) {
-                    temp_heading += 360;
-                }
-                if (temp_heading >= 360) {
-                    temp_heading -= 360;
-                }
-                return (heading = temp_heading);
-            }
-        }
     }
     return heading;
 }
