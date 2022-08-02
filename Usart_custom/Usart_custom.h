@@ -2,6 +2,7 @@
 #define USART_CUSTOM_H __DATE__ ", " __TIME__
 
 #include <Arduino.h>
+#include <Stream.h>
 
 // UCSRnA:
 
@@ -473,7 +474,7 @@ namespace yh {
             // 5, 6, 7, 8 or 9 data bits
             // no, even or odd parity bits
             // 1 or 2 stop bits
-        class Usart : public Print {
+        class Usart : public Stream {
             private:
                 //
             protected:
